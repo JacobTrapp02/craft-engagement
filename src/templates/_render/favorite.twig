@@ -1,0 +1,140 @@
+{% set widgetUid = random() %}
+{% set widgetElementId = elementId ?? null %}
+{% set widgetFieldId = fieldId ?? null %}
+{% set widgetSiteId = siteId ?? craft.app.sites.currentSite.id %}
+{% set widgetScale = scale ?? 5 %}
+{% set widgetActionUrl = actionUrl ?? actionUrl('engagement/ratings/cast-rating') %}
+{% set widgetAverage = average ?? 0 %}
+{% set widgetDisplayAverage = ((widgetAverage * 4)|round) / 4 %}
+{% set widgetIsLoggedIn = isLoggedIn ?? false %}
+{% set widgetUserRating = userRating ?? null %}
+{% set widgetLoginUrl = loginUrl ?? url('login') %}
+
+{% set emptyStars %}{% for _ in 1..widgetScale %}☆{% endfor %}{% endset %}
+{% set filledStars %}{% for _ in 1..widgetScale %}★{% endfor %}{% endset %}
+{% set fillPercent = (widgetUserRating is not null and widgetScale > 0) ? (widgetDisplayAverage / widgetScale * 100) : 0 %}
+
+{% if widgetElementId and widgetFieldId %}
+  <div
+    data-engagement-rating
+    data-rating-uid="{{ widgetUid }}"
+    data-element-id="{{ widgetElementId|e('html_attr') }}"
+    data-field-id="{{ widgetFieldId|e('html_attr') }}"
+    data-site-id="{{ widgetSiteId|e('html_attr') }}"
+    data-action-url="{{ widgetActionUrl|e('html_attr') }}"
+    data-login-url="{{ widgetLoginUrl|e('html_attr') }}"
+    data-is-logged-in="{{ widgetIsLoggedIn ? '1' : '0' }}"
+    data-scale="{{ widgetScale|e('html_attr') }}"
+    style="text-align:center;"
+  >
+    <div data-overall-wrap>
+      <div style="display:inline-block; position:relative; font-size:24px; line-height:1; letter-spacing:1px; margin-bottom:8px;">
+        <span style="color:#cbd5e1;">{{ emptyStars }}</span>
+        <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; color:#f59e0b; width:{{ fillPercent }}%;">{{ filledStars }}</span>
+        <div data-rating-stars style="position:absolute; inset:0; display:flex; justify-content:center; gap:6px; align-items:center;">
+          {% for value in 1..widgetScale %}
+            <button
+              type="button"
+              data-rating-value="{{ value }}"
+              aria-label="{{ 'Rate {value}'|t('engagement', { value: value }) }}"
+              style="border:none; background:transparent; padding:0; cursor:pointer; line-height:1; font-size:28px; opacity:0;"
+            >
+              ★
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div data-rating-user style="font-size:13px; color:#334155; min-height:18px;">
+      {% if widgetUserRating is not null %}
+        {{ 'Your rating:'|t('engagement') }} {{ widgetUserRating }} / {{ widgetScale }}
+      {% else %}
+        {{ 'Click to rate'|t('engagement') }}
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+  (() => {
+    const root = document.querySelector('[data-engagement-rating][data-rating-uid="{{ widgetUid }}"]');
+    if (!root) {
+      return;
+    }
+
+    const buttons = root.querySelectorAll('[data-rating-value]');
+    const userEl = root.querySelector('[data-rating-user]');
+    const overallFillEl = root.querySelector('[data-overall-fill]');
+
+    const scale = Number(root.getAttribute('data-scale') || 5);
+    const actionUrl = root.getAttribute('data-action-url');
+    const loginUrl = root.getAttribute('data-login-url') || '/login';
+    const isLoggedIn = root.getAttribute('data-is-logged-in') === '1';
+    const elementId = Number(root.getAttribute('data-element-id'));
+    const fieldId = Number(root.getAttribute('data-field-id'));
+    const siteId = Number(root.getAttribute('data-site-id'));
+
+    let selected = Number({{ widgetUserRating is not null ? widgetUserRating : 0 }});
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!isLoggedIn) {
+          const goLogin = window.confirm({{ 'Please log in to rate this.'|t('engagement')|json_encode|raw }});
+          if (goLogin) {
+            window.location.href = loginUrl;
+          }
+          return;
+        }
+
+        if (!actionUrl || !elementId || !fieldId) {
+          return;
+        }
+
+        const value = Number(btn.getAttribute('data-rating-value'));
+        if (!value || value < 1 || value > scale) {
+          return;
+        }
+
+        try {
+          const response = await fetch(actionUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'X-CSRF-Token': {{ craft.app.request.csrfToken|json_encode|raw }},
+            },
+            body: JSON.stringify({ elementId, fieldId, siteId, rating: value }),
+          });
+
+          if (!response.ok) {
+            if (userEl) {
+              userEl.textContent = {{ 'Could not submit rating right now.'|t('engagement')|json_encode|raw }};
+            }
+            return;
+          }
+
+          const data = await response.json();
+          selected = Number(data?.vote?.rating || value);
+
+          if (userEl) {
+            userEl.textContent = {{ 'Your rating:'|t('engagement')|json_encode|raw }} + ' ' + selected + ' / ' + scale;
+          }
+
+          if (data?.aggregate && overallFillEl) {
+            const avgRaw = Number(data.aggregate.average ?? data.aggregate.roundedAverage ?? 0);
+            const avgQuarter = Math.round(avgRaw * 4) / 4;
+            const fill = scale > 0 ? (avgQuarter / scale) * 100 : 0;
+
+            overallFillEl.style.width = fill + '%';
+          }
+        } catch (e) {
+          if (userEl) {
+            userEl.textContent = {{ 'Could not submit rating right now.'|t('engagement')|json_encode|raw }};
+          }
+        }
+      });
+    });
+  })();
+  </script>
+{% endif %}

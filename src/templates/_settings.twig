@@ -3,4 +3,69 @@
 
 {% import '_includes/forms.twig' as forms %}
 
-{# ... #}
+{% set moderatorGroupOptions = craft.app.userGroups.allGroups|map(group => {
+    label: group.name,
+    value: group.id,
+}) %}
+
+{{ forms.textField({
+    label: 'Max Scale'|t('engagement'),
+    instructions: 'Hard ceiling for all rating fields. Must be between 1 and 100.'|t('engagement'),
+    id: 'maxScale',
+    name: 'maxScale',
+    type: 'number',
+    min: 1,
+    max: 100,
+    value: settings.maxScale,
+    required: true,
+    errors: settings.getErrors('maxScale'),
+}) }}
+
+{{ forms.textField({
+    label: 'Default Scale'|t('engagement'),
+    instructions: 'Applied to new rating fields. Must be less than or equal to Max Scale.'|t('engagement'),
+    id: 'defaultScale',
+    name: 'defaultScale',
+    type: 'number',
+    min: 1,
+    max: settings.maxScale ?? 100,
+    value: settings.defaultScale,
+    required: true,
+    errors: settings.getErrors('defaultScale'),
+}) }}
+
+{{ forms.selectField({
+    label: 'Default Icon'|t('engagement'),
+    instructions: 'Default icon for new rating fields. Editors can override per field.'|t('engagement'),
+    id: 'defaultIcon',
+    name: 'defaultIcon',
+    value: settings.defaultIcon,
+    options: [
+        { label: 'Star'|t('engagement'), value: 'star' },
+        { label: 'Heart'|t('engagement'), value: 'heart' },
+        { label: 'Thumbs'|t('engagement'), value: 'thumbs' },
+        { label: 'Custom SVG'|t('engagement'), value: 'customSvg' },
+    ],
+    errors: settings.getErrors('defaultIcon'),
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Enable Moderation Features'|t('engagement'),
+    instructions: 'Master toggle for moderation permissions and UI.'|t('engagement'),
+    id: 'moderationEnabled',
+    name: 'moderationEnabled',
+    on: settings.moderationEnabled,
+    errors: settings.getErrors('moderationEnabled'),
+}) }}
+
+{{ forms.checkboxSelectField({
+    label: 'Moderator Groups'|t('engagement'),
+    instructions: 'User groups eligible for ratings moderation permissions.'|t('engagement'),
+    id: 'moderatorGroups',
+    name: 'moderatorGroups',
+    values: settings.moderatorGroups,
+    options: moderatorGroupOptions,
+    showAllOption: false,
+    errors: settings.getErrors('moderatorGroups'),
+    disabled: not settings.moderationEnabled,
+}) }}

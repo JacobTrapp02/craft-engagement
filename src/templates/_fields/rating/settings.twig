@@ -1,0 +1,72 @@
+{# @var field \jtdev\craftengagement\fields\RatingField #}
+{# @var pluginSettings \jtdev\craftengagement\models\Settings #}
+
+{% import '_includes/forms.twig' as forms %}
+
+{{ forms.lightswitchField({
+    label: 'Default Enabled State'|t('engagement'),
+    instructions: 'Whether ratings are enabled by default on newly-created elements.'|t('engagement'),
+    id: 'defaultEnabled',
+    name: 'defaultEnabled',
+    on: field.defaultEnabled,
+    errors: field.getErrors('defaultEnabled'),
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Allow Entry-Level Overrides'|t('engagement'),
+    instructions: 'Allow editors to override enabled state, scale, and icon per element.'|t('engagement'),
+    id: 'allowEntryOverrides',
+    name: 'allowEntryOverrides',
+    on: field.allowEntryOverrides,
+    errors: field.getErrors('allowEntryOverrides'),
+}) }}
+
+{{ forms.textField({
+    label: 'Scale'|t('engagement'),
+    instructions: 'Default scale for this field. Must be between 1 and plugin Max Scale ({max}).'|t('engagement', { max: pluginSettings.maxScale }),
+    id: 'scale',
+    name: 'scale',
+    type: 'number',
+    min: 1,
+    max: pluginSettings.maxScale,
+    value: field.scale ?: pluginSettings.defaultScale,
+    required: true,
+    errors: field.getErrors('scale'),
+}) }}
+
+{{ forms.selectField({
+    label: 'Icon'|t('engagement'),
+    instructions: 'Visual style used for this field.'|t('engagement'),
+    id: 'icon',
+    name: 'icon',
+    options: iconOptions,
+    value: field.icon ?: pluginSettings.defaultIcon,
+    errors: field.getErrors('icon'),
+}) }}
+
+{{ forms.textareaField({
+    label: 'Custom SVG'|t('engagement'),
+    instructions: 'Optional. Required when Icon is set to Custom SVG.'|t('engagement'),
+    id: 'customSvg',
+    name: 'customSvg',
+    value: field.customSvg,
+    errors: field.getErrors('customSvg'),
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Allow Guest Ratings'|t('engagement'),
+    instructions: 'Allow non-authenticated users to submit ratings for this field.'|t('engagement'),
+    id: 'allowGuestRatings',
+    name: 'allowGuestRatings',
+    on: field.allowGuestRatings,
+    errors: field.getErrors('allowGuestRatings'),
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Allow Users to Change Their Rating'|t('engagement'),
+    instructions: 'If disabled, each logged-in user can only submit one vote.'|t('engagement'),
+    id: 'allowUserRatingChange',
+    name: 'allowUserRatingChange',
+    on: field.allowUserRatingChange,
+    errors: field.getErrors('allowUserRatingChange'),
+}) }}

@@ -1,0 +1,47 @@
+<?php
+
+namespace jtdev\craftengagement\models;
+
+use craft\base\Model;
+use DateTime;
+
+/**
+ * Ratings aggregate model.
+ */
+class Aggregate extends Model
+{
+    public ?int $id = null;
+    public int $elementId;
+    public int $fieldId;
+    public int $siteId;
+    public float $average = 0.0;
+    public int $voteCount = 0;
+    public int $scale = 5;
+    public ?DateTime $dateCreated = null;
+    public ?DateTime $dateUpdated = null;
+
+    public function rules(): array
+    {
+        return [
+            [['elementId', 'fieldId', 'siteId', 'scale'], 'required'],
+            [['id', 'elementId', 'fieldId', 'siteId', 'voteCount', 'scale'], 'integer', 'min' => 0],
+            [['average'], 'number', 'min' => 0],
+            [['scale'], 'integer', 'min' => 1, 'max' => 100],
+            [['dateCreated', 'dateUpdated'], 'safe'],
+        ];
+    }
+
+    public function getPercentage(): float
+    {
+        if ($this->scale <= 0) {
+            return 0.0;
+        }
+
+        return ($this->average / $this->scale) * 100;
+    }
+
+    public function getRoundedAverage(): float
+    {
+        return round($this->average, 1);
+    }
+}

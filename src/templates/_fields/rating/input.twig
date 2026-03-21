@@ -1,0 +1,68 @@
+{# @var field \jtdev\craftengagement\fields\RatingField #}
+{# @var rating \jtdev\craftengagement\models\Rating #}
+{# @var maxScale int #}
+
+{% import '_includes/forms.twig' as forms %}
+
+{% set prefix = field.handle %}
+
+<div style="border: 1px solid #d6d9de; border-radius: 8px; background: #f7f8fa; padding: 14px 14px 2px;">
+  <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #5c6b7a; margin-bottom: 8px;">
+    {{ 'Rating Settings'|t('engagement') }}
+  </div>
+
+  <div class="readable" style="margin-bottom: 12px; color: #3f4d5a;">
+    <div style="font-size: 12px; margin-bottom: 2px;">{{ 'Current Aggregate'|t('engagement') }}</div>
+    <div style="font-weight: 600;">
+      {{ 'Average {average} / {scale} ({count} votes)'|t('engagement', {
+        average: rating.roundedAverage,
+        scale: rating.scale,
+        count: rating.voteCount,
+      }) }}
+    </div>
+  </div>
+
+  {{ forms.lightswitchField({
+      label: 'Enabled for This Element'|t('engagement'),
+      instructions: 'Disable to hide rating interactions for this element.'|t('engagement'),
+      id: prefix ~ '-enabled',
+      name: prefix ~ '[enabled]',
+      on: rating.enabled,
+  }) }}
+
+  {% if field.allowEntryOverrides %}
+    <div style="border-top: 1px solid #e5e7eb; margin: 2px 0 12px; padding-top: 12px;">
+      <div style="font-size: 12px; font-weight: 600; color: #5c6b7a; margin-bottom: 8px;">
+        {{ 'Entry Overrides'|t('engagement') }}
+      </div>
+
+      {{ forms.textField({
+          label: 'Scale Override'|t('engagement'),
+          instructions: 'Override the field default scale for this element.'|t('engagement'),
+          id: prefix ~ '-scale',
+          name: prefix ~ '[scale]',
+          type: 'number',
+          min: 1,
+          max: maxScale,
+          value: rating.scale,
+      }) }}
+
+      {{ forms.selectField({
+          label: 'Icon Override'|t('engagement'),
+          instructions: 'Override the field default icon for this element.'|t('engagement'),
+          id: prefix ~ '-icon',
+          name: prefix ~ '[icon]',
+          options: iconOptions,
+          value: rating.icon,
+      }) }}
+
+      {{ forms.textareaField({
+          label: 'Custom SVG Override'|t('engagement'),
+          instructions: 'Optional. Used when icon is Custom SVG.'|t('engagement'),
+          id: prefix ~ '-custom-svg',
+          name: prefix ~ '[customSvg]',
+          value: rating.customSvg,
+      }) }}
+    </div>
+  {% endif %}
+</div>
