@@ -1,0 +1,324 @@
+{# Reusable full-width emoji picker UI for Craft field settings. #}
+
+<div class="field" data-emoji-picker>
+  <div class="heading">
+    <label>{{ label }}</label>
+  </div>
+  {% if instructions %}
+    <div class="instructions"><p>{{ instructions }}</p></div>
+  {% endif %}
+
+  <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+    <input
+      id="{{ inputId }}"
+      name="{{ inputName }}"
+      type="text"
+      value="{{ inputValue }}"
+      maxlength="16"
+      class="text fullwidth"
+      placeholder="Paste an emoji or use Pick Emoji"
+      data-emoji-input
+    >
+    <button type="button" class="btn" data-emoji-toggle aria-expanded="false">Pick Emoji</button>
+    <div data-emoji-preview style="font-size:28px; min-width:34px; text-align:center;">{{ inputValue ?: '⭐' }}</div>
+  </div>
+
+  <div data-emoji-panel style="display:none; width:100%; border:1px solid #d6d9de; border-radius:10px; background:#fff; padding:10px; box-sizing:border-box;">
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+      <input type="text" class="text fullwidth" placeholder="Search emoji" data-emoji-search>
+      <button type="button" class="btn small" data-emoji-clear>Clear</button>
+    </div>
+
+    <div data-emoji-tabs style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;"></div>
+
+    <div data-emoji-grid style="display:grid; grid-template-columns:repeat(auto-fill, minmax(46px, 1fr)); gap:6px; width:100%; max-height:420px; overflow:auto;"></div>
+
+    <div data-emoji-footer style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+      <div data-emoji-count style="font-size:12px; color:#6b7280;"></div>
+      <button type="button" class="btn small" data-emoji-more style="display:none;">Load More</button>
+    </div>
+
+    <div style="margin-top:8px; font-size:12px; color:#6b7280;">
+      Paste any emoji into the input above if you don't see it in the grid.
+    </div>
+  </div>
+
+  {% if errors is defined and errors %}
+    <ul class="errors">
+      {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+</div>
+
+{% js %}
+(() => {
+  const RE_EMOJI_PRESENTATION = /\p{Emoji_Presentation}/u;
+  const RE_EMOJI_COMPONENT = /\p{Emoji_Component}/u;
+  const RE_EMOJI_MODIFIER = /\p{Emoji_Modifier}/u;
+
+  const makeRange = (start, end) => {
+    const out = [];
+    for (let cp = start; cp <= end; cp++) {
+      const char = String.fromCodePoint(cp);
+      if (!RE_EMOJI_PRESENTATION.test(char)) {
+        continue;
+      }
+      // Skip building-block codepoints (modifiers/components) that render as bars/tofu.
+      if (RE_EMOJI_COMPONENT.test(char) || RE_EMOJI_MODIFIER.test(char)) {
+        continue;
+      }
+      out.push(char);
+    }
+    return out;
+  };
+
+  const uniq = (arr) => {
+    const seen = new Set();
+    const out = [];
+    for (const item of arr) {
+      if (!seen.has(item)) {
+        seen.add(item);
+        out.push(item);
+      }
+    }
+    return out;
+  };
+
+  const getDataset = () => {
+    if (window.__engagementEmojiDataset) {
+      return window.__engagementEmojiDataset;
+    }
+
+    const categories = {
+      'Smileys': uniq([
+        ...makeRange(0x1F600, 0x1F64F),
+        ...makeRange(0x1F910, 0x1F92F),
+        ...makeRange(0x1F970, 0x1F97A),
+      ]),
+      'People': uniq([
+        ...makeRange(0x1F466, 0x1F487),
+        ...makeRange(0x1F575, 0x1F64A),
+        ...makeRange(0x1F9CD, 0x1F9DD),
+      ]),
+      'Animals': uniq([
+        ...makeRange(0x1F400, 0x1F43E),
+        ...makeRange(0x1F980, 0x1F9A2),
+        ...makeRange(0x1F9A5, 0x1F9AE),
+      ]),
+      'Food': uniq([
+        ...makeRange(0x1F32D, 0x1F37F),
+        ...makeRange(0x1F950, 0x1F96F),
+        ...makeRange(0x1F9C0, 0x1F9CA),
+      ]),
+      'Activities': uniq([
+        ...makeRange(0x1F3A0, 0x1F3C4),
+        ...makeRange(0x1F3C5, 0x1F3FA),
+        ...makeRange(0x1F93A, 0x1F945),
+      ]),
+      'Travel': uniq([
+        ...makeRange(0x1F680, 0x1F6C5),
+        ...makeRange(0x1F6CB, 0x1F6D2),
+        ...makeRange(0x1F6F4, 0x1F6FC),
+      ]),
+      'Objects': uniq([
+        ...makeRange(0x1F4A0, 0x1F4FF),
+        ...makeRange(0x1F9F0, 0x1F9FF),
+      ]),
+      'Symbols': uniq([
+        ...makeRange(0x2600, 0x26FF),
+        ...makeRange(0x2700, 0x27BF),
+        ...makeRange(0x1F300, 0x1F321),
+        ...makeRange(0x1FA70, 0x1FAFF),
+      ]),
+      'Flags': [
+        '🇺🇸','🇨🇦','🇲🇽','🇬🇧','🇫🇷','🇩🇪','🇮🇹','🇪🇸','🇯🇵','🇰🇷',
+        '🇨🇳','🇮🇳','🇧🇷','🇦🇺','🇳🇿','🇸🇪','🇳🇴','🇩🇰','🇫🇮','🇳🇱',
+        '🇧🇪','🇨🇭','🇦🇹','🇵🇹','🇮🇪','🇵🇱','🇺🇦','🇹🇷','🇸🇦','🇦🇪',
+        '🇿🇦','🇪🇬','🇳🇬','🇦🇷','🇨🇱','🇨🇴','🇵🇪','🇻🇪','🇸🇬','🇹🇭',
+      ],
+    };
+
+    window.__engagementEmojiDataset = categories;
+    return categories;
+  };
+
+  const bindPicker = (root) => {
+    if (root.dataset.emojiBound === '1') {
+      return;
+    }
+    root.dataset.emojiBound = '1';
+
+    const input = root.querySelector('[data-emoji-input]');
+    const toggle = root.querySelector('[data-emoji-toggle]');
+    const panel = root.querySelector('[data-emoji-panel]');
+    const tabs = root.querySelector('[data-emoji-tabs]');
+    const grid = root.querySelector('[data-emoji-grid]');
+    const preview = root.querySelector('[data-emoji-preview]');
+    const search = root.querySelector('[data-emoji-search]');
+    const clearBtn = root.querySelector('[data-emoji-clear]');
+    const moreBtn = root.querySelector('[data-emoji-more]');
+    const countEl = root.querySelector('[data-emoji-count]');
+
+    if (!input || !toggle || !panel || !tabs || !grid || !preview || !search || !clearBtn || !moreBtn || !countEl) {
+      return;
+    }
+
+    const data = getDataset();
+    const tabNames = Object.keys(data);
+    let activeTab = tabNames[0];
+    let query = '';
+    let pageSize = 240;
+    let visibleCount = pageSize;
+
+    const getCurrentList = () => {
+      const base = data[activeTab] || [];
+      if (!query.trim()) {
+        return base;
+      }
+
+      // Search by Unicode codepoint hex or direct emoji character paste.
+      const q = query.trim().toLowerCase();
+      return base.filter((emoji) => {
+        if (emoji.includes(query.trim())) {
+          return true;
+        }
+
+        const hex = Array.from(emoji)
+          .map((char) => char.codePointAt(0)?.toString(16) || '')
+          .join(' ');
+
+        return hex.includes(q);
+      });
+    };
+
+    const renderGrid = () => {
+      const list = getCurrentList();
+      const showing = list.slice(0, visibleCount);
+
+      grid.innerHTML = '';
+      for (const emoji of showing) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn';
+        btn.textContent = emoji;
+        btn.style.height = '44px';
+        btn.style.fontSize = '28px';
+        btn.style.lineHeight = '1';
+        btn.style.padding = '0';
+
+        btn.addEventListener('click', () => {
+          input.value = emoji;
+          preview.textContent = emoji;
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+          panel.style.display = 'none';
+          toggle.setAttribute('aria-expanded', 'false');
+        });
+
+        grid.appendChild(btn);
+      }
+
+      countEl.textContent = `Showing ${Math.min(showing.length, list.length)} of ${list.length}`;
+      moreBtn.style.display = list.length > visibleCount ? '' : 'none';
+    };
+
+    const renderTabs = () => {
+      tabs.innerHTML = '';
+
+      for (const name of tabNames) {
+        const tab = document.createElement('button');
+        tab.type = 'button';
+        tab.className = 'btn small';
+        tab.textContent = name;
+        tab.dataset.category = name;
+        if (name === activeTab) {
+          tab.classList.add('active');
+        }
+
+        tabs.appendChild(tab);
+      }
+    };
+
+    const togglePanel = (open) => {
+      panel.style.display = open ? 'block' : 'none';
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) {
+        search.focus();
+      }
+    };
+
+    input.addEventListener('input', () => {
+      preview.textContent = input.value || '⭐';
+    });
+
+    tabs.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+
+      const btn = target.closest('button[data-category]');
+      if (!btn) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const next = btn.dataset.category;
+      if (!next || next === activeTab) {
+        return;
+      }
+
+      activeTab = next;
+      visibleCount = pageSize;
+      renderTabs();
+      renderGrid();
+    });
+
+    panel.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+
+    toggle.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const open = panel.style.display === 'none';
+      togglePanel(open);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      query = '';
+      search.value = '';
+      visibleCount = pageSize;
+      renderGrid();
+      search.focus();
+    });
+
+    search.addEventListener('input', () => {
+      query = search.value;
+      visibleCount = pageSize;
+      renderGrid();
+    });
+
+    moreBtn.addEventListener('click', () => {
+      visibleCount += pageSize;
+      renderGrid();
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!root.contains(event.target)) {
+        togglePanel(false);
+      }
+    });
+
+    renderTabs();
+    renderGrid();
+  };
+
+  window.__engagementEmojiPickerInit = () => {
+    document.querySelectorAll('[data-emoji-picker]').forEach(bindPicker);
+  };
+
+  window.__engagementEmojiPickerInit();
+})();
+{% endjs %}

@@ -97,7 +97,7 @@ class RatingsController extends Controller
         if ($currentUser !== null) {
             $existingVote = $voteService->getByAggregateAndUserId($aggregate->id, (int)$currentUser->id);
         } else {
-            if (!$field->allowGuestRatings) {
+            if (!$normalized->allowGuestRatings) {
                 throw new ForbiddenHttpException('Guest ratings are disabled for this field.');
             }
 
@@ -107,7 +107,7 @@ class RatingsController extends Controller
             $existingVote = $voteService->getByAggregateAndSessionId($aggregate->id, $sessionId);
         }
 
-        if ($existingVote !== null && !$field->allowUserRatingChange) {
+        if ($existingVote !== null && !$normalized->allowUserRatingChange) {
             throw new ForbiddenHttpException('Changing an existing rating is disabled for this field.');
         }
 

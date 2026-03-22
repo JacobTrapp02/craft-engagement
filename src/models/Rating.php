@@ -18,12 +18,19 @@ class Rating extends Model
     public int $voteCount = 0;
     public int $scale = 5;
     public string $icon = Settings::ICON_STAR;
+    public string $emojiIcon = '⭐';
     public ?string $customSvg = null;
+    public bool $allowGuestRatings = false;
+    public bool $allowUserRatingChange = true;
+    public ?string $headingText = null;
+    public ?string $clickToRateText = null;
+    public ?string $yourRatingText = null;
 
     public function rules(): array
     {
         return [
             [['enabled'], 'boolean'],
+            [['allowGuestRatings', 'allowUserRatingChange'], 'boolean'],
             [['id', 'elementId', 'fieldId', 'siteId', 'voteCount', 'scale'], 'integer', 'min' => 0],
             [['average'], 'number', 'min' => 0],
             [['scale'], 'integer', 'min' => 1, 'max' => 100],
@@ -33,7 +40,7 @@ class Rating extends Model
                 Settings::ICON_THUMBS,
                 Settings::ICON_CUSTOM_SVG,
             ]],
-            [['customSvg'], 'string'],
+            [['emojiIcon', 'customSvg', 'headingText', 'clickToRateText', 'yourRatingText'], 'string'],
         ];
     }
 

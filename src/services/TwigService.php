@@ -51,11 +51,15 @@ class TwigService extends Component
                 'siteId' => $data['siteId'] ?? Craft::$app->getSites()->getCurrentSite()->id,
                 'label' => $fieldName ?? Craft::t('engagement', 'Favorite'),
                 'icon' => $data['icon'] ?? 'star',
+                'emojiIcon' => $data['emojiIcon'] ?? '⭐',
                 'customSvg' => $data['customSvg'] ?? null,
                 'scale' => $data['scale'] ?? 5,
                 'average' => $data['average'] ?? 0,
                 'roundedAverage' => $data['roundedAverage'] ?? 0,
                 'voteCount' => $data['voteCount'] ?? 0,
+                'headingText' => $data['headingText'] ?? null,
+                'clickToRateText' => $data['clickToRateText'] ?? null,
+                'yourRatingText' => $data['yourRatingText'] ?? null,
                 'isLoggedIn' => $isLoggedIn,
                 'userRating' => $userRating,
                 'loginUrl' => UrlHelper::url('login'),
@@ -67,7 +71,7 @@ class TwigService extends Component
     }
 
     /**
-     * @return array{id?: ?int, elementId: ?int, siteId: ?int, fieldId: ?int, enabled?: bool, scale?: int, icon?: string, customSvg?: ?string, average?: float, roundedAverage?: float, voteCount?: int}|null
+     * @return array{id?: ?int, elementId: ?int, siteId: ?int, fieldId: ?int, enabled?: bool, scale?: int, icon?: string, emojiIcon?: string, customSvg?: ?string, average?: float, roundedAverage?: float, voteCount?: int, headingText?: ?string, clickToRateText?: ?string, yourRatingText?: ?string}|null
      */
     private function normalizeFieldData(mixed $fieldValue): ?array
     {
@@ -80,10 +84,14 @@ class TwigService extends Component
                 'enabled' => $fieldValue->enabled,
                 'scale' => $fieldValue->scale,
                 'icon' => $fieldValue->icon,
+                'emojiIcon' => $fieldValue->emojiIcon,
                 'customSvg' => $fieldValue->customSvg,
                 'average' => $fieldValue->average,
                 'roundedAverage' => $fieldValue->roundedAverage,
                 'voteCount' => $fieldValue->voteCount,
+                'headingText' => $fieldValue->headingText,
+                'clickToRateText' => $fieldValue->clickToRateText,
+                'yourRatingText' => $fieldValue->yourRatingText,
             ];
         }
 
@@ -96,10 +104,14 @@ class TwigService extends Component
                 'enabled' => isset($fieldValue['enabled']) ? (bool)$fieldValue['enabled'] : true,
                 'scale' => isset($fieldValue['scale']) ? (int)$fieldValue['scale'] : 5,
                 'icon' => isset($fieldValue['icon']) ? (string)$fieldValue['icon'] : 'star',
+                'emojiIcon' => isset($fieldValue['emojiIcon']) ? (string)$fieldValue['emojiIcon'] : '⭐',
                 'customSvg' => $fieldValue['customSvg'] ?? null,
                 'average' => isset($fieldValue['average']) ? (float)$fieldValue['average'] : 0,
                 'roundedAverage' => isset($fieldValue['roundedAverage']) ? (float)$fieldValue['roundedAverage'] : 0,
                 'voteCount' => isset($fieldValue['voteCount']) ? (int)$fieldValue['voteCount'] : 0,
+                'headingText' => isset($fieldValue['headingText']) ? trim((string)$fieldValue['headingText']) : null,
+                'clickToRateText' => isset($fieldValue['clickToRateText']) ? trim((string)$fieldValue['clickToRateText']) : null,
+                'yourRatingText' => isset($fieldValue['yourRatingText']) ? trim((string)$fieldValue['yourRatingText']) : null,
             ];
         }
 

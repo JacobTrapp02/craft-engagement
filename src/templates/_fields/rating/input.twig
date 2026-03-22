@@ -1,6 +1,7 @@
 {# @var field \jtdev\craftengagement\fields\RatingField #}
 {# @var rating \jtdev\craftengagement\models\Rating #}
 {# @var maxScale int #}
+{# @var tokenHelp string #}
 
 {% import '_includes/forms.twig' as forms %}
 
@@ -28,41 +29,110 @@
       id: prefix ~ '-enabled',
       name: prefix ~ '[enabled]',
       on: rating.enabled,
+      disabled: not (field.allowEditorOverrides and field.allowOverrideWidgetEnabled),
   }) }}
 
-  {% if field.allowEntryOverrides %}
+  {% if field.allowEditorOverrides and (field.allowOverrideScale or field.allowOverrideIconAppearance) %}
     <div style="border-top: 1px solid #e5e7eb; margin: 2px 0 12px; padding-top: 12px;">
       <div style="font-size: 12px; font-weight: 600; color: #5c6b7a; margin-bottom: 8px;">
         {{ 'Entry Overrides'|t('engagement') }}
       </div>
 
-      {{ forms.textField({
-          label: 'Scale Override'|t('engagement'),
-          instructions: 'Override the field default scale for this element.'|t('engagement'),
-          id: prefix ~ '-scale',
-          name: prefix ~ '[scale]',
-          type: 'number',
-          min: 1,
-          max: maxScale,
-          value: rating.scale,
-      }) }}
+      {% if field.allowOverrideScale %}
+        {{ forms.textField({
+            label: 'Scale Override'|t('engagement'),
+            instructions: 'Override the field default scale for this element.'|t('engagement'),
+            id: prefix ~ '-scale',
+            name: prefix ~ '[scale]',
+            type: 'number',
+            min: 1,
+            max: maxScale,
+            value: rating.scale,
+        }) }}
+      {% endif %}
 
-      {{ forms.selectField({
-          label: 'Icon Override'|t('engagement'),
-          instructions: 'Override the field default icon for this element.'|t('engagement'),
-          id: prefix ~ '-icon',
-          name: prefix ~ '[icon]',
-          options: iconOptions,
-          value: rating.icon,
-      }) }}
+      {% if field.allowOverrideIconAppearance %}
+        {{ forms.selectField({
+            label: 'Icon Override'|t('engagement'),
+            instructions: 'Override the field default icon for this element.'|t('engagement'),
+            id: prefix ~ '-icon',
+            name: prefix ~ '[icon]',
+            options: iconOptions,
+            value: rating.icon,
+        }) }}
 
-      {{ forms.textareaField({
-          label: 'Custom SVG Override'|t('engagement'),
-          instructions: 'Optional. Used when icon is Custom SVG.'|t('engagement'),
-          id: prefix ~ '-custom-svg',
-          name: prefix ~ '[customSvg]',
-          value: rating.customSvg,
-      }) }}
+        {% include 'engagement/_fields/rating/_emojiPicker.twig' with {
+            label: 'Emoji Override'|t('engagement'),
+            instructions: 'Used when icon is set to Emoji. You can pick by category or paste any emoji.'|t('engagement'),
+            inputId: prefix ~ '-emoji-icon',
+            inputName: prefix ~ '[emojiIcon]',
+            inputValue: rating.emojiIcon,
+        } only %}
+
+        {{ forms.textareaField({
+            label: 'Custom SVG Override'|t('engagement'),
+            instructions: 'Optional. Used when icon is Custom SVG.'|t('engagement'),
+            id: prefix ~ '-custom-svg',
+            name: prefix ~ '[customSvg]',
+            value: rating.customSvg,
+        }) }}
+      {% endif %}
+
+      {% if field.allowOverrideGuestRatings %}
+        {{ forms.lightswitchField({
+            label: 'Allow Guest Ratings Override'|t('engagement'),
+            id: prefix ~ '-allow-guest-ratings',
+            name: prefix ~ '[allowGuestRatings]',
+            on: rating.allowGuestRatings,
+        }) }}
+      {% endif %}
+
+      {% if field.allowOverrideUserRatingChange %}
+        {{ forms.lightswitchField({
+            label: 'Allow Users To Change Rating Override'|t('engagement'),
+            id: prefix ~ '-allow-user-rating-change',
+            name: prefix ~ '[allowUserRatingChange]',
+            on: rating.allowUserRatingChange,
+        }) }}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if field.allowEditorOverrides and (field.allowOverrideHeadingText or field.allowOverrideClickToRateText or field.allowOverrideYourRatingText) %}
+    <div style="border-top: 1px solid #e5e7eb; margin: 2px 0 12px; padding-top: 12px;">
+      <div style="font-size: 12px; font-weight: 600; color: #5c6b7a; margin-bottom: 8px;">
+        {{ 'Entry Text Overrides'|t('engagement') }}
+      </div>
+
+      {% if field.allowOverrideHeadingText %}
+        {{ forms.textField({
+            label: 'Text Above Widget Override'|t('engagement'),
+            instructions: 'Optional. Blank hides it. Tokens: {tokens}'|t('engagement', { tokens: tokenHelp }),
+            id: prefix ~ '-heading-text',
+            name: prefix ~ '[headingText]',
+            value: rating.headingText,
+        }) }}
+      {% endif %}
+
+      {% if field.allowOverrideClickToRateText %}
+        {{ forms.textField({
+            label: 'Click-To-Rate Text Override'|t('engagement'),
+            instructions: 'Optional. Blank hides it. Tokens: {tokens}'|t('engagement', { tokens: tokenHelp }),
+            id: prefix ~ '-click-to-rate-text',
+            name: prefix ~ '[clickToRateText]',
+            value: rating.clickToRateText,
+        }) }}
+      {% endif %}
+
+      {% if field.allowOverrideYourRatingText %}
+        {{ forms.textField({
+            label: 'Your-Rating Text Override'|t('engagement'),
+            instructions: 'Optional. Blank hides it. Tokens: {tokens}'|t('engagement', { tokens: tokenHelp }),
+            id: prefix ~ '-your-rating-text',
+            name: prefix ~ '[yourRatingText]',
+            value: rating.yourRatingText,
+        }) }}
+      {% endif %}
     </div>
   {% endif %}
 </div>
