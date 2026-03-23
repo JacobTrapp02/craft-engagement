@@ -33,6 +33,7 @@ class RatingField extends Field
     public bool $allowOverrideScale = true;
     public bool $allowOverrideIconAppearance = true;
     public bool $allowOverrideWidgetEnabled = true;
+    public bool $allowOverrideWidgetPreview = true;
     public bool $allowOverrideGuestRatings = true;
     public bool $allowOverrideUserRatingChange = true;
     public bool $allowOverrideHeadingText = true;
@@ -111,6 +112,7 @@ class RatingField extends Field
             'allowOverrideScale',
             'allowOverrideIconAppearance',
             'allowOverrideWidgetEnabled',
+            'allowOverrideWidgetPreview',
             'allowOverrideGuestRatings',
             'allowOverrideUserRatingChange',
             'allowOverrideHeadingText',
@@ -277,7 +279,6 @@ class RatingField extends Field
                 'rating' => $rating,
                 'iconOptions' => $this->iconOptions(),
                 'maxScale' => $this->pluginSettings()->maxScale,
-                'tokenHelp' => $this->tokenHelp(),
             ]
         );
     }
@@ -392,8 +393,4 @@ class RatingField extends Field
         return $stored;
     }
 
-    private function tokenHelp(): string
-    {
-        return '{userRating}, {votes}, {average}, {roundedAverage}, {scale}, {fieldName}, {elementId}';
-    }
 }

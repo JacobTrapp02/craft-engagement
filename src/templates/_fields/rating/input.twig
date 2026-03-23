@@ -1,20 +1,25 @@
 {# @var field \jtdev\craftengagement\fields\RatingField #}
 {# @var rating \jtdev\craftengagement\models\Rating #}
 {# @var maxScale int #}
-{# @var tokenHelp string #}
 
 {% import '_includes/forms.twig' as forms %}
 
 {% set prefix = field.handle %}
+{% set canOverrideEnabled = field.allowEditorOverrides and field.allowOverrideWidgetEnabled %}
+{% set canOverrideScale = field.allowEditorOverrides and field.allowOverrideScale %}
+{% set canOverrideIcon = field.allowEditorOverrides and field.allowOverrideIconAppearance %}
+{% set canOverrideGuests = field.allowEditorOverrides and field.allowOverrideGuestRatings %}
+{% set canOverrideUserChange = field.allowEditorOverrides and field.allowOverrideUserRatingChange %}
+{% set canOverrideText = field.allowEditorOverrides and (field.allowOverrideHeadingText or field.allowOverrideClickToRateText or field.allowOverrideYourRatingText) %}
+{% set canShowWidgetPreview = field.allowEditorOverrides and field.allowOverrideWidgetPreview %}
 
-<div style="border: 1px solid #d6d9de; border-radius: 8px; background: #f7f8fa; padding: 14px 14px 2px;">
-  <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #5c6b7a; margin-bottom: 8px;">
+<div class="eng-entry-settings" data-rating-entry-settings>
+  <div class="eng-entry-title">
     {{ 'Rating Settings'|t('engagement') }}
   </div>
 
-  <div class="readable" style="margin-bottom: 12px; color: #3f4d5a;">
-    <div style="font-size: 12px; margin-bottom: 2px;">{{ 'Current Aggregate'|t('engagement') }}</div>
-    <div style="font-weight: 600;">
+  <div class="readable eng-entry-aggregate">
+    <div class="eng-entry-aggregate-value">
       {{ 'Average {average} / {scale} ({count} votes)'|t('engagement', {
         average: rating.roundedAverage,
         scale: rating.scale,
@@ -23,116 +28,168 @@
     </div>
   </div>
 
-  {{ forms.lightswitchField({
-      label: 'Enabled for This Element'|t('engagement'),
-      instructions: 'Disable to hide rating interactions for this element.'|t('engagement'),
-      id: prefix ~ '-enabled',
-      name: prefix ~ '[enabled]',
-      on: rating.enabled,
-      disabled: not (field.allowEditorOverrides and field.allowOverrideWidgetEnabled),
-  }) }}
-
-  {% if field.allowEditorOverrides and (field.allowOverrideScale or field.allowOverrideIconAppearance) %}
-    <div style="border-top: 1px solid #e5e7eb; margin: 2px 0 12px; padding-top: 12px;">
-      <div style="font-size: 12px; font-weight: 600; color: #5c6b7a; margin-bottom: 8px;">
-        {{ 'Entry Overrides'|t('engagement') }}
-      </div>
-
-      {% if field.allowOverrideScale %}
-        {{ forms.textField({
-            label: 'Scale Override'|t('engagement'),
-            instructions: 'Override the field default scale for this element.'|t('engagement'),
-            id: prefix ~ '-scale',
-            name: prefix ~ '[scale]',
-            type: 'number',
-            min: 1,
-            max: maxScale,
-            value: rating.scale,
-        }) }}
-      {% endif %}
-
-      {% if field.allowOverrideIconAppearance %}
-        {{ forms.selectField({
-            label: 'Icon Override'|t('engagement'),
-            instructions: 'Override the field default icon for this element.'|t('engagement'),
-            id: prefix ~ '-icon',
-            name: prefix ~ '[icon]',
-            options: iconOptions,
-            value: rating.icon,
-        }) }}
-
-        {% include 'engagement/_fields/rating/_emojiPicker.twig' with {
-            label: 'Emoji Override'|t('engagement'),
-            instructions: 'Used when icon is set to Emoji. You can pick by category or paste any emoji.'|t('engagement'),
-            inputId: prefix ~ '-emoji-icon',
-            inputName: prefix ~ '[emojiIcon]',
-            inputValue: rating.emojiIcon,
-        } only %}
-
-        {{ forms.textareaField({
-            label: 'Custom SVG Override'|t('engagement'),
-            instructions: 'Optional. Used when icon is Custom SVG.'|t('engagement'),
-            id: prefix ~ '-custom-svg',
-            name: prefix ~ '[customSvg]',
-            value: rating.customSvg,
-        }) }}
-      {% endif %}
-
-      {% if field.allowOverrideGuestRatings %}
-        {{ forms.lightswitchField({
-            label: 'Allow Guest Ratings Override'|t('engagement'),
-            id: prefix ~ '-allow-guest-ratings',
-            name: prefix ~ '[allowGuestRatings]',
-            on: rating.allowGuestRatings,
-        }) }}
-      {% endif %}
-
-      {% if field.allowOverrideUserRatingChange %}
-        {{ forms.lightswitchField({
-            label: 'Allow Users To Change Rating Override'|t('engagement'),
-            id: prefix ~ '-allow-user-rating-change',
-            name: prefix ~ '[allowUserRatingChange]',
-            on: rating.allowUserRatingChange,
-        }) }}
-      {% endif %}
-    </div>
+  {% if canOverrideEnabled %}
+    {{ forms.lightswitchField({
+        label: 'Enabled for This Element'|t('engagement'),
+        instructions: 'Disable to hide rating interactions for this element.'|t('engagement'),
+        id: prefix ~ '-enabled',
+        name: prefix ~ '[enabled]',
+        on: rating.enabled,
+    }) }}
   {% endif %}
 
-  {% if field.allowEditorOverrides and (field.allowOverrideHeadingText or field.allowOverrideClickToRateText or field.allowOverrideYourRatingText) %}
-    <div style="border-top: 1px solid #e5e7eb; margin: 2px 0 12px; padding-top: 12px;">
-      <div style="font-size: 12px; font-weight: 600; color: #5c6b7a; margin-bottom: 8px;">
-        {{ 'Entry Text Overrides'|t('engagement') }}
-      </div>
+  {% if canShowWidgetPreview %}
+    {% include 'engagement/_fields/rating/_widgetPreview.twig' with {
+        title: 'Widget Preview'|t('engagement'),
+        instructions: null,
+        elementId: 1,
+        fieldId: field.id ?? 1,
+        siteId: craft.app.sites.currentSite.id,
+        label: field.name ?? 'Rating'|t('engagement'),
+        icon: rating.icon,
+        emojiIcon: rating.emojiIcon,
+        customSvg: rating.customSvg,
+        scale: rating.scale,
+        average: rating.roundedAverage ?: 0,
+        voteCount: rating.voteCount ?: 0,
+        headingText: rating.headingText,
+        clickToRateText: rating.clickToRateText,
+        yourRatingText: rating.yourRatingText,
+        afterUserRating: rating.scale >= 4 ? 4 : rating.scale,
+    } only %}
+  {% endif %}
 
-      {% if field.allowOverrideHeadingText %}
-        {{ forms.textField({
-            label: 'Text Above Widget Override'|t('engagement'),
-            instructions: 'Optional. Blank hides it. Tokens: {tokens}'|t('engagement', { tokens: tokenHelp }),
-            id: prefix ~ '-heading-text',
-            name: prefix ~ '[headingText]',
-            value: rating.headingText,
-        }) }}
-      {% endif %}
+  {% if canOverrideIcon %}
+    {% include 'engagement/_fields/rating/input/_sectionIconAppearance.twig' with {
+        prefix: prefix,
+        rating: rating,
+        iconOptions: iconOptions,
+    } only %}
+  {% endif %}
 
-      {% if field.allowOverrideClickToRateText %}
-        {{ forms.textField({
-            label: 'Click-To-Rate Text Override'|t('engagement'),
-            instructions: 'Optional. Blank hides it. Tokens: {tokens}'|t('engagement', { tokens: tokenHelp }),
-            id: prefix ~ '-click-to-rate-text',
-            name: prefix ~ '[clickToRateText]',
-            value: rating.clickToRateText,
-        }) }}
-      {% endif %}
+  {% if canOverrideScale or canOverrideGuests or canOverrideUserChange %}
+    {% include 'engagement/_fields/rating/input/_sectionRatingBehavior.twig' with {
+        prefix: prefix,
+        rating: rating,
+        maxScale: maxScale,
+        canOverrideScale: canOverrideScale,
+        canOverrideGuests: canOverrideGuests,
+        canOverrideUserChange: canOverrideUserChange,
+    } only %}
+  {% endif %}
 
-      {% if field.allowOverrideYourRatingText %}
-        {{ forms.textField({
-            label: 'Your-Rating Text Override'|t('engagement'),
-            instructions: 'Optional. Blank hides it. Tokens: {tokens}'|t('engagement', { tokens: tokenHelp }),
-            id: prefix ~ '-your-rating-text',
-            name: prefix ~ '[yourRatingText]',
-            value: rating.yourRatingText,
-        }) }}
-      {% endif %}
-    </div>
+  {% if canOverrideText %}
+    {% include 'engagement/_fields/rating/input/_sectionTextOverrides.twig' with {
+        prefix: prefix,
+        field: field,
+        rating: rating,
+    } only %}
   {% endif %}
 </div>
+
+{% js %}
+(() => {
+  const roots = document.querySelectorAll('[data-rating-entry-settings]');
+  roots.forEach((root) => {
+    const panels = root.querySelectorAll('[data-entry-icon-mode-panel]');
+    const select = root.querySelector('[data-entry-icon-mode-source="1"]');
+    if (!(select instanceof HTMLSelectElement)) {
+      return;
+    }
+
+    const syncPanels = () => {
+      const mode = select.value;
+      panels.forEach((panel) => {
+        if (panel instanceof HTMLElement) {
+          panel.style.display = panel.dataset.entryIconModePanel === mode ? '' : 'none';
+        }
+      });
+    };
+
+    select.addEventListener('change', syncPanels);
+    syncPanels();
+    requestAnimationFrame(syncPanels);
+  });
+})();
+{% endjs %}
+
+{% css %}
+.eng-entry-settings {
+  border: 1px solid #d6d9de;
+  border-radius: 8px;
+  background: #f7f8fa;
+  padding: 14px;
+}
+
+.eng-entry-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5c6b7a;
+  margin-bottom: 8px;
+}
+
+.eng-entry-aggregate {
+  margin-bottom: 12px;
+  color: #3f4d5a;
+}
+
+.eng-entry-aggregate-value {
+  font-weight: 600;
+}
+
+.eng-disclosure {
+  margin: 12px 0;
+  border: 1px solid #d6d9de;
+  border-radius: 10px;
+  background: #f9fafb;
+  padding: 12px;
+}
+
+.eng-disclosure > summary {
+  cursor: pointer;
+  font-weight: 600;
+  display: list-item;
+  margin-bottom: 0;
+}
+
+.eng-disclosure[open] > summary {
+  margin-bottom: 10px;
+}
+
+.eng-group-card {
+  border: 1px solid #d6d9de;
+  border-radius: 10px;
+  background: #f9fafb;
+  padding: 12px;
+}
+
+.eng-disclosure .eng-group-card {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.eng-preview-grid {
+  margin-top: 4px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.eng-preview-col {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px;
+}
+
+.eng-preview-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+{% endcss %}

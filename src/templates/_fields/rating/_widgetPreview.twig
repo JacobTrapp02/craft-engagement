@@ -1,0 +1,55 @@
+{# Shared widget preview block for settings + entry editor #}
+<div class="field eng-group-card">
+  <div class="heading"><label>{{ title }}</label></div>
+  {% if instructions is defined and instructions %}
+    <div class="instructions"><p>{{ instructions }}</p></div>
+  {% endif %}
+  <div class="eng-preview-grid">
+    <div class="eng-preview-col">
+      <div class="eng-preview-title">{{ 'Before Rating'|t('engagement') }}</div>
+      {% include 'engagement/_render/favorite.twig' with {
+          previewMode: true,
+          elementId: elementId,
+          fieldId: fieldId,
+          siteId: siteId,
+          label: label,
+          icon: icon,
+          emojiIcon: emojiIcon,
+          customSvg: customSvg,
+          scale: scale,
+          average: average,
+          voteCount: voteCount,
+          headingText: headingText,
+          clickToRateText: clickToRateText,
+          yourRatingText: yourRatingText,
+          isLoggedIn: true,
+          userRating: null,
+          actionUrl: '#',
+          loginUrl: '#',
+      } only %}
+    </div>
+    <div class="eng-preview-col">
+      <div class="eng-preview-title">{{ 'After Rating'|t('engagement') }}</div>
+      {% include 'engagement/_render/favorite.twig' with {
+          previewMode: true,
+          elementId: elementId,
+          fieldId: fieldId,
+          siteId: siteId,
+          label: label,
+          icon: icon,
+          emojiIcon: emojiIcon,
+          customSvg: customSvg,
+          scale: scale,
+          average: average,
+          voteCount: voteCount,
+          headingText: headingText,
+          clickToRateText: clickToRateText,
+          yourRatingText: yourRatingText,
+          isLoggedIn: true,
+          userRating: afterUserRating,
+          actionUrl: '#',
+          loginUrl: '#',
+      } only %}
+    </div>
+  </div>
+</div>

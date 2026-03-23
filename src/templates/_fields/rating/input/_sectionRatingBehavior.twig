@@ -1,0 +1,35 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Rating Behavior'|t('engagement') }}</summary>
+  {% if canOverrideScale %}
+    {{ forms.textField({
+        label: 'Scale Override'|t('engagement'),
+        instructions: 'Override the field default scale for this element.'|t('engagement'),
+        id: prefix ~ '-scale',
+        name: prefix ~ '[scale]',
+        type: 'number',
+        min: 1,
+        max: maxScale,
+        value: rating.scale,
+    }) }}
+  {% endif %}
+
+  {% if canOverrideGuests %}
+    {{ forms.lightswitchField({
+        label: 'Allow Guest Ratings Override'|t('engagement'),
+        id: prefix ~ '-allow-guest-ratings',
+        name: prefix ~ '[allowGuestRatings]',
+        on: rating.allowGuestRatings,
+    }) }}
+  {% endif %}
+
+  {% if canOverrideUserChange %}
+    {{ forms.lightswitchField({
+        label: 'Allow Users To Change Rating Override'|t('engagement'),
+        id: prefix ~ '-allow-user-rating-change',
+        name: prefix ~ '[allowUserRatingChange]',
+        on: rating.allowUserRatingChange,
+    }) }}
+  {% endif %}
+</details>

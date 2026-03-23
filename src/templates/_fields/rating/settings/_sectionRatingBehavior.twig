@@ -1,0 +1,42 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Rating Behavior'|t('engagement') }}</summary>
+  {{ forms.textField({
+      label: 'Scale'|t('engagement'),
+      instructions: 'Default scale for this field. Must be between 1 and plugin Max Scale ({max}).'|t('engagement', { max: pluginSettings.maxScale }),
+      id: 'scale',
+      name: 'scale',
+      type: 'number',
+      min: 1,
+      max: pluginSettings.maxScale,
+      value: field.scale ?: pluginSettings.defaultScale,
+      required: true,
+      errors: field.getErrors('scale'),
+  }) }}
+
+  {{ forms.lightswitchField({
+      label: 'Default Enabled State'|t('engagement'),
+      instructions: 'Whether ratings are enabled by default on newly-created elements.'|t('engagement'),
+      id: 'defaultEnabled',
+      name: 'defaultEnabled',
+      on: field.defaultEnabled,
+      errors: field.getErrors('defaultEnabled'),
+  }) }}
+
+  {{ forms.lightswitchField({
+      label: 'Allow Guest Ratings'|t('engagement'),
+      id: 'allowGuestRatings',
+      name: 'allowGuestRatings',
+      on: field.allowGuestRatings,
+      errors: field.getErrors('allowGuestRatings'),
+  }) }}
+
+  {{ forms.lightswitchField({
+      label: 'Allow Users to Change Their Rating'|t('engagement'),
+      id: 'allowUserRatingChange',
+      name: 'allowUserRatingChange',
+      on: field.allowUserRatingChange,
+      errors: field.getErrors('allowUserRatingChange'),
+  }) }}
+</details>

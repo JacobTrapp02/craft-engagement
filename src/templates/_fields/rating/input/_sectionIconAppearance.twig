@@ -1,0 +1,38 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Icon Appearance'|t('engagement') }}</summary>
+  <div class="field eng-group-card">
+    {{ forms.selectField({
+        label: 'Icon Override'|t('engagement'),
+        instructions: 'Override the field default icon for this element.'|t('engagement'),
+        id: prefix ~ '-icon',
+        name: prefix ~ '[icon]',
+        options: iconOptions,
+        value: rating.icon,
+        inputAttributes: {
+          'data-entry-icon-mode-source': '1',
+        },
+    }) }}
+
+    <div data-entry-icon-mode-panel="emoji" style="{{ rating.icon == 'emoji' ? '' : 'display:none;' }}">
+      {% include 'engagement/_fields/rating/_emojiPicker.twig' with {
+          label: 'Emoji Override'|t('engagement'),
+          instructions: 'Used when icon is set to Emoji. You can pick by category or paste any emoji.'|t('engagement'),
+          inputId: prefix ~ '-emoji-icon',
+          inputName: prefix ~ '[emojiIcon]',
+          inputValue: rating.emojiIcon,
+      } only %}
+    </div>
+
+    <div data-entry-icon-mode-panel="customSvg" style="{{ rating.icon == 'customSvg' ? '' : 'display:none;' }}">
+      {{ forms.textareaField({
+          label: 'Custom SVG Override'|t('engagement'),
+          instructions: 'Optional. Used when icon is Custom SVG.'|t('engagement'),
+          id: prefix ~ '-custom-svg',
+          name: prefix ~ '[customSvg]',
+          value: rating.customSvg,
+      }) }}
+    </div>
+  </div>
+</details>

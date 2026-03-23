@@ -1,0 +1,44 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Icon Appearance'|t('engagement') }}</summary>
+  <div class="field eng-group-card">
+    <div class="instructions"><p>{{ 'Choose how rating icons are displayed. Pick an icon mode, then configure the matching input below.'|t('engagement') }}</p></div>
+
+    {{ forms.selectField({
+        label: 'Icon Mode'|t('engagement'),
+        id: 'icon',
+        name: 'icon',
+        options: iconOptions,
+        value: field.icon ?: pluginSettings.defaultIcon,
+        errors: field.getErrors('icon'),
+        inputAttributes: {
+            'data-icon-mode-source': '1',
+        },
+    }) }}
+
+    <div data-icon-mode-panel="emoji" style="{{ field.icon == 'emoji' ? '' : 'display:none;' }}">
+      {% include 'engagement/_fields/rating/_emojiPicker.twig' with {
+          label: 'Emoji Icon'|t('engagement'),
+          instructions: 'Paste an emoji or choose one with Pick Emoji.'|t('engagement'),
+          inputId: 'emojiIcon',
+          inputName: 'emojiIcon',
+          inputValue: field.emojiIcon,
+          errors: field.getErrors('emojiIcon'),
+      } only %}
+    </div>
+
+    <div data-icon-mode-panel="customSvg" style="{{ field.icon == 'customSvg' ? '' : 'display:none;' }}">
+      {{ forms.textareaField({
+          label: 'Custom SVG Markup'|t('engagement'),
+          instructions: 'Paste one SVG icon. It will be repeated across the scale.'|t('engagement'),
+          id: 'customSvg',
+          name: 'customSvg',
+          value: field.customSvg,
+          errors: field.getErrors('customSvg'),
+          rows: 6,
+          placeholder: '<svg viewBox="0 0 24 24" ...>...</svg>',
+      }) }}
+    </div>
+  </div>
+</details>

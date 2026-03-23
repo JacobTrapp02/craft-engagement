@@ -1,211 +1,48 @@
 {# @var field \jtdev\craftengagement\fields\RatingField #}
 {# @var pluginSettings \jtdev\craftengagement\models\Settings #}
 
-{% import '_includes/forms.twig' as forms %}
+{% include 'engagement/_fields/rating/_widgetPreview.twig' with {
+    title: 'Widget Preview'|t('engagement'),
+    instructions: 'Live preview of how the widget will look before and after rating.'|t('engagement'),
+    elementId: 1,
+    fieldId: 1,
+    siteId: 1,
+    label: field.name ?? 'Rating'|t('engagement'),
+    icon: field.icon,
+    emojiIcon: field.emojiIcon,
+    customSvg: field.customSvg,
+    scale: field.scale ?: pluginSettings.defaultScale,
+    average: 3.75,
+    voteCount: 42,
+    headingText: field.headingText,
+    clickToRateText: field.clickToRateText,
+    yourRatingText: field.yourRatingText,
+    afterUserRating: 4,
+} only %}
 
-{{ forms.textField({
-    label: 'Scale'|t('engagement'),
-    instructions: 'Default scale for this field. Must be between 1 and plugin Max Scale ({max}).'|t('engagement', { max: pluginSettings.maxScale }),
-    id: 'scale',
-    name: 'scale',
-    type: 'number',
-    min: 1,
-    max: pluginSettings.maxScale,
-    value: field.scale ?: pluginSettings.defaultScale,
-    required: true,
-    errors: field.getErrors('scale'),
-}) }}
+{% include 'engagement/_fields/rating/settings/_sectionIconAppearance.twig' with {
+    field: field,
+    pluginSettings: pluginSettings,
+    iconOptions: iconOptions,
+} only %}
 
-<div class="field eng-group-card">
-      <div class="heading"><label>{{ 'Icon Appearance'|t('engagement') }}</label></div>
-      <div class="instructions"><p>{{ 'Choose how rating icons are displayed. Pick an icon mode, then configure the matching input below.'|t('engagement') }}</p></div>
+{% include 'engagement/_fields/rating/settings/_sectionRatingBehavior.twig' with {
+    field: field,
+    pluginSettings: pluginSettings,
+} only %}
 
-      {{ forms.selectField({
-          label: 'Icon Mode'|t('engagement'),
-          id: 'icon',
-          name: 'icon',
-          options: iconOptions,
-          value: field.icon ?: pluginSettings.defaultIcon,
-          errors: field.getErrors('icon'),
-          inputAttributes: {
-              'data-icon-mode-source': '1',
-          },
-      }) }}
+{% include 'engagement/_fields/rating/settings/_sectionTextOverrides.twig' with {
+    field: field,
+} only %}
 
-      <div data-icon-mode-panel="emoji" style="{{ field.icon == 'emoji' ? '' : 'display:none;' }}">
-        {% include 'engagement/_fields/rating/_emojiPicker.twig' with {
-            label: 'Emoji Icon'|t('engagement'),
-            instructions: 'Paste an emoji or choose one with Pick Emoji.'|t('engagement'),
-            inputId: 'emojiIcon',
-            inputName: 'emojiIcon',
-            inputValue: field.emojiIcon,
-            errors: field.getErrors('emojiIcon'),
-        } only %}
-      </div>
-
-      <div data-icon-mode-panel="customSvg" style="{{ field.icon == 'customSvg' ? '' : 'display:none;' }}">
-        {{ forms.textareaField({
-            label: 'Custom SVG Markup'|t('engagement'),
-            instructions: 'Paste one SVG icon. It will be repeated across the scale.'|t('engagement'),
-            id: 'customSvg',
-            name: 'customSvg',
-            value: field.customSvg,
-            errors: field.getErrors('customSvg'),
-            rows: 6,
-            placeholder: '<svg viewBox="0 0 24 24" ...>...</svg>',
-        }) }}
-      </div>
-</div>
-
-<div class="field eng-group-card">
-      <div class="heading"><label>{{ 'Widget Preview'|t('engagement') }}</label></div>
-      <div class="instructions"><p>{{ 'Live preview of how the widget will look before and after rating.'|t('engagement') }}</p></div>
-      <div class="eng-preview-grid">
-        <div class="eng-preview-col">
-          <div class="eng-preview-title">{{ 'Before Rating'|t('engagement') }}</div>
-          {% include 'engagement/_render/favorite.twig' with {
-              previewMode: true,
-              elementId: 1,
-              fieldId: 1,
-              siteId: 1,
-              label: field.name ?? 'Rating'|t('engagement'),
-              icon: field.icon,
-              emojiIcon: field.emojiIcon,
-              customSvg: field.customSvg,
-              scale: field.scale ?: pluginSettings.defaultScale,
-              average: 3.75,
-              voteCount: 42,
-              headingText: field.headingText,
-              clickToRateText: field.clickToRateText,
-              yourRatingText: field.yourRatingText,
-              isLoggedIn: true,
-              userRating: null,
-              actionUrl: '#',
-              loginUrl: '#',
-          } only %}
-        </div>
-        <div class="eng-preview-col">
-          <div class="eng-preview-title">{{ 'After Rating'|t('engagement') }}</div>
-          {% include 'engagement/_render/favorite.twig' with {
-              previewMode: true,
-              elementId: 1,
-              fieldId: 1,
-              siteId: 1,
-              label: field.name ?? 'Rating'|t('engagement'),
-              icon: field.icon,
-              emojiIcon: field.emojiIcon,
-              customSvg: field.customSvg,
-              scale: field.scale ?: pluginSettings.defaultScale,
-              average: 3.75,
-              voteCount: 42,
-              headingText: field.headingText,
-              clickToRateText: field.clickToRateText,
-              yourRatingText: field.yourRatingText,
-              isLoggedIn: true,
-              userRating: 4,
-              actionUrl: '#',
-              loginUrl: '#',
-          } only %}
-        </div>
-      </div>
-</div>
-
-<details class="eng-disclosure">
-  <summary>{{ 'Text Overrides'|t('engagement') }}</summary>
-  <div class="field eng-group-card">
-    <div class="instructions"><p>{{ 'Configure the text shown around the rating widget.'|t('engagement') }}</p></div>
-
-    {{ forms.textField({
-        label: 'Text Above Widget'|t('engagement'),
-        instructions: 'Optional. Supports tokens: {userRating}, {votes}, {average}, {roundedAverage}, {scale}, {fieldName}, {elementId}.'|t('engagement'),
-        id: 'headingText',
-        name: 'headingText',
-        value: field.headingText,
-        errors: field.getErrors('headingText'),
-    }) }}
-
-    {{ forms.textField({
-        label: 'Click-To-Rate Text'|t('engagement'),
-        instructions: 'Optional. Supports tokens: {userRating}, {votes}, {average}, {roundedAverage}, {scale}, {fieldName}, {elementId}.'|t('engagement'),
-        id: 'clickToRateText',
-        name: 'clickToRateText',
-        value: field.clickToRateText,
-        errors: field.getErrors('clickToRateText'),
-    }) }}
-
-    {{ forms.textField({
-        label: 'Your-Rating Text'|t('engagement'),
-        instructions: 'Optional. Supports tokens: {userRating}, {votes}, {average}, {roundedAverage}, {scale}, {fieldName}, {elementId}.'|t('engagement'),
-        id: 'yourRatingText',
-        name: 'yourRatingText',
-        value: field.yourRatingText,
-        errors: field.getErrors('yourRatingText'),
-    }) }}
-  </div>
-</details>
-
-<details class="eng-disclosure">
-  <summary>{{ 'Rating Behavior'|t('engagement') }}</summary>
-  {{ forms.lightswitchField({
-      label: 'Default Enabled State'|t('engagement'),
-      instructions: 'Whether ratings are enabled by default on newly-created elements.'|t('engagement'),
-      id: 'defaultEnabled',
-      name: 'defaultEnabled',
-      on: field.defaultEnabled,
-      errors: field.getErrors('defaultEnabled'),
-  }) }}
-
-  {{ forms.lightswitchField({
-      label: 'Allow Guest Ratings'|t('engagement'),
-      id: 'allowGuestRatings',
-      name: 'allowGuestRatings',
-      on: field.allowGuestRatings,
-      errors: field.getErrors('allowGuestRatings'),
-  }) }}
-
-  {{ forms.lightswitchField({
-      label: 'Allow Users to Change Their Rating'|t('engagement'),
-      id: 'allowUserRatingChange',
-      name: 'allowUserRatingChange',
-      on: field.allowUserRatingChange,
-      errors: field.getErrors('allowUserRatingChange'),
-  }) }}
-</details>
-
-<details class="eng-disclosure">
-  <summary>{{ 'Editor Overrides'|t('engagement') }}</summary>
-  {{ forms.lightswitchField({
-      label: 'Allow Editor Overrides'|t('engagement'),
-      instructions: 'Turn on if editors should be able to override field defaults on entries.'|t('engagement'),
-      id: 'allowEditorOverridesToggle',
-      name: 'allowEditorOverrides',
-      on: field.allowEditorOverrides,
-      errors: field.getErrors('allowEditorOverrides'),
-  }) }}
-
-  <div id="editorOverridePermissions" class="eng-group-card">
-    <div class="heading"><label>{{ 'Editor Override Permissions'|t('engagement') }}</label></div>
-    <div class="instructions"><p>{{ 'Choose which options editors can change per entry.'|t('engagement') }}</p></div>
-    {{ forms.lightswitchField({ label: 'Scale'|t('engagement'), id: 'allowOverrideScaleToggle', name: 'allowOverrideScale', on: field.allowOverrideScale, errors: field.getErrors('allowOverrideScale') }) }}
-    {{ forms.lightswitchField({ label: 'Icon Appearance'|t('engagement'), id: 'allowOverrideIconAppearanceToggle', name: 'allowOverrideIconAppearance', on: field.allowOverrideIconAppearance, errors: field.getErrors('allowOverrideIconAppearance') }) }}
-    {{ forms.lightswitchField({ label: 'Widget Preview'|t('engagement'), id: 'allowOverrideWidgetEnabledToggle', name: 'allowOverrideWidgetEnabled', on: field.allowOverrideWidgetEnabled, errors: field.getErrors('allowOverrideWidgetEnabled') }) }}
-    {{ forms.lightswitchField({ label: 'Allow Guest Ratings'|t('engagement'), id: 'allowOverrideGuestRatingsToggle', name: 'allowOverrideGuestRatings', on: field.allowOverrideGuestRatings, errors: field.getErrors('allowOverrideGuestRatings') }) }}
-    {{ forms.lightswitchField({ label: 'Allow Users to Change Their Rating'|t('engagement'), id: 'allowOverrideUserRatingChangeToggle', name: 'allowOverrideUserRatingChange', on: field.allowOverrideUserRatingChange, errors: field.getErrors('allowOverrideUserRatingChange') }) }}
-
-    <div class="heading"><label>{{ 'Text Overrides'|t('engagement') }}</label></div>
-    <div class="instructions"><p>{{ 'These control the three optional text messages around the widget.'|t('engagement') }}</p></div>
-    {{ forms.lightswitchField({ label: 'Text Above Widget'|t('engagement'), id: 'allowOverrideHeadingTextToggle', name: 'allowOverrideHeadingText', on: field.allowOverrideHeadingText, errors: field.getErrors('allowOverrideHeadingText') }) }}
-    {{ forms.lightswitchField({ label: 'Click-To-Rate Text'|t('engagement'), id: 'allowOverrideClickToRateTextToggle', name: 'allowOverrideClickToRateText', on: field.allowOverrideClickToRateText, errors: field.getErrors('allowOverrideClickToRateText') }) }}
-    {{ forms.lightswitchField({ label: 'Your-Rating Text'|t('engagement'), id: 'allowOverrideYourRatingTextToggle', name: 'allowOverrideYourRatingText', on: field.allowOverrideYourRatingText, errors: field.getErrors('allowOverrideYourRatingText') }) }}
-  </div>
-</details>
+{% include 'engagement/_fields/rating/settings/_sectionEditorOverrides.twig' with {
+    field: field,
+} only %}
 
 {% js %}
 (() => {
   const panels = document.querySelectorAll('[data-icon-mode-panel]');
   const getIconSelect = () => document.querySelector('[data-icon-mode-source="1"]');
-  const getMasterToggle = () => document.getElementById('allowEditorOverridesToggle');
-  const getPermissions = () => document.getElementById('editorOverridePermissions');
 
   const syncIconPanels = () => {
     const iconSelect = getIconSelect();
@@ -220,16 +57,6 @@
     });
   };
 
-  const syncOverridePermissions = () => {
-    const master = getMasterToggle();
-    const permissions = getPermissions();
-    if (!permissions) {
-      return;
-    }
-    const show = !!(master && master.checked);
-    permissions.style.display = show ? '' : 'none';
-  };
-
   document.addEventListener('change', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) {
@@ -239,16 +66,10 @@
     if (target.matches('[data-icon-mode-source="1"]')) {
       syncIconPanels();
     }
-
-    if (target.id === 'allowEditorOverridesToggle') {
-      syncOverridePermissions();
-    }
   });
 
   syncIconPanels();
-  syncOverridePermissions();
   requestAnimationFrame(syncIconPanels);
-  requestAnimationFrame(syncOverridePermissions);
 })();
 {% endjs %}
 
@@ -257,18 +78,51 @@
   border: 1px solid #d6d9de;
   border-radius: 10px;
   background: #f9fafb;
-  padding: 12px 12px 2px;
+  padding: 12px;
   margin-bottom: 14px;
 }
 
 .eng-disclosure {
   margin: 14px 0;
+  border: 1px solid #d6d9de;
+  border-radius: 10px;
+  background: #f9fafb;
+  padding: 12px;
 }
 
 .eng-disclosure > summary {
   cursor: pointer;
   font-weight: 600;
-  margin-bottom: 8px;
+  display: list-item;
+  margin-bottom: 0;
+}
+
+.eng-disclosure[open] > summary {
+  margin-bottom: 10px;
+}
+
+.eng-disclosure .eng-group-card {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.eng-editor-master {
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.eng-subgroup-card {
+  border: 1px solid #e5e7eb !important;
+  background: #fff !important;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.eng-disclosure .eng-subgroup-card {
+  padding: 12px;
 }
 
 .eng-preview-grid {

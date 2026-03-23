@@ -1,0 +1,35 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Text Overrides'|t('engagement') }}</summary>
+  <div class="field eng-group-card">
+    <div class="instructions"><p>{{ 'Optional. Supports tokens: {userRating}, {votes}, {average}, {roundedAverage}, {scale}, {fieldName}.'|t('engagement') }}</p></div>
+
+    {% if field.allowOverrideHeadingText %}
+      {{ forms.textField({
+          label: 'Text Above Widget Override'|t('engagement'),
+          id: prefix ~ '-heading-text',
+          name: prefix ~ '[headingText]',
+          value: rating.headingText,
+      }) }}
+    {% endif %}
+
+    {% if field.allowOverrideClickToRateText %}
+      {{ forms.textField({
+          label: 'Text Below Widget (After Rating) Override'|t('engagement'),
+          id: prefix ~ '-click-to-rate-text',
+          name: prefix ~ '[clickToRateText]',
+          value: rating.clickToRateText,
+      }) }}
+    {% endif %}
+
+    {% if field.allowOverrideYourRatingText %}
+      {{ forms.textField({
+          label: 'Text After Rating Override'|t('engagement'),
+          id: prefix ~ '-your-rating-text',
+          name: prefix ~ '[yourRatingText]',
+          value: rating.yourRatingText,
+      }) }}
+    {% endif %}
+  </div>
+</details>

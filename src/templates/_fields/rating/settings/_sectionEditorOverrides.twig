@@ -1,0 +1,32 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Editor Overrides'|t('engagement') }}</summary>
+  <div id="allowEditorOverridesField" class="eng-editor-master">
+    {{ forms.lightswitchField({
+        label: 'Allow Editor Overrides'|t('engagement'),
+        instructions: 'Master switch. Turn this on to allow any per-entry overrides.'|t('engagement'),
+        id: 'allowEditorOverridesToggle',
+        name: 'allowEditorOverrides',
+        on: field.allowEditorOverrides,
+        errors: field.getErrors('allowEditorOverrides'),
+    }) }}
+  </div>
+
+  <div id="editorOverridePermissions" class="eng-group-card eng-subgroup-card">
+    <div class="heading"><label>{{ 'Editor Override Permissions'|t('engagement') }}</label></div>
+    <div class="instructions"><p>{{ 'Choose which options editors can change per entry.'|t('engagement') }}</p></div>
+    {{ forms.lightswitchField({ label: 'Enable/Disable Widget Per Entry'|t('engagement'), instructions: 'Shows the “Enabled for This Element” switch in entry edit screens.'|t('engagement'), id: 'allowOverrideWidgetEnabledToggle', name: 'allowOverrideWidgetEnabled', on: field.allowOverrideWidgetEnabled, errors: field.getErrors('allowOverrideWidgetEnabled') }) }}
+    {{ forms.lightswitchField({ label: 'Show Widget Preview to Editors'|t('engagement'), instructions: 'Shows the preview widget at the top of the entry editor rating box.'|t('engagement'), id: 'allowOverrideWidgetPreviewToggle', name: 'allowOverrideWidgetPreview', on: field.allowOverrideWidgetPreview, errors: field.getErrors('allowOverrideWidgetPreview') }) }}
+    {{ forms.lightswitchField({ label: 'Scale'|t('engagement'), id: 'allowOverrideScaleToggle', name: 'allowOverrideScale', on: field.allowOverrideScale, errors: field.getErrors('allowOverrideScale') }) }}
+    {{ forms.lightswitchField({ label: 'Icon Appearance'|t('engagement'), id: 'allowOverrideIconAppearanceToggle', name: 'allowOverrideIconAppearance', on: field.allowOverrideIconAppearance, errors: field.getErrors('allowOverrideIconAppearance') }) }}
+    {{ forms.lightswitchField({ label: 'Allow Guest Ratings'|t('engagement'), id: 'allowOverrideGuestRatingsToggle', name: 'allowOverrideGuestRatings', on: field.allowOverrideGuestRatings, errors: field.getErrors('allowOverrideGuestRatings') }) }}
+    {{ forms.lightswitchField({ label: 'Allow Users to Change Their Rating'|t('engagement'), id: 'allowOverrideUserRatingChangeToggle', name: 'allowOverrideUserRatingChange', on: field.allowOverrideUserRatingChange, errors: field.getErrors('allowOverrideUserRatingChange') }) }}
+
+    <div class="heading"><label>{{ 'Text Overrides'|t('engagement') }}</label></div>
+    <div class="instructions"><p>{{ 'These control the three optional text messages around the widget.'|t('engagement') }}</p></div>
+    {{ forms.lightswitchField({ label: 'Text Above Widget'|t('engagement'), id: 'allowOverrideHeadingTextToggle', name: 'allowOverrideHeadingText', on: field.allowOverrideHeadingText, errors: field.getErrors('allowOverrideHeadingText') }) }}
+    {{ forms.lightswitchField({ label: 'Text Below Widget (After Rating)'|t('engagement'), id: 'allowOverrideClickToRateTextToggle', name: 'allowOverrideClickToRateText', on: field.allowOverrideClickToRateText, errors: field.getErrors('allowOverrideClickToRateText') }) }}
+    {{ forms.lightswitchField({ label: 'Text After Rating'|t('engagement'), id: 'allowOverrideYourRatingTextToggle', name: 'allowOverrideYourRatingText', on: field.allowOverrideYourRatingText, errors: field.getErrors('allowOverrideYourRatingText') }) }}
+  </div>
+</details>
