@@ -1,0 +1,37 @@
+{% import '_includes/forms.twig' as forms %}
+
+{% set colorPattern = '/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/' %}
+{% set rawValue = (value ?? '')|trim %}
+{% set fallbackColor = defaultColor ?? '#64748b' %}
+{% set normalizedValue = rawValue matches colorPattern ? rawValue : fallbackColor %}
+
+<div class="eng-color-pair">
+  {{ forms.textField({
+      label: label,
+      id: id,
+      name: name,
+      value: value ?? '',
+      errors: errors ?? null,
+      placeholder: placeholder ?? fallbackColor,
+      inputAttributes: {
+          'data-eng-color-text': '1',
+      },
+  }) }}
+
+  <div
+    class="eng-color-picker-row"
+    style="display:flex; align-items:center; gap:10px; margin:-4px 0 12px 0;"
+  >
+    <label for="{{ id }}-picker" style="font-size:12px; color:#64748b;">
+      {{ 'Pick color'|t('engagement') }}
+    </label>
+    <input
+      type="color"
+      id="{{ id }}-picker"
+      value="{{ normalizedValue|length == 4 ? '#' ~ normalizedValue[1] ~ normalizedValue[1] ~ normalizedValue[2] ~ normalizedValue[2] ~ normalizedValue[3] ~ normalizedValue[3] : normalizedValue }}"
+      data-eng-color-picker="1"
+      style="width:40px; height:28px; border:1px solid #d1d5db; border-radius:6px; background:#fff; padding:0;"
+    >
+    <span style="font-size:12px; color:#64748b;">{{ 'You can still paste a hex value.'|t('engagement') }}</span>
+  </div>
+</div>

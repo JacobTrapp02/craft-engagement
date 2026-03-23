@@ -1,0 +1,11 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Text Overrides'|t('engagement') }}</summary>
+  <div class="field eng-group-card">
+    <div class="instructions"><p>{{ 'Optional. Supports tokens: {favorites}, {favoriteCount}, {fieldName}, {elementId}, {isFavorited}.'|t('engagement') }}</p></div>
+    {{ forms.textField({ label: 'Text Above Widget'|t('engagement'), id: 'headingText', name: 'headingText', value: field.headingText, errors: field.getErrors('headingText') }) }}
+    {{ forms.textField({ label: 'Favorite Button Text'|t('engagement'), id: 'favoriteText', name: 'favoriteText', value: field.favoriteText, errors: field.getErrors('favoriteText') }) }}
+    {{ forms.textField({ label: 'Unfavorite Button Text'|t('engagement'), id: 'unfavoriteText', name: 'unfavoriteText', value: field.unfavoriteText, errors: field.getErrors('unfavoriteText') }) }}
+  </div>
+</details>

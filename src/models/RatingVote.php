@@ -8,7 +8,7 @@ use DateTime;
 /**
  * Individual rating vote model.
  */
-class Vote extends Model
+class RatingVote extends Model
 {
     public ?int $id = null;
     public int $topId;

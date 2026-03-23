@@ -1,0 +1,57 @@
+{# Shared favorites widget preview block for settings + entry editor #}
+<div class="field eng-group-card">
+  <div class="heading"><label>{{ title }}</label></div>
+  {% if instructions is defined and instructions %}
+    <div class="instructions"><p>{{ instructions }}</p></div>
+  {% endif %}
+  <div class="eng-preview-grid">
+    <div class="eng-preview-col">
+      <div class="eng-preview-title">{{ 'Before Interaction'|t('engagement') }}</div>
+      {% include 'engagement/favorites/_render/widget.twig' with {
+          previewMode: true,
+          elementId: elementId,
+          fieldId: fieldId,
+          siteId: siteId,
+          label: label,
+          icon: icon,
+          emojiIcon: emojiIcon,
+          beforeFavoriteColor: beforeFavoriteColor,
+          afterFavoriteColor: afterFavoriteColor,
+          customSvg: customSvg,
+          favoriteCount: favoriteCount,
+          headingText: headingText,
+          favoriteText: favoriteText,
+          unfavoriteText: unfavoriteText,
+          isLoggedIn: true,
+          guestAllowed: true,
+          isFavorited: false,
+          actionUrl: '#',
+          loginUrl: '#',
+      } only %}
+    </div>
+    <div class="eng-preview-col">
+      <div class="eng-preview-title">{{ 'After Interaction'|t('engagement') }}</div>
+      {% include 'engagement/favorites/_render/widget.twig' with {
+          previewMode: true,
+          elementId: elementId,
+          fieldId: fieldId,
+          siteId: siteId,
+          label: label,
+          icon: icon,
+          emojiIcon: emojiIcon,
+          beforeFavoriteColor: beforeFavoriteColor,
+          afterFavoriteColor: afterFavoriteColor,
+          customSvg: customSvg,
+          favoriteCount: favoriteCount,
+          headingText: headingText,
+          favoriteText: favoriteText,
+          unfavoriteText: unfavoriteText,
+          isLoggedIn: true,
+          guestAllowed: true,
+          isFavorited: true,
+          actionUrl: '#',
+          loginUrl: '#',
+      } only %}
+    </div>
+  </div>
+</div>

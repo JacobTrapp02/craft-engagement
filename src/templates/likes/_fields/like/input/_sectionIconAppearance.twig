@@ -1,0 +1,88 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Icon Appearance'|t('engagement') }}</summary>
+  <div class="field eng-group-card">
+    {% if canOverrideIcon %}
+      {{ forms.selectField({
+          label: 'Icon Override'|t('engagement'),
+          id: prefix ~ '-icon',
+          name: prefix ~ '[icon]',
+          options: iconOptions,
+          value: like.icon,
+          inputAttributes: {
+            'data-entry-icon-mode-source': '1',
+          },
+      }) }}
+
+      <div data-entry-icon-mode-panel="emoji" style="{{ like.icon == 'emoji' ? '' : 'display:none;' }}">
+        {% include 'engagement/ratings/_fields/rating/_emojiPicker.twig' with {
+            label: 'Like Emoji Override'|t('engagement'),
+            inputId: prefix ~ '-like-emoji-icon',
+            inputName: prefix ~ '[likeEmojiIcon]',
+            inputValue: like.likeEmojiIcon,
+        } only %}
+
+        {% include 'engagement/ratings/_fields/rating/_emojiPicker.twig' with {
+            label: 'Dislike Emoji Override'|t('engagement'),
+            inputId: prefix ~ '-dislike-emoji-icon',
+            inputName: prefix ~ '[dislikeEmojiIcon]',
+            inputValue: like.dislikeEmojiIcon,
+        } only %}
+      </div>
+
+      <div data-entry-icon-mode-panel="customSvg" style="{{ like.icon == 'customSvg' ? '' : 'display:none;' }}">
+        {{ forms.textareaField({ label: 'Custom SVG Override'|t('engagement'), id: prefix ~ '-custom-svg', name: prefix ~ '[customSvg]', value: like.customSvg }) }}
+      </div>
+    {% endif %}
+
+    {% if canOverrideColors %}
+      <div class="instructions"><p>{{ 'Controls icon colors for before/after like and dislike states on this entry.'|t('engagement') }}</p></div>
+      <div class="eng-color-matrix">
+        <div></div>
+        <div class="eng-color-matrix__header">{{ 'Like'|t('engagement') }}</div>
+        <div class="eng-color-matrix__header">{{ 'Dislike'|t('engagement') }}</div>
+
+        <div class="eng-color-matrix__row">{{ 'Before'|t('engagement') }}</div>
+        <div>
+          {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+              label: 'Like Color Override'|t('engagement'),
+              id: prefix ~ '-before-like-color',
+              name: prefix ~ '[beforeLikeColor]',
+              value: like.beforeLikeColor,
+              defaultColor: '#64748b',
+          } only %}
+        </div>
+        <div>
+          {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+              label: 'Dislike Color Override'|t('engagement'),
+              id: prefix ~ '-before-dislike-color',
+              name: prefix ~ '[beforeDislikeColor]',
+              value: like.beforeDislikeColor,
+              defaultColor: '#64748b',
+          } only %}
+        </div>
+
+        <div class="eng-color-matrix__row">{{ 'After'|t('engagement') }}</div>
+        <div>
+          {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+              label: 'Like Color Override'|t('engagement'),
+              id: prefix ~ '-after-like-color',
+              name: prefix ~ '[afterLikeColor]',
+              value: like.afterLikeColor,
+              defaultColor: '#0369a1',
+          } only %}
+        </div>
+        <div>
+          {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+            label: 'Dislike Color Override'|t('engagement'),
+              id: prefix ~ '-after-dislike-color',
+              name: prefix ~ '[afterDislikeColor]',
+              value: like.afterDislikeColor,
+              defaultColor: '#b91c1c',
+          } only %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</details>

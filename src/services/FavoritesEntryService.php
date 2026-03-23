@@ -3,31 +3,31 @@
 namespace jtdev\craftengagement\services;
 
 use craft\base\Component;
-use jtdev\craftengagement\models\Vote;
-use jtdev\craftengagement\records\VoteRecord;
+use jtdev\craftengagement\models\FavoritesEntry;
+use jtdev\craftengagement\records\FavoritesEntryRecord;
 
 /**
- * Basic CRUD service for rating votes.
+ * Basic CRUD service for favorite entries.
  */
-class VoteService extends Component
+class FavoritesEntryService extends Component
 {
-    public function getById(int $id): ?Vote
+    public function getById(int $id): ?FavoritesEntry
     {
-        $record = VoteRecord::findOne($id);
+        $record = FavoritesEntryRecord::findOne($id);
 
         return $record ? $this->recordToModel($record) : null;
     }
 
     /**
-     * @return Vote[]
+     * @return FavoritesEntry[]
      */
-    public function getByAggregateId(int $topId): array
+    public function getByAggregateId(int $aggregateId): array
     {
-        return $this->getMany(['topId' => $topId]);
+        return $this->getMany(['aggregateId' => $aggregateId]);
     }
 
     /**
-     * @return Vote[]
+     * @return FavoritesEntry[]
      */
     public function getByUserId(int $userId): array
     {
@@ -35,18 +35,18 @@ class VoteService extends Component
     }
 
     /**
-     * @return Vote[]
+     * @return FavoritesEntry[]
      */
     public function getBySessionId(string $sessionId): array
     {
         return $this->getMany(['sessionId' => $sessionId]);
     }
 
-    public function getByAggregateAndUserId(int $topId, int $userId): ?Vote
+    public function getByAggregateAndUserId(int $aggregateId, int $userId): ?FavoritesEntry
     {
-        $record = VoteRecord::find()
+        $record = FavoritesEntryRecord::find()
             ->where([
-                'topId' => $topId,
+                'aggregateId' => $aggregateId,
                 'userId' => $userId,
             ])
             ->one();
@@ -54,11 +54,11 @@ class VoteService extends Component
         return $record ? $this->recordToModel($record) : null;
     }
 
-    public function getByAggregateAndSessionId(int $topId, string $sessionId): ?Vote
+    public function getByAggregateAndSessionId(int $aggregateId, string $sessionId): ?FavoritesEntry
     {
-        $record = VoteRecord::find()
+        $record = FavoritesEntryRecord::find()
             ->where([
-                'topId' => $topId,
+                'aggregateId' => $aggregateId,
                 'sessionId' => $sessionId,
             ])
             ->one();
@@ -69,7 +69,7 @@ class VoteService extends Component
     /**
      * @param array<string, mixed> $criteria
      * @param array<string, int>|null $orderBy
-     * @return Vote[]
+     * @return FavoritesEntry[]
      */
     public function getMany(
         array $criteria = [],
@@ -77,7 +77,7 @@ class VoteService extends Component
         ?int $limit = null,
         ?int $offset = null
     ): array {
-        $query = VoteRecord::find()->where($criteria);
+        $query = FavoritesEntryRecord::find()->where($criteria);
 
         if ($orderBy !== null) {
             $query->orderBy($orderBy);
@@ -91,20 +91,19 @@ class VoteService extends Component
             $query->offset($offset);
         }
 
-        /** @var VoteRecord[] $records */
+        /** @var FavoritesEntryRecord[] $records */
         $records = $query->all();
 
         return array_map([$this, 'recordToModel'], $records);
     }
 
-    public function add(Vote $vote): ?Vote
+    public function add(FavoritesEntry $entry): ?FavoritesEntry
     {
-        $record = new VoteRecord();
+        $record = new FavoritesEntryRecord();
 
-        $record->topId = $vote->topId;
-        $record->userId = $vote->userId;
-        $record->sessionId = $vote->sessionId;
-        $record->rating = $vote->rating;
+        $record->aggregateId = $entry->aggregateId;
+        $record->userId = $entry->userId;
+        $record->sessionId = $entry->sessionId;
 
         if (!$record->save()) {
             return null;
@@ -113,9 +112,9 @@ class VoteService extends Component
         return $this->recordToModel($record);
     }
 
-    public function update(int $id, array $attributes): ?Vote
+    public function update(int $id, array $attributes): ?FavoritesEntry
     {
-        $record = VoteRecord::findOne($id);
+        $record = FavoritesEntryRecord::findOne($id);
 
         if (!$record) {
             return null;
@@ -136,7 +135,7 @@ class VoteService extends Component
 
     public function delete(int $id): bool
     {
-        $record = VoteRecord::findOne($id);
+        $record = FavoritesEntryRecord::findOne($id);
 
         if (!$record) {
             return false;
@@ -145,14 +144,13 @@ class VoteService extends Component
         return (bool)$record->delete();
     }
 
-    private function recordToModel(VoteRecord $record): Vote
+    private function recordToModel(FavoritesEntryRecord $record): FavoritesEntry
     {
-        return new Vote([
+        return new FavoritesEntry([
             'id' => (int)$record->id,
-            'topId' => (int)$record->topId,
+            'aggregateId' => (int)$record->aggregateId,
             'userId' => $record->userId !== null ? (int)$record->userId : null,
             'sessionId' => $record->sessionId,
-            'rating' => (int)$record->rating,
         ]);
     }
 }

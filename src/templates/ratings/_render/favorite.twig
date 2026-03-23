@@ -11,6 +11,7 @@
 {% set widgetEmojiIcon = emojiIcon ?? '⭐' %}
 {% set widgetCustomSvg = customSvg ?? null %}
 {% set widgetIsLoggedIn = isLoggedIn ?? false %}
+{% set widgetGuestAllowed = guestAllowed ?? false %}
 {% set widgetUserRating = userRating ?? null %}
 {% set widgetLoginUrl = loginUrl ?? url('login') %}
 {% set widgetHeadingText = headingText ?? null %}
@@ -54,6 +55,7 @@
     data-action-url="{{ widgetActionUrl|e('html_attr') }}"
     data-login-url="{{ widgetLoginUrl|e('html_attr') }}"
     data-is-logged-in="{{ widgetIsLoggedIn ? '1' : '0' }}"
+    data-guest-allowed="{{ widgetGuestAllowed ? '1' : '0' }}"
     data-scale="{{ widgetScale|e('html_attr') }}"
     style="text-align:center;"
   >
@@ -140,6 +142,7 @@
     const actionUrl = root.getAttribute('data-action-url');
     const loginUrl = root.getAttribute('data-login-url') || '/login';
     const isLoggedIn = root.getAttribute('data-is-logged-in') === '1';
+    const guestAllowed = root.getAttribute('data-guest-allowed') === '1';
     const elementId = Number(root.getAttribute('data-element-id'));
     const fieldId = Number(root.getAttribute('data-field-id'));
     const siteId = Number(root.getAttribute('data-site-id'));
@@ -205,7 +208,7 @@
 
     buttons.forEach((btn) => {
       btn.addEventListener('click', async () => {
-        if (!isLoggedIn) {
+        if (!isLoggedIn && !guestAllowed) {
           const goLogin = window.confirm({{ 'Please log in to rate this.'|t('engagement')|json_encode|raw }});
           if (goLogin) {
             window.location.href = loginUrl;

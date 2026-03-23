@@ -1,0 +1,8 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Favorite Behavior'|t('engagement') }}</summary>
+  {{ forms.lightswitchField({ label: 'Default Enabled State'|t('engagement'), id: 'defaultEnabled', name: 'defaultEnabled', on: field.defaultEnabled, errors: field.getErrors('defaultEnabled') }) }}
+
+  {{ forms.lightswitchField({ label: 'Allow Guest Interactions'|t('engagement'), id: 'allowGuestInteractions', name: 'allowGuestInteractions', on: field.allowGuestInteractions, errors: field.getErrors('allowGuestInteractions') }) }}
+</details>

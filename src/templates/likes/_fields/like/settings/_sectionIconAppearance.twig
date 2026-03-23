@@ -1,0 +1,100 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Icon Appearance'|t('engagement') }}</summary>
+  <div class="field eng-group-card">
+    <div class="instructions"><p>{{ 'Set icon colors before and after a vote. These apply to icon mode states (like/dislike and favorited/unfavorited).'|t('engagement') }}</p></div>
+    {{ forms.selectField({
+        label: 'Icon Mode'|t('engagement'),
+        id: 'icon',
+        name: 'icon',
+        options: iconOptions,
+        value: field.icon,
+        errors: field.getErrors('icon'),
+        inputAttributes: {
+            'data-icon-mode-source': '1',
+        },
+    }) }}
+
+    <div data-icon-mode-panel="emoji" style="{{ field.icon == 'emoji' ? '' : 'display:none;' }}">
+      {% include 'engagement/ratings/_fields/rating/_emojiPicker.twig' with {
+          label: 'Like Emoji Icon'|t('engagement'),
+          instructions: 'Paste an emoji or choose one with Pick Emoji.'|t('engagement'),
+          inputId: 'likeEmojiIcon',
+          inputName: 'likeEmojiIcon',
+          inputValue: field.likeEmojiIcon,
+          errors: field.getErrors('likeEmojiIcon'),
+      } only %}
+
+      {% include 'engagement/ratings/_fields/rating/_emojiPicker.twig' with {
+          label: 'Dislike Emoji Icon'|t('engagement'),
+          instructions: 'Set the emoji used for the dislike button.'|t('engagement'),
+          inputId: 'dislikeEmojiIcon',
+          inputName: 'dislikeEmojiIcon',
+          inputValue: field.dislikeEmojiIcon,
+          errors: field.getErrors('dislikeEmojiIcon'),
+      } only %}
+    </div>
+
+    <div data-icon-mode-panel="customSvg" style="{{ field.icon == 'customSvg' ? '' : 'display:none;' }}">
+      {{ forms.textareaField({
+          label: 'Custom SVG Markup'|t('engagement'),
+          id: 'customSvg',
+          name: 'customSvg',
+          value: field.customSvg,
+          errors: field.getErrors('customSvg'),
+          rows: 6,
+      }) }}
+    </div>
+
+    <div class="eng-color-matrix">
+      <div></div>
+      <div class="eng-color-matrix__header">{{ 'Like'|t('engagement') }}</div>
+      <div class="eng-color-matrix__header">{{ 'Dislike'|t('engagement') }}</div>
+
+      <div class="eng-color-matrix__row">{{ 'Before'|t('engagement') }}</div>
+      <div>
+        {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+            label: 'Like Color'|t('engagement'),
+            id: 'beforeLikeColor',
+            name: 'beforeLikeColor',
+            value: field.beforeLikeColor,
+            errors: field.getErrors('beforeLikeColor'),
+            defaultColor: '#64748b',
+        } only %}
+      </div>
+      <div>
+        {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+            label: 'Dislike Color'|t('engagement'),
+            id: 'beforeDislikeColor',
+            name: 'beforeDislikeColor',
+            value: field.beforeDislikeColor,
+            errors: field.getErrors('beforeDislikeColor'),
+            defaultColor: '#64748b',
+        } only %}
+      </div>
+
+      <div class="eng-color-matrix__row">{{ 'After'|t('engagement') }}</div>
+      <div>
+        {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+            label: 'Like Color'|t('engagement'),
+            id: 'afterLikeColor',
+            name: 'afterLikeColor',
+            value: field.afterLikeColor,
+            errors: field.getErrors('afterLikeColor'),
+            defaultColor: '#0369a1',
+        } only %}
+      </div>
+      <div>
+        {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+            label: 'Dislike Color'|t('engagement'),
+            id: 'afterDislikeColor',
+            name: 'afterDislikeColor',
+            value: field.afterDislikeColor,
+            errors: field.getErrors('afterDislikeColor'),
+            defaultColor: '#b91c1c',
+        } only %}
+      </div>
+    </div>
+  </div>
+</details>

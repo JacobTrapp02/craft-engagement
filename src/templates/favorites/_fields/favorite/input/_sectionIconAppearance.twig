@@ -1,0 +1,50 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Icon Appearance'|t('engagement') }}</summary>
+  <div class="field eng-group-card">
+    {% if canOverrideIcon %}
+      {{ forms.selectField({
+          label: 'Icon Override'|t('engagement'),
+          id: prefix ~ '-icon',
+          name: prefix ~ '[icon]',
+          options: iconOptions,
+          value: favorite.icon,
+          inputAttributes: {
+            'data-entry-icon-mode-source': '1',
+          },
+      }) }}
+
+      <div data-entry-icon-mode-panel="emoji" style="{{ favorite.icon == 'emoji' ? '' : 'display:none;' }}">
+        {% include 'engagement/ratings/_fields/rating/_emojiPicker.twig' with {
+            label: 'Emoji Override'|t('engagement'),
+            inputId: prefix ~ '-emoji-icon',
+            inputName: prefix ~ '[emojiIcon]',
+            inputValue: favorite.emojiIcon,
+        } only %}
+      </div>
+
+      <div data-entry-icon-mode-panel="customSvg" style="{{ favorite.icon == 'customSvg' ? '' : 'display:none;' }}">
+        {{ forms.textareaField({ label: 'Custom SVG Override'|t('engagement'), id: prefix ~ '-custom-svg', name: prefix ~ '[customSvg]', value: favorite.customSvg }) }}
+      </div>
+    {% endif %}
+
+    {% if canOverrideColors %}
+      <div class="instructions"><p>{{ 'Controls icon colors for before and after the item is favorited on this entry.'|t('engagement') }}</p></div>
+      {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+          label: 'Before Favorite Color Override'|t('engagement'),
+          id: prefix ~ '-before-favorite-color',
+          name: prefix ~ '[beforeFavoriteColor]',
+          value: favorite.beforeFavoriteColor,
+          defaultColor: '#64748b',
+      } only %}
+      {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+          label: 'After Favorite Color Override'|t('engagement'),
+          id: prefix ~ '-after-favorite-color',
+          name: prefix ~ '[afterFavoriteColor]',
+          value: favorite.afterFavoriteColor,
+          defaultColor: '#dc2626',
+      } only %}
+    {% endif %}
+  </div>
+</details>

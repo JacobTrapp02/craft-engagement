@@ -6,7 +6,7 @@ use Craft;
 use craft\web\Controller;
 use jtdev\craftengagement\fields\RatingField;
 use jtdev\craftengagement\models\RatingAggregate;
-use jtdev\craftengagement\models\Vote;
+use jtdev\craftengagement\models\RatingVote;
 use jtdev\craftengagement\Plugin;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
@@ -68,7 +68,7 @@ class RatingsController extends Controller
         }
 
         $aggregateService = Plugin::getInstance()->ratingAggregates;
-        $voteService = Plugin::getInstance()->votes;
+        $voteService = Plugin::getInstance()->ratingVotes;
 
         $aggregate = $aggregateService->getByElementFieldSite($elementId, $fieldId, $siteId);
         if ($aggregate === null) {
@@ -112,7 +112,7 @@ class RatingsController extends Controller
         }
 
         if ($existingVote === null) {
-            $newVote = new Vote([
+            $newVote = new RatingVote([
                 'topId' => $aggregate->id,
                 'userId' => $currentUser !== null ? (int)$currentUser->id : null,
                 'sessionId' => $currentUser === null ? Craft::$app->getSession()->getId() : null,
@@ -157,7 +157,7 @@ class RatingsController extends Controller
     private function recalculateAggregate(int $aggregateId): ?RatingAggregate
     {
         $aggregateService = Plugin::getInstance()->ratingAggregates;
-        $voteService = Plugin::getInstance()->votes;
+        $voteService = Plugin::getInstance()->ratingVotes;
 
         $aggregate = $aggregateService->getById($aggregateId);
         if ($aggregate === null) {

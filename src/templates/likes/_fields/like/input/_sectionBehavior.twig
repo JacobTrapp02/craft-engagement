@@ -1,0 +1,12 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Like/Dislike Behavior'|t('engagement') }}</summary>
+  {% if canOverrideGuests %}
+    {{ forms.lightswitchField({ label: 'Allow Guest Interactions Override'|t('engagement'), id: prefix ~ '-allow-guest', name: prefix ~ '[allowGuestInteractions]', on: like.allowGuestInteractions }) }}
+  {% endif %}
+
+  {% if canOverrideVoteChange %}
+    {{ forms.lightswitchField({ label: 'Allow Users To Change Vote Override'|t('engagement'), id: prefix ~ '-allow-vote-change', name: prefix ~ '[allowUserVoteChange]', on: like.allowVoteChange }) }}
+  {% endif %}
+</details>

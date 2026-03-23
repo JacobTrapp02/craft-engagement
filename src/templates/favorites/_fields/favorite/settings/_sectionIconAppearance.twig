@@ -1,0 +1,51 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Icon Appearance'|t('engagement') }}</summary>
+  <div class="field eng-group-card">
+    <div class="instructions"><p>{{ 'Set icon colors before and after favoriting.'|t('engagement') }}</p></div>
+    {{ forms.selectField({
+        label: 'Icon Mode'|t('engagement'),
+        id: 'icon',
+        name: 'icon',
+        options: iconOptions,
+        value: field.icon,
+        errors: field.getErrors('icon'),
+        inputAttributes: {
+            'data-icon-mode-source': '1',
+        },
+    }) }}
+
+    <div data-icon-mode-panel="emoji" style="{{ field.icon == 'emoji' ? '' : 'display:none;' }}">
+      {% include 'engagement/ratings/_fields/rating/_emojiPicker.twig' with {
+          label: 'Emoji Icon'|t('engagement'),
+          inputId: 'emojiIcon',
+          inputName: 'emojiIcon',
+          inputValue: field.emojiIcon,
+          errors: field.getErrors('emojiIcon'),
+      } only %}
+    </div>
+
+    <div data-icon-mode-panel="customSvg" style="{{ field.icon == 'customSvg' ? '' : 'display:none;' }}">
+      {{ forms.textareaField({ label: 'Custom SVG Markup'|t('engagement'), id: 'customSvg', name: 'customSvg', value: field.customSvg, errors: field.getErrors('customSvg'), rows: 6 }) }}
+    </div>
+
+    {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+        label: 'Before Favorite Color'|t('engagement'),
+        id: 'beforeFavoriteColor',
+        name: 'beforeFavoriteColor',
+        value: field.beforeFavoriteColor,
+        errors: field.getErrors('beforeFavoriteColor'),
+        defaultColor: '#64748b',
+    } only %}
+
+    {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+        label: 'After Favorite Color'|t('engagement'),
+        id: 'afterFavoriteColor',
+        name: 'afterFavoriteColor',
+        value: field.afterFavoriteColor,
+        errors: field.getErrors('afterFavoriteColor'),
+        defaultColor: '#dc2626',
+    } only %}
+  </div>
+</details>

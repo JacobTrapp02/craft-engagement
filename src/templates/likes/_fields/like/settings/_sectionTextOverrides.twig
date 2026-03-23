@@ -1,0 +1,11 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Text Overrides'|t('engagement') }}</summary>
+  <div class="field eng-group-card">
+    <div class="instructions"><p>{{ 'Optional. Supports tokens: {likes}, {dislikes}, {fieldName}, {elementId}, {userVote}.'|t('engagement') }}</p></div>
+    {{ forms.textField({ label: 'Text Above Widget'|t('engagement'), id: 'headingText', name: 'headingText', value: field.headingText, errors: field.getErrors('headingText') }) }}
+    {{ forms.textField({ label: 'Like Button Text'|t('engagement'), id: 'likeText', name: 'likeText', value: field.likeText, errors: field.getErrors('likeText') }) }}
+    {{ forms.textField({ label: 'Dislike Button Text'|t('engagement'), id: 'dislikeText', name: 'dislikeText', value: field.dislikeText, errors: field.getErrors('dislikeText') }) }}
+  </div>
+</details>

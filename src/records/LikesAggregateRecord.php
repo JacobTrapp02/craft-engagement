@@ -6,17 +6,17 @@ use craft\db\ActiveRecord;
 use yii\db\ActiveQueryInterface;
 
 /**
- * Active record for ratings_aggregate.
+ * Active record for engagement_likes_aggregate.
  */
-class RatingAggregateRecord extends ActiveRecord
+class LikesAggregateRecord extends ActiveRecord
 {
     public static function tableName(): string
     {
-        return '{{%ratings_aggregate}}';
+        return '{{%engagement_likes_aggregate}}';
     }
 
     public function getVotes(): ActiveQueryInterface
     {
-        return $this->hasMany(RatingVoteRecord::class, ['topId' => 'id']);
+        return $this->hasMany(LikesVoteRecord::class, ['aggregateId' => 'id']);
     }
 }

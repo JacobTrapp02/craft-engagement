@@ -8,11 +8,17 @@ use craft\base\Plugin as BasePlugin;
 use craft\events\RegisterComponentTypesEvent;
 use craft\services\Fields;
 use craft\web\twig\variables\CraftVariable;
+use jtdev\craftengagement\fields\FavoritesField;
+use jtdev\craftengagement\fields\LikesField;
 use jtdev\craftengagement\fields\RatingField;
 use jtdev\craftengagement\models\Settings;
+use jtdev\craftengagement\services\FavoritesAggregateService;
+use jtdev\craftengagement\services\FavoritesEntryService;
+use jtdev\craftengagement\services\LikesAggregateService;
+use jtdev\craftengagement\services\LikesVoteService;
 use jtdev\craftengagement\services\RatingAggregateService;
+use jtdev\craftengagement\services\RatingVoteService;
 use jtdev\craftengagement\services\TwigService;
-use jtdev\craftengagement\services\VoteService;
 use jtdev\craftengagement\variables\EngagementVariable;
 use yii\base\Event;
 
@@ -24,7 +30,14 @@ use yii\base\Event;
  * @property-read RatingAggregateService $ratingAggregates
  * @property-read RatingAggregateService $aggregates
  * @property-read TwigService $twig
- * @property-read VoteService $votes
+ * @property-read RatingVoteService $ratingVotes
+ * @property-read RatingVoteService $votes
+ * @property-read LikesAggregateService $likesAggregates
+ * @property-read LikesVoteService $likesVotes
+ * @property-read LikesVoteService $likes
+ * @property-read FavoritesAggregateService $favoritesAggregates
+ * @property-read FavoritesEntryService $favoritesEntries
+ * @property-read FavoritesEntryService $favorites
  * @author JTDev <jake.trapp02@gmail.com>
  * @copyright JTDev
  * @license https://craftcms.github.io/license/ Craft License
@@ -41,7 +54,14 @@ class Plugin extends BasePlugin
                 'ratingAggregates' => RatingAggregateService::class,
                 'aggregates' => RatingAggregateService::class,
                 'twig' => TwigService::class,
-                'votes' => VoteService::class,
+                'ratingVotes' => RatingVoteService::class,
+                'votes' => RatingVoteService::class,
+                'likesAggregates' => LikesAggregateService::class,
+                'likesVotes' => LikesVoteService::class,
+                'likes' => LikesVoteService::class,
+                'favoritesAggregates' => FavoritesAggregateService::class,
+                'favoritesEntries' => FavoritesEntryService::class,
+                'favorites' => FavoritesEntryService::class,
             ],
         ];
     }
@@ -79,6 +99,8 @@ class Plugin extends BasePlugin
             Fields::EVENT_REGISTER_FIELD_TYPES,
             static function(RegisterComponentTypesEvent $event): void {
                 $event->types[] = RatingField::class;
+                $event->types[] = LikesField::class;
+                $event->types[] = FavoritesField::class;
             }
         );
 

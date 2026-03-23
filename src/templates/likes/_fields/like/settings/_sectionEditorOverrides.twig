@@ -1,0 +1,21 @@
+{% import '_includes/forms.twig' as forms %}
+
+<details class="eng-disclosure">
+  <summary>{{ 'Editor Overrides'|t('engagement') }}</summary>
+  <div class="eng-editor-master">
+    {{ forms.lightswitchField({ label: 'Allow Editor Overrides'|t('engagement'), id: 'allowEditorOverridesToggle', name: 'allowEditorOverrides', on: field.allowEditorOverrides, errors: field.getErrors('allowEditorOverrides') }) }}
+  </div>
+
+  <div class="eng-group-card eng-subgroup-card">
+    {{ forms.lightswitchField({ label: 'Enable/Disable Widget Per Entry'|t('engagement'), id: 'allowOverrideWidgetEnabledToggle', name: 'allowOverrideWidgetEnabled', on: field.allowOverrideWidgetEnabled, errors: field.getErrors('allowOverrideWidgetEnabled') }) }}
+    {{ forms.lightswitchField({ label: 'Show Widget Preview to Editors'|t('engagement'), id: 'allowOverrideWidgetPreviewToggle', name: 'allowOverrideWidgetPreview', on: field.allowOverrideWidgetPreview, errors: field.getErrors('allowOverrideWidgetPreview') }) }}
+    {{ forms.lightswitchField({ label: 'Icon Appearance'|t('engagement'), id: 'allowOverrideIconAppearanceToggle', name: 'allowOverrideIconAppearance', on: field.allowOverrideIconAppearance, errors: field.getErrors('allowOverrideIconAppearance') }) }}
+    <div class="instructions"><p>{{ 'Color Override lets editors change all icon state colors (before/after like and before/after dislike) per entry.'|t('engagement') }}</p></div>
+    {{ forms.lightswitchField({ label: 'Color Override'|t('engagement'), id: 'allowOverrideIconColorsToggle', name: 'allowOverrideIconColors', on: field.allowOverrideIconColors, errors: field.getErrors('allowOverrideIconColors') }) }}
+    {{ forms.lightswitchField({ label: 'Allow Guest Interactions'|t('engagement'), id: 'allowOverrideGuestInteractionsToggle', name: 'allowOverrideGuestInteractions', on: field.allowOverrideGuestInteractions, errors: field.getErrors('allowOverrideGuestInteractions') }) }}
+    {{ forms.lightswitchField({ label: 'Allow Users to Change Their Vote'|t('engagement'), id: 'allowOverrideUserVoteChangeToggle', name: 'allowOverrideUserVoteChange', on: field.allowOverrideUserVoteChange, errors: field.getErrors('allowOverrideUserVoteChange') }) }}
+    {{ forms.lightswitchField({ label: 'Text Above Widget'|t('engagement'), id: 'allowOverrideHeadingTextToggle', name: 'allowOverrideHeadingText', on: field.allowOverrideHeadingText, errors: field.getErrors('allowOverrideHeadingText') }) }}
+    {{ forms.lightswitchField({ label: 'Like Button Text'|t('engagement'), id: 'allowOverrideLikeTextToggle', name: 'allowOverrideLikeText', on: field.allowOverrideLikeText, errors: field.getErrors('allowOverrideLikeText') }) }}
+    {{ forms.lightswitchField({ label: 'Dislike Button Text'|t('engagement'), id: 'allowOverrideDislikeTextToggle', name: 'allowOverrideDislikeText', on: field.allowOverrideDislikeText, errors: field.getErrors('allowOverrideDislikeText') }) }}
+  </div>
+</details>

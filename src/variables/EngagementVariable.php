@@ -11,7 +11,31 @@ use Twig\Markup;
 class EngagementVariable
 {
     /**
-     * Render the default favorite UI snippet.
+     * Render UI by inferring the field value type automatically.
+     */
+    public function render(mixed $fieldValue): Markup|string
+    {
+        return Plugin::getInstance()->twig->render($fieldValue);
+    }
+
+    /**
+     * Render the default ratings UI snippet.
+     */
+    public function renderRating(mixed $fieldValue): Markup|string
+    {
+        return Plugin::getInstance()->twig->renderRating($fieldValue);
+    }
+
+    /**
+     * Render the default likes UI snippet.
+     */
+    public function renderLikes(mixed $fieldValue): Markup|string
+    {
+        return Plugin::getInstance()->twig->renderLikes($fieldValue);
+    }
+
+    /**
+     * Render the default favorites UI snippet.
      */
     public function renderFavorite(mixed $fieldValue): Markup|string
     {
