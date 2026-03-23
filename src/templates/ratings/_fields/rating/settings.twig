@@ -1,7 +1,7 @@
 {# @var field \jtdev\craftengagement\fields\RatingField #}
 {# @var pluginSettings \jtdev\craftengagement\models\Settings #}
 
-{% include 'engagement/_fields/rating/_widgetPreview.twig' with {
+{% include 'engagement/ratings/_fields/rating/_widgetPreview.twig' with {
     title: 'Widget Preview'|t('engagement'),
     instructions: 'Live preview of how the widget will look before and after rating.'|t('engagement'),
     elementId: 1,
@@ -20,22 +20,22 @@
     afterUserRating: 4,
 } only %}
 
-{% include 'engagement/_fields/rating/settings/_sectionIconAppearance.twig' with {
+{% include 'engagement/ratings/_fields/rating/settings/_sectionIconAppearance.twig' with {
     field: field,
     pluginSettings: pluginSettings,
     iconOptions: iconOptions,
 } only %}
 
-{% include 'engagement/_fields/rating/settings/_sectionRatingBehavior.twig' with {
+{% include 'engagement/ratings/_fields/rating/settings/_sectionRatingBehavior.twig' with {
     field: field,
     pluginSettings: pluginSettings,
 } only %}
 
-{% include 'engagement/_fields/rating/settings/_sectionTextOverrides.twig' with {
+{% include 'engagement/ratings/_fields/rating/settings/_sectionTextOverrides.twig' with {
     field: field,
 } only %}
 
-{% include 'engagement/_fields/rating/settings/_sectionEditorOverrides.twig' with {
+{% include 'engagement/ratings/_fields/rating/settings/_sectionEditorOverrides.twig' with {
     field: field,
 } only %}
 

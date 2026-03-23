@@ -17,6 +17,6 @@ class VoteRecord extends ActiveRecord
 
     public function getAggregate(): ActiveQueryInterface
     {
-        return $this->hasOne(AggregateRecord::class, ['id' => 'topId']);
+        return $this->hasOne(RatingAggregateRecord::class, ['id' => 'topId']);
     }
 }

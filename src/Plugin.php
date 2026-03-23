@@ -10,7 +10,7 @@ use craft\services\Fields;
 use craft\web\twig\variables\CraftVariable;
 use jtdev\craftengagement\fields\RatingField;
 use jtdev\craftengagement\models\Settings;
-use jtdev\craftengagement\services\AggregateService;
+use jtdev\craftengagement\services\RatingAggregateService;
 use jtdev\craftengagement\services\TwigService;
 use jtdev\craftengagement\services\VoteService;
 use jtdev\craftengagement\variables\EngagementVariable;
@@ -21,7 +21,8 @@ use yii\base\Event;
  *
  * @method static Plugin getInstance()
  * @method Settings getSettings()
- * @property-read AggregateService $aggregates
+ * @property-read RatingAggregateService $ratingAggregates
+ * @property-read RatingAggregateService $aggregates
  * @property-read TwigService $twig
  * @property-read VoteService $votes
  * @author JTDev <jake.trapp02@gmail.com>
@@ -37,7 +38,8 @@ class Plugin extends BasePlugin
     {
         return [
             'components' => [
-                'aggregates' => AggregateService::class,
+                'ratingAggregates' => RatingAggregateService::class,
+                'aggregates' => RatingAggregateService::class,
                 'twig' => TwigService::class,
                 'votes' => VoteService::class,
             ],

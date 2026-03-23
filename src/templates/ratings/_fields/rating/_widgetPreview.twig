@@ -7,7 +7,7 @@
   <div class="eng-preview-grid">
     <div class="eng-preview-col">
       <div class="eng-preview-title">{{ 'Before Rating'|t('engagement') }}</div>
-      {% include 'engagement/_render/favorite.twig' with {
+      {% include 'engagement/ratings/_render/favorite.twig' with {
           previewMode: true,
           elementId: elementId,
           fieldId: fieldId,
@@ -30,7 +30,7 @@
     </div>
     <div class="eng-preview-col">
       <div class="eng-preview-title">{{ 'After Rating'|t('engagement') }}</div>
-      {% include 'engagement/_render/favorite.twig' with {
+      {% include 'engagement/ratings/_render/favorite.twig' with {
           previewMode: true,
           elementId: elementId,
           fieldId: fieldId,

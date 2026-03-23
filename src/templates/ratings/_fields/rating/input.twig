@@ -39,7 +39,7 @@
   {% endif %}
 
   {% if canShowWidgetPreview %}
-    {% include 'engagement/_fields/rating/_widgetPreview.twig' with {
+    {% include 'engagement/ratings/_fields/rating/_widgetPreview.twig' with {
         title: 'Widget Preview'|t('engagement'),
         instructions: null,
         elementId: 1,
@@ -60,7 +60,7 @@
   {% endif %}
 
   {% if canOverrideIcon %}
-    {% include 'engagement/_fields/rating/input/_sectionIconAppearance.twig' with {
+    {% include 'engagement/ratings/_fields/rating/input/_sectionIconAppearance.twig' with {
         prefix: prefix,
         rating: rating,
         iconOptions: iconOptions,
@@ -68,7 +68,7 @@
   {% endif %}
 
   {% if canOverrideScale or canOverrideGuests or canOverrideUserChange %}
-    {% include 'engagement/_fields/rating/input/_sectionRatingBehavior.twig' with {
+    {% include 'engagement/ratings/_fields/rating/input/_sectionRatingBehavior.twig' with {
         prefix: prefix,
         rating: rating,
         maxScale: maxScale,
@@ -79,7 +79,7 @@
   {% endif %}
 
   {% if canOverrideText %}
-    {% include 'engagement/_fields/rating/input/_sectionTextOverrides.twig' with {
+    {% include 'engagement/ratings/_fields/rating/input/_sectionTextOverrides.twig' with {
         prefix: prefix,
         field: field,
         rating: rating,

@@ -143,7 +143,7 @@ class RatingField extends Field
     public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate(
-            'engagement/_fields/rating/settings.twig',
+            'engagement/ratings/_fields/rating/settings.twig',
             [
                 'field' => $this,
                 'pluginSettings' => $this->pluginSettings(),
@@ -222,7 +222,7 @@ class RatingField extends Field
             ]);
         }
 
-        $aggregate = Plugin::getInstance()->aggregates->getByElementFieldSite(
+        $aggregate = Plugin::getInstance()->ratingAggregates->getByElementFieldSite(
             (int)$element->id,
             (int)$this->id,
             (int)$element->siteId
@@ -273,7 +273,7 @@ class RatingField extends Field
         $rating = $value instanceof Rating ? $value : $this->normalizeValue($value, $element);
 
         return Craft::$app->getView()->renderTemplate(
-            'engagement/_fields/rating/input.twig',
+            'engagement/ratings/_fields/rating/input.twig',
             [
                 'field' => $this,
                 'rating' => $rating,

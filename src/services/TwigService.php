@@ -44,7 +44,7 @@ class TwigService extends Component
         }
 
         $html = $this->renderPluginTemplate(
-            'engagement/_render/favorite.twig',
+            'engagement/ratings/_render/favorite.twig',
             [
                 'elementId' => $data['elementId'],
                 'fieldId' => $data['fieldId'],

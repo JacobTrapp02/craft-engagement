@@ -5,7 +5,7 @@ namespace jtdev\craftengagement\controllers;
 use Craft;
 use craft\web\Controller;
 use jtdev\craftengagement\fields\RatingField;
-use jtdev\craftengagement\models\Aggregate;
+use jtdev\craftengagement\models\RatingAggregate;
 use jtdev\craftengagement\models\Vote;
 use jtdev\craftengagement\Plugin;
 use yii\web\BadRequestHttpException;
@@ -67,12 +67,12 @@ class RatingsController extends Controller
             throw new BadRequestHttpException('Rating must be between 1 and the configured scale.');
         }
 
-        $aggregateService = Plugin::getInstance()->aggregates;
+        $aggregateService = Plugin::getInstance()->ratingAggregates;
         $voteService = Plugin::getInstance()->votes;
 
         $aggregate = $aggregateService->getByElementFieldSite($elementId, $fieldId, $siteId);
         if ($aggregate === null) {
-            $aggregate = $aggregateService->add(new Aggregate([
+            $aggregate = $aggregateService->add(new RatingAggregate([
                 'elementId' => $elementId,
                 'fieldId' => $fieldId,
                 'siteId' => $siteId,
@@ -154,9 +154,9 @@ class RatingsController extends Controller
         ]);
     }
 
-    private function recalculateAggregate(int $aggregateId): ?Aggregate
+    private function recalculateAggregate(int $aggregateId): ?RatingAggregate
     {
-        $aggregateService = Plugin::getInstance()->aggregates;
+        $aggregateService = Plugin::getInstance()->ratingAggregates;
         $voteService = Plugin::getInstance()->votes;
 
         $aggregate = $aggregateService->getById($aggregateId);

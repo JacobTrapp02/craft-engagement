@@ -8,7 +8,7 @@ use yii\db\ActiveQueryInterface;
 /**
  * Active record for ratings_aggregate.
  */
-class AggregateRecord extends ActiveRecord
+class RatingAggregateRecord extends ActiveRecord
 {
     public static function tableName(): string
     {

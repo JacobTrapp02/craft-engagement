@@ -8,7 +8,7 @@ use DateTime;
 /**
  * Ratings aggregate model.
  */
-class Aggregate extends Model
+class RatingAggregate extends Model
 {
     public ?int $id = null;
     public int $elementId;

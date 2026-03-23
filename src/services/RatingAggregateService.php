@@ -3,17 +3,17 @@
 namespace jtdev\craftengagement\services;
 
 use craft\base\Component;
-use jtdev\craftengagement\models\Aggregate;
-use jtdev\craftengagement\records\AggregateRecord;
+use jtdev\craftengagement\models\RatingAggregate;
+use jtdev\craftengagement\records\RatingAggregateRecord;
 
 /**
  * Basic CRUD service for rating aggregates.
  */
-class AggregateService extends Component
+class RatingAggregateService extends Component
 {
-    public function getById(int $id): ?Aggregate
+    public function getById(int $id): ?RatingAggregate
     {
-        $record = AggregateRecord::findOne($id);
+        $record = RatingAggregateRecord::findOne($id);
 
         return $record ? $this->recordToModel($record) : null;
     }
@@ -21,9 +21,9 @@ class AggregateService extends Component
     /**
      * Fetch a single aggregate for an element/field/site triplet.
      */
-    public function getByElementFieldSite(int $elementId, int $fieldId, int $siteId): ?Aggregate
+    public function getByElementFieldSite(int $elementId, int $fieldId, int $siteId): ?RatingAggregate
     {
-        $record = AggregateRecord::find()
+        $record = RatingAggregateRecord::find()
             ->where([
                 'elementId' => $elementId,
                 'fieldId' => $fieldId,
@@ -35,7 +35,7 @@ class AggregateService extends Component
     }
 
     /**
-     * @return Aggregate[]
+     * @return RatingAggregate[]
      */
     public function getByElementId(int $elementId, ?int $siteId = null, ?int $fieldId = null): array
     {
@@ -53,7 +53,7 @@ class AggregateService extends Component
     }
 
     /**
-     * @return Aggregate[]
+     * @return RatingAggregate[]
      */
     public function getByFieldId(int $fieldId, ?int $siteId = null): array
     {
@@ -67,7 +67,7 @@ class AggregateService extends Component
     }
 
     /**
-     * @return Aggregate[]
+     * @return RatingAggregate[]
      */
     public function getBySiteId(int $siteId): array
     {
@@ -77,7 +77,7 @@ class AggregateService extends Component
     /**
      * @param array<string, mixed> $criteria
      * @param array<string, int>|null $orderBy
-     * @return Aggregate[]
+     * @return RatingAggregate[]
      */
     public function getMany(
         array $criteria = [],
@@ -85,7 +85,7 @@ class AggregateService extends Component
         ?int $limit = null,
         ?int $offset = null
     ): array {
-        $query = AggregateRecord::find()->where($criteria);
+        $query = RatingAggregateRecord::find()->where($criteria);
 
         if ($orderBy !== null) {
             $query->orderBy($orderBy);
@@ -99,15 +99,15 @@ class AggregateService extends Component
             $query->offset($offset);
         }
 
-        /** @var AggregateRecord[] $records */
+        /** @var RatingAggregateRecord[] $records */
         $records = $query->all();
 
         return array_map([$this, 'recordToModel'], $records);
     }
 
-    public function add(Aggregate $aggregate): ?Aggregate
+    public function add(RatingAggregate $aggregate): ?RatingAggregate
     {
-        $record = new AggregateRecord();
+        $record = new RatingAggregateRecord();
 
         $record->elementId = $aggregate->elementId;
         $record->fieldId = $aggregate->fieldId;
@@ -123,9 +123,9 @@ class AggregateService extends Component
         return $this->recordToModel($record);
     }
 
-    public function update(int $id, array $attributes): ?Aggregate
+    public function update(int $id, array $attributes): ?RatingAggregate
     {
-        $record = AggregateRecord::findOne($id);
+        $record = RatingAggregateRecord::findOne($id);
 
         if (!$record) {
             return null;
@@ -146,7 +146,7 @@ class AggregateService extends Component
 
     public function delete(int $id): bool
     {
-        $record = AggregateRecord::findOne($id);
+        $record = RatingAggregateRecord::findOne($id);
 
         if (!$record) {
             return false;
@@ -155,9 +155,9 @@ class AggregateService extends Component
         return (bool)$record->delete();
     }
 
-    private function recordToModel(AggregateRecord $record): Aggregate
+    private function recordToModel(RatingAggregateRecord $record): RatingAggregate
     {
-        return new Aggregate([
+        return new RatingAggregate([
             'id' => (int)$record->id,
             'elementId' => (int)$record->elementId,
             'fieldId' => (int)$record->fieldId,

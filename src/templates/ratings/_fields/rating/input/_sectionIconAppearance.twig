@@ -16,7 +16,7 @@
     }) }}
 
     <div data-entry-icon-mode-panel="emoji" style="{{ rating.icon == 'emoji' ? '' : 'display:none;' }}">
-      {% include 'engagement/_fields/rating/_emojiPicker.twig' with {
+      {% include 'engagement/ratings/_fields/rating/_emojiPicker.twig' with {
           label: 'Emoji Override'|t('engagement'),
           instructions: 'Used when icon is set to Emoji. You can pick by category or paste any emoji.'|t('engagement'),
           inputId: prefix ~ '-emoji-icon',
