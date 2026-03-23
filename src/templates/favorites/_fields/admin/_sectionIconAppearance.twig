@@ -17,7 +17,7 @@
     }) }}
 
     <div data-icon-mode-panel="emoji" style="{{ field.icon == 'emoji' ? '' : 'display:none;' }}">
-      {% include 'engagement/ratings/_fields/rating/_emojiPicker.twig' with {
+      {% include 'engagement/_partials/emojiPicker.twig' with {
           label: 'Emoji Icon'|t('engagement'),
           inputId: 'emojiIcon',
           inputName: 'emojiIcon',

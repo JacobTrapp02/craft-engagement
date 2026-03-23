@@ -1,0 +1,89 @@
+{# @var field \jtdev\craftengagement\fields\LikesField #}
+{# @var like \jtdev\craftengagement\models\Like #}
+
+{% import '_includes/forms.twig' as forms %}
+
+{% set prefix = field.handle %}
+{% set canOverrideEnabled = field.allowEditorOverrides and field.allowOverrideWidgetEnabled %}
+{% set canOverrideIcon = field.allowEditorOverrides and field.allowOverrideIconAppearance %}
+{% set canOverrideColors = field.allowEditorOverrides and field.allowOverrideIconColors %}
+{% set canOverrideGuests = field.allowEditorOverrides and field.allowOverrideGuestInteractions %}
+{% set canOverrideVoteChange = field.allowEditorOverrides and field.allowOverrideUserVoteChange %}
+{% set canOverrideText = field.allowEditorOverrides and (field.allowOverrideHeadingText or field.allowOverrideLikeText or field.allowOverrideDislikeText) %}
+{% set canShowWidgetPreview = field.allowEditorOverrides and field.allowOverrideWidgetPreview %}
+
+<div class="eng-entry-settings" data-like-entry-settings>
+  <div class="eng-entry-title">{{ 'Likes Settings'|t('engagement') }}</div>
+
+  <div class="readable eng-entry-aggregate">
+    <div class="eng-entry-aggregate-value">
+      {{ 'Likes {likes} • Dislikes {dislikes}'|t('engagement', {
+        likes: like.likeCount,
+        dislikes: like.dislikeCount,
+      }) }}
+    </div>
+  </div>
+
+  {% if canOverrideEnabled %}
+    {{ forms.lightswitchField({
+        label: 'Enabled for This Element'|t('engagement'),
+        id: prefix ~ '-enabled',
+        name: prefix ~ '[enabled]',
+        on: like.enabled,
+    }) }}
+  {% endif %}
+
+  {% if canShowWidgetPreview %}
+    {% include 'engagement/likes/_fields/_widgetPreview.twig' with {
+        title: 'Widget Preview'|t('engagement'),
+        instructions: null,
+        elementId: 1,
+        fieldId: field.id ?? 1,
+        siteId: craft.app.sites.currentSite.id,
+        label: field.name ?? 'Likes'|t('engagement'),
+        icon: like.icon,
+        likeEmojiIcon: like.likeEmojiIcon,
+        dislikeEmojiIcon: like.dislikeEmojiIcon,
+        beforeLikeColor: like.beforeLikeColor,
+        afterLikeColor: like.afterLikeColor,
+        beforeDislikeColor: like.beforeDislikeColor,
+        afterDislikeColor: like.afterDislikeColor,
+        customSvg: like.customSvg,
+        likeCount: like.likeCount ?: 0,
+        dislikeCount: like.dislikeCount ?: 0,
+        headingText: like.headingText,
+        likeText: like.likeText,
+        dislikeText: like.dislikeText,
+        afterUserVote: 1,
+    } only %}
+  {% endif %}
+
+  {% if canOverrideIcon or canOverrideColors %}
+    {% include 'engagement/likes/_fields/editor/_sectionIconAppearance.twig' with {
+        prefix: prefix,
+        like: like,
+        iconOptions: iconOptions,
+        canOverrideIcon: canOverrideIcon,
+        canOverrideColors: canOverrideColors,
+    } only %}
+  {% endif %}
+
+  {% if canOverrideGuests or canOverrideVoteChange %}
+    {% include 'engagement/likes/_fields/editor/_sectionBehavior.twig' with {
+        prefix: prefix,
+        like: like,
+        canOverrideGuests: canOverrideGuests,
+        canOverrideVoteChange: canOverrideVoteChange,
+    } only %}
+  {% endif %}
+
+  {% if canOverrideText %}
+    {% include 'engagement/likes/_fields/editor/_sectionTextOverrides.twig' with {
+        prefix: prefix,
+        field: field,
+        like: like,
+    } only %}
+  {% endif %}
+</div>
+
+{% include 'engagement/_partials/sharedFieldAssets.twig' %}

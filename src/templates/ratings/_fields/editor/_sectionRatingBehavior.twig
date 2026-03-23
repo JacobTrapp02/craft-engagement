@@ -4,8 +4,8 @@
   <summary>{{ 'Rating Behavior'|t('engagement') }}</summary>
   {% if canOverrideScale %}
     {{ forms.textField({
-        label: 'Scale Override'|t('engagement'),
-        instructions: 'Override the field default scale for this element.'|t('engagement'),
+        label: 'Scale'|t('engagement'),
+        instructions: 'Set the scale for this element.'|t('engagement'),
         id: prefix ~ '-scale',
         name: prefix ~ '[scale]',
         type: 'number',
@@ -17,7 +17,7 @@
 
   {% if canOverrideGuests %}
     {{ forms.lightswitchField({
-        label: 'Allow Guest Ratings Override'|t('engagement'),
+        label: 'Allow Guest Ratings'|t('engagement'),
         id: prefix ~ '-allow-guest-ratings',
         name: prefix ~ '[allowGuestRatings]',
         on: rating.allowGuestRatings,
@@ -26,7 +26,7 @@
 
   {% if canOverrideUserChange %}
     {{ forms.lightswitchField({
-        label: 'Allow Users To Change Rating Override'|t('engagement'),
+        label: 'Allow Users To Change Rating'|t('engagement'),
         id: prefix ~ '-allow-user-rating-change',
         name: prefix ~ '[allowUserRatingChange]',
         on: rating.allowUserRatingChange,

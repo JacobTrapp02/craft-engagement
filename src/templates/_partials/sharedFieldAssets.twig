@@ -1,51 +1,9 @@
-{# @var field \jtdev\craftengagement\fields\LikesField #}
-{# @var pluginSettings \jtdev\craftengagement\models\Settings #}
-
-{% include 'engagement/likes/_fields/like/_widgetPreview.twig' with {
-    title: 'Widget Preview'|t('engagement'),
-    instructions: 'Live preview of the like/dislike widget before and after interaction.'|t('engagement'),
-    elementId: 1,
-    fieldId: 1,
-    siteId: 1,
-    label: field.name ?? 'Likes'|t('engagement'),
-    icon: field.icon,
-    likeEmojiIcon: field.likeEmojiIcon,
-    dislikeEmojiIcon: field.dislikeEmojiIcon,
-    beforeLikeColor: field.beforeLikeColor,
-    afterLikeColor: field.afterLikeColor,
-    beforeDislikeColor: field.beforeDislikeColor,
-    afterDislikeColor: field.afterDislikeColor,
-    customSvg: field.customSvg,
-    likeCount: 21,
-    dislikeCount: 4,
-    headingText: field.headingText,
-    likeText: field.likeText,
-    dislikeText: field.dislikeText,
-    afterUserVote: 1,
-} only %}
-
-{% include 'engagement/likes/_fields/like/settings/_sectionIconAppearance.twig' with {
-    field: field,
-    iconOptions: iconOptions,
-} only %}
-
-{% include 'engagement/likes/_fields/like/settings/_sectionBehavior.twig' with {
-    field: field,
-} only %}
-
-{% include 'engagement/likes/_fields/like/settings/_sectionTextOverrides.twig' with {
-    field: field,
-} only %}
-
-{% include 'engagement/likes/_fields/like/settings/_sectionEditorOverrides.twig' with {
-    field: field,
-} only %}
-
 {% js %}
 (() => {
-  const panels = document.querySelectorAll('[data-icon-mode-panel]');
-  const getIconSelect = () => document.querySelector('[data-icon-mode-source="1"]');
-  const colorPairs = document.querySelectorAll('.eng-color-pair');
+  if (window.__engagementSharedFieldAssetsBound) {
+    return;
+  }
+  window.__engagementSharedFieldAssetsBound = true;
 
   const toSixDigitHex = (value) => {
     if (typeof value !== 'string') {
@@ -64,21 +22,9 @@
     return null;
   };
 
-  const syncIconPanels = () => {
-    const iconSelect = getIconSelect();
-    if (!iconSelect) {
-      return;
-    }
-    const mode = iconSelect.value;
-    panels.forEach((panel) => {
-      if (panel instanceof HTMLElement) {
-        panel.style.display = panel.dataset.iconModePanel === mode ? '' : 'none';
-      }
-    });
-  };
-
-  const syncColorPairs = () => {
-    colorPairs.forEach((pair) => {
+  const bindColorPairs = (scope = document) => {
+    const pairs = scope.querySelectorAll('.eng-color-pair');
+    pairs.forEach((pair) => {
       if (!(pair instanceof HTMLElement)) {
         return;
       }
@@ -93,7 +39,7 @@
       }
       picker.dataset.engColorBound = '1';
 
-      const setPickerFromText = () => {
+      const syncPickerFromText = () => {
         const normalized = toSixDigitHex(textInput.value);
         if (normalized) {
           picker.value = normalized;
@@ -103,8 +49,54 @@
       picker.addEventListener('input', () => {
         textInput.value = picker.value;
       });
-      textInput.addEventListener('input', setPickerFromText);
-      setPickerFromText();
+      textInput.addEventListener('input', syncPickerFromText);
+      syncPickerFromText();
+    });
+  };
+
+  const syncSettingsIconPanels = () => {
+    const select = document.querySelector('[data-icon-mode-source="1"]');
+    if (!(select instanceof HTMLSelectElement)) {
+      return;
+    }
+    const mode = select.value;
+    const panels = document.querySelectorAll('[data-icon-mode-panel]');
+    panels.forEach((panel) => {
+      if (panel instanceof HTMLElement) {
+        panel.style.display = panel.dataset.iconModePanel === mode ? '' : 'none';
+      }
+    });
+  };
+
+  const bindEntryRoots = () => {
+    const roots = document.querySelectorAll('[data-rating-entry-settings], [data-like-entry-settings], [data-favorite-entry-settings]');
+    roots.forEach((root) => {
+      if (!(root instanceof HTMLElement)) {
+        return;
+      }
+
+      const select = root.querySelector('[data-entry-icon-mode-source="1"]');
+      const syncPanels = () => {
+        if (!(select instanceof HTMLSelectElement)) {
+          return;
+        }
+        const mode = select.value;
+        const panels = root.querySelectorAll('[data-entry-icon-mode-panel]');
+        panels.forEach((panel) => {
+          if (panel instanceof HTMLElement) {
+            panel.style.display = panel.dataset.entryIconModePanel === mode ? '' : 'none';
+          }
+        });
+      };
+
+      if (select instanceof HTMLSelectElement && select.dataset.engPanelsBound !== '1') {
+        select.dataset.engPanelsBound = '1';
+        select.addEventListener('change', syncPanels);
+      }
+
+      bindColorPairs(root);
+      syncPanels();
+      requestAnimationFrame(syncPanels);
     });
   };
 
@@ -113,16 +105,19 @@
     if (!(target instanceof HTMLElement)) {
       return;
     }
-
     if (target.matches('[data-icon-mode-source="1"]')) {
-      syncIconPanels();
+      syncSettingsIconPanels();
     }
   });
 
-  syncIconPanels();
-  syncColorPairs();
-  requestAnimationFrame(syncIconPanels);
-  requestAnimationFrame(syncColorPairs);
+  bindColorPairs(document);
+  bindEntryRoots();
+  syncSettingsIconPanels();
+  requestAnimationFrame(() => {
+    bindColorPairs(document);
+    bindEntryRoots();
+    syncSettingsIconPanels();
+  });
 })();
 {% endjs %}
 
@@ -196,6 +191,39 @@
   font-weight: 600;
   color: #64748b;
   margin-bottom: 8px;
+}
+
+.eng-entry-settings {
+  border: 1px solid #d6d9de;
+  border-radius: 8px;
+  background: #f7f8fa;
+  padding: 14px;
+}
+
+.eng-entry-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5c6b7a;
+  margin-bottom: 8px;
+}
+
+.eng-entry-aggregate {
+  margin-bottom: 12px;
+  color: #3f4d5a;
+}
+
+.eng-entry-aggregate-value {
+  font-weight: 600;
+}
+
+.eng-entry-settings .eng-disclosure {
+  margin: 12px 0;
+}
+
+.eng-entry-settings .eng-preview-grid {
+  margin-top: 4px;
 }
 
 .eng-color-matrix {

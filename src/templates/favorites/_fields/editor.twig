@@ -1,0 +1,74 @@
+{# @var field \jtdev\craftengagement\fields\FavoritesField #}
+{# @var favorite \jtdev\craftengagement\models\Favorite #}
+
+{% import '_includes/forms.twig' as forms %}
+
+{% set prefix = field.handle %}
+{% set canOverrideEnabled = field.allowEditorOverrides and field.allowOverrideWidgetEnabled %}
+{% set canOverrideIcon = field.allowEditorOverrides and field.allowOverrideIconAppearance %}
+{% set canOverrideColors = field.allowEditorOverrides and field.allowOverrideIconColors %}
+{% set canOverrideGuests = field.allowEditorOverrides and field.allowOverrideGuestInteractions %}
+{% set canOverrideText = field.allowEditorOverrides and (field.allowOverrideHeadingText or field.allowOverrideFavoriteText or field.allowOverrideUnfavoriteText) %}
+{% set canShowWidgetPreview = field.allowEditorOverrides and field.allowOverrideWidgetPreview %}
+
+<div class="eng-entry-settings" data-favorite-entry-settings>
+  <div class="eng-entry-title">{{ 'Favorites Settings'|t('engagement') }}</div>
+
+  <div class="readable eng-entry-aggregate">
+    <div class="eng-entry-aggregate-value">
+      {{ 'Favorites {count}'|t('engagement', { count: favorite.favoriteCount }) }}
+    </div>
+  </div>
+
+  {% if canOverrideEnabled %}
+    {{ forms.lightswitchField({ label: 'Enabled for This Element'|t('engagement'), id: prefix ~ '-enabled', name: prefix ~ '[enabled]', on: favorite.enabled }) }}
+  {% endif %}
+
+  {% if canShowWidgetPreview %}
+    {% include 'engagement/favorites/_fields/_widgetPreview.twig' with {
+        title: 'Widget Preview'|t('engagement'),
+        instructions: null,
+        elementId: 1,
+        fieldId: field.id ?? 1,
+        siteId: craft.app.sites.currentSite.id,
+        label: field.name ?? 'Favorites'|t('engagement'),
+        icon: favorite.icon,
+        emojiIcon: favorite.emojiIcon,
+        beforeFavoriteColor: favorite.beforeFavoriteColor,
+        afterFavoriteColor: favorite.afterFavoriteColor,
+        customSvg: favorite.customSvg,
+        favoriteCount: favorite.favoriteCount ?: 0,
+        headingText: favorite.headingText,
+        favoriteText: favorite.favoriteText,
+        unfavoriteText: favorite.unfavoriteText,
+    } only %}
+  {% endif %}
+
+  {% if canOverrideIcon or canOverrideColors %}
+    {% include 'engagement/favorites/_fields/editor/_sectionIconAppearance.twig' with {
+        prefix: prefix,
+        favorite: favorite,
+        iconOptions: iconOptions,
+        canOverrideIcon: canOverrideIcon,
+        canOverrideColors: canOverrideColors,
+    } only %}
+  {% endif %}
+
+  {% if canOverrideGuests %}
+    {% include 'engagement/favorites/_fields/editor/_sectionBehavior.twig' with {
+        prefix: prefix,
+        favorite: favorite,
+        canOverrideGuests: canOverrideGuests,
+    } only %}
+  {% endif %}
+
+  {% if canOverrideText %}
+    {% include 'engagement/favorites/_fields/editor/_sectionTextOverrides.twig' with {
+        prefix: prefix,
+        field: field,
+        favorite: favorite,
+    } only %}
+  {% endif %}
+</div>
+
+{% include 'engagement/_partials/sharedFieldAssets.twig' %}

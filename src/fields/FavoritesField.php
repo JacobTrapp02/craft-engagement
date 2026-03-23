@@ -130,7 +130,7 @@ class FavoritesField extends Field
     public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate(
-            'engagement/favorites/_fields/favorite/settings.twig',
+            'engagement/favorites/_fields/admin.twig',
             [
                 'field' => $this,
                 'pluginSettings' => $this->pluginSettings(),
@@ -265,7 +265,7 @@ class FavoritesField extends Field
         $favorite = $value instanceof Favorite ? $value : $this->normalizeValue($value, $element);
 
         return Craft::$app->getView()->renderTemplate(
-            'engagement/favorites/_fields/favorite/input.twig',
+            'engagement/favorites/_fields/editor.twig',
             [
                 'field' => $this,
                 'favorite' => $favorite,

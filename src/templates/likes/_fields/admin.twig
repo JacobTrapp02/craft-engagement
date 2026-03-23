@@ -1,0 +1,44 @@
+{# @var field \jtdev\craftengagement\fields\LikesField #}
+{# @var pluginSettings \jtdev\craftengagement\models\Settings #}
+
+{% include 'engagement/likes/_fields/_widgetPreview.twig' with {
+    title: 'Widget Preview'|t('engagement'),
+    instructions: 'Live preview of the like/dislike widget before and after interaction.'|t('engagement'),
+    elementId: 1,
+    fieldId: 1,
+    siteId: 1,
+    label: field.name ?? 'Likes'|t('engagement'),
+    icon: field.icon,
+    likeEmojiIcon: field.likeEmojiIcon,
+    dislikeEmojiIcon: field.dislikeEmojiIcon,
+    beforeLikeColor: field.beforeLikeColor,
+    afterLikeColor: field.afterLikeColor,
+    beforeDislikeColor: field.beforeDislikeColor,
+    afterDislikeColor: field.afterDislikeColor,
+    customSvg: field.customSvg,
+    likeCount: 21,
+    dislikeCount: 4,
+    headingText: field.headingText,
+    likeText: field.likeText,
+    dislikeText: field.dislikeText,
+    afterUserVote: 1,
+} only %}
+
+{% include 'engagement/likes/_fields/admin/_sectionIconAppearance.twig' with {
+    field: field,
+    iconOptions: iconOptions,
+} only %}
+
+{% include 'engagement/likes/_fields/admin/_sectionBehavior.twig' with {
+    field: field,
+} only %}
+
+{% include 'engagement/likes/_fields/admin/_sectionTextOverrides.twig' with {
+    field: field,
+} only %}
+
+{% include 'engagement/likes/_fields/admin/_sectionEditorOverrides.twig' with {
+    field: field,
+} only %}
+
+{% include 'engagement/_partials/sharedFieldAssets.twig' %}

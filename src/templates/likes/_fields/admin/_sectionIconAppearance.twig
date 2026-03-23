@@ -17,7 +17,7 @@
     }) }}
 
     <div data-icon-mode-panel="emoji" style="{{ field.icon == 'emoji' ? '' : 'display:none;' }}">
-      {% include 'engagement/ratings/_fields/rating/_emojiPicker.twig' with {
+      {% include 'engagement/_partials/emojiPicker.twig' with {
           label: 'Like Emoji Icon'|t('engagement'),
           instructions: 'Paste an emoji or choose one with Pick Emoji.'|t('engagement'),
           inputId: 'likeEmojiIcon',
@@ -26,7 +26,7 @@
           errors: field.getErrors('likeEmojiIcon'),
       } only %}
 
-      {% include 'engagement/ratings/_fields/rating/_emojiPicker.twig' with {
+      {% include 'engagement/_partials/emojiPicker.twig' with {
           label: 'Dislike Emoji Icon'|t('engagement'),
           instructions: 'Set the emoji used for the dislike button.'|t('engagement'),
           inputId: 'dislikeEmojiIcon',

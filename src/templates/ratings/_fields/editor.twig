@@ -39,7 +39,7 @@
   {% endif %}
 
   {% if canShowWidgetPreview %}
-    {% include 'engagement/ratings/_fields/rating/_widgetPreview.twig' with {
+    {% include 'engagement/ratings/_fields/_widgetPreview.twig' with {
         title: 'Widget Preview'|t('engagement'),
         instructions: null,
         elementId: 1,
@@ -60,7 +60,7 @@
   {% endif %}
 
   {% if canOverrideIcon %}
-    {% include 'engagement/ratings/_fields/rating/input/_sectionIconAppearance.twig' with {
+    {% include 'engagement/ratings/_fields/editor/_sectionIconAppearance.twig' with {
         prefix: prefix,
         rating: rating,
         iconOptions: iconOptions,
@@ -68,7 +68,7 @@
   {% endif %}
 
   {% if canOverrideScale or canOverrideGuests or canOverrideUserChange %}
-    {% include 'engagement/ratings/_fields/rating/input/_sectionRatingBehavior.twig' with {
+    {% include 'engagement/ratings/_fields/editor/_sectionRatingBehavior.twig' with {
         prefix: prefix,
         rating: rating,
         maxScale: maxScale,
@@ -79,7 +79,7 @@
   {% endif %}
 
   {% if canOverrideText %}
-    {% include 'engagement/ratings/_fields/rating/input/_sectionTextOverrides.twig' with {
+    {% include 'engagement/ratings/_fields/editor/_sectionTextOverrides.twig' with {
         prefix: prefix,
         field: field,
         rating: rating,
@@ -87,109 +87,4 @@
   {% endif %}
 </div>
 
-{% js %}
-(() => {
-  const roots = document.querySelectorAll('[data-rating-entry-settings]');
-  roots.forEach((root) => {
-    const panels = root.querySelectorAll('[data-entry-icon-mode-panel]');
-    const select = root.querySelector('[data-entry-icon-mode-source="1"]');
-    if (!(select instanceof HTMLSelectElement)) {
-      return;
-    }
-
-    const syncPanels = () => {
-      const mode = select.value;
-      panels.forEach((panel) => {
-        if (panel instanceof HTMLElement) {
-          panel.style.display = panel.dataset.entryIconModePanel === mode ? '' : 'none';
-        }
-      });
-    };
-
-    select.addEventListener('change', syncPanels);
-    syncPanels();
-    requestAnimationFrame(syncPanels);
-  });
-})();
-{% endjs %}
-
-{% css %}
-.eng-entry-settings {
-  border: 1px solid #d6d9de;
-  border-radius: 8px;
-  background: #f7f8fa;
-  padding: 14px;
-}
-
-.eng-entry-title {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #5c6b7a;
-  margin-bottom: 8px;
-}
-
-.eng-entry-aggregate {
-  margin-bottom: 12px;
-  color: #3f4d5a;
-}
-
-.eng-entry-aggregate-value {
-  font-weight: 600;
-}
-
-.eng-disclosure {
-  margin: 12px 0;
-  border: 1px solid #d6d9de;
-  border-radius: 10px;
-  background: #f9fafb;
-  padding: 12px;
-}
-
-.eng-disclosure > summary {
-  cursor: pointer;
-  font-weight: 600;
-  display: list-item;
-  margin-bottom: 0;
-}
-
-.eng-disclosure[open] > summary {
-  margin-bottom: 10px;
-}
-
-.eng-group-card {
-  border: 1px solid #d6d9de;
-  border-radius: 10px;
-  background: #f9fafb;
-  padding: 12px;
-}
-
-.eng-disclosure .eng-group-card {
-  border: 0;
-  background: transparent;
-  padding: 0;
-  margin-bottom: 0;
-}
-
-.eng-preview-grid {
-  margin-top: 4px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.eng-preview-col {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fff;
-  padding: 10px;
-}
-
-.eng-preview-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #64748b;
-  margin-bottom: 8px;
-}
-{% endcss %}
+{% include 'engagement/_partials/sharedFieldAssets.twig' %}

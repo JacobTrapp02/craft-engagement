@@ -1,0 +1,38 @@
+{# @var field \jtdev\craftengagement\fields\FavoritesField #}
+
+{% include 'engagement/favorites/_fields/_widgetPreview.twig' with {
+    title: 'Widget Preview'|t('engagement'),
+    instructions: 'Live preview of the favorites widget before and after interaction.'|t('engagement'),
+    elementId: 1,
+    fieldId: 1,
+    siteId: 1,
+    label: field.name ?? 'Favorites'|t('engagement'),
+    icon: field.icon,
+    emojiIcon: field.emojiIcon,
+    beforeFavoriteColor: field.beforeFavoriteColor,
+    afterFavoriteColor: field.afterFavoriteColor,
+    customSvg: field.customSvg,
+    favoriteCount: 17,
+    headingText: field.headingText,
+    favoriteText: field.favoriteText,
+    unfavoriteText: field.unfavoriteText,
+} only %}
+
+{% include 'engagement/favorites/_fields/admin/_sectionIconAppearance.twig' with {
+    field: field,
+    iconOptions: iconOptions,
+} only %}
+
+{% include 'engagement/favorites/_fields/admin/_sectionBehavior.twig' with {
+    field: field,
+} only %}
+
+{% include 'engagement/favorites/_fields/admin/_sectionTextOverrides.twig' with {
+    field: field,
+} only %}
+
+{% include 'engagement/favorites/_fields/admin/_sectionEditorOverrides.twig' with {
+    field: field,
+} only %}
+
+{% include 'engagement/_partials/sharedFieldAssets.twig' %}

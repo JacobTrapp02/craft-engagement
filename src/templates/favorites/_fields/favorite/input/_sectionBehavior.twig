@@ -1,8 +1,0 @@
-{% import '_includes/forms.twig' as forms %}
-
-<details class="eng-disclosure">
-  <summary>{{ 'Favorite Behavior'|t('engagement') }}</summary>
-  {% if canOverrideGuests %}
-    {{ forms.lightswitchField({ label: 'Allow Guest Interactions Override'|t('engagement'), id: prefix ~ '-allow-guest', name: prefix ~ '[allowGuestInteractions]', on: favorite.allowGuestInteractions }) }}
-  {% endif %}
-</details>

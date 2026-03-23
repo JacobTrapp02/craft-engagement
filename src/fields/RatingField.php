@@ -143,7 +143,7 @@ class RatingField extends Field
     public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate(
-            'engagement/ratings/_fields/rating/settings.twig',
+            'engagement/ratings/_fields/admin.twig',
             [
                 'field' => $this,
                 'pluginSettings' => $this->pluginSettings(),
@@ -273,7 +273,7 @@ class RatingField extends Field
         $rating = $value instanceof Rating ? $value : $this->normalizeValue($value, $element);
 
         return Craft::$app->getView()->renderTemplate(
-            'engagement/ratings/_fields/rating/input.twig',
+            'engagement/ratings/_fields/editor.twig',
             [
                 'field' => $this,
                 'rating' => $rating,

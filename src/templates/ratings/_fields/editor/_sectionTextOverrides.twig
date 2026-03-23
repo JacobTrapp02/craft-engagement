@@ -7,7 +7,7 @@
 
     {% if field.allowOverrideHeadingText %}
       {{ forms.textField({
-          label: 'Text Above Widget Override'|t('engagement'),
+          label: 'Text Above Widget'|t('engagement'),
           id: prefix ~ '-heading-text',
           name: prefix ~ '[headingText]',
           value: rating.headingText,
@@ -16,7 +16,7 @@
 
     {% if field.allowOverrideClickToRateText %}
       {{ forms.textField({
-          label: 'Text Below Widget (After Rating) Override'|t('engagement'),
+          label: 'Text Below Widget (After Rating)'|t('engagement'),
           id: prefix ~ '-click-to-rate-text',
           name: prefix ~ '[clickToRateText]',
           value: rating.clickToRateText,
@@ -25,7 +25,7 @@
 
     {% if field.allowOverrideYourRatingText %}
       {{ forms.textField({
-          label: 'Text After Rating Override'|t('engagement'),
+          label: 'Text After Rating'|t('engagement'),
           id: prefix ~ '-your-rating-text',
           name: prefix ~ '[yourRatingText]',
           value: rating.yourRatingText,

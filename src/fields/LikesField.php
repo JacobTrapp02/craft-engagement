@@ -139,7 +139,7 @@ class LikesField extends Field
     public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate(
-            'engagement/likes/_fields/like/settings.twig',
+            'engagement/likes/_fields/admin.twig',
             [
                 'field' => $this,
                 'pluginSettings' => $this->pluginSettings(),
@@ -297,7 +297,7 @@ class LikesField extends Field
         $like = $value instanceof Like ? $value : $this->normalizeValue($value, $element);
 
         return Craft::$app->getView()->renderTemplate(
-            'engagement/likes/_fields/like/input.twig',
+            'engagement/likes/_fields/editor.twig',
             [
                 'field' => $this,
                 'like' => $like,

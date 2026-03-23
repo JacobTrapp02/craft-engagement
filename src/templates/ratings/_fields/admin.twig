@@ -1,0 +1,42 @@
+{# @var field \jtdev\craftengagement\fields\RatingField #}
+{# @var pluginSettings \jtdev\craftengagement\models\Settings #}
+
+{% include 'engagement/ratings/_fields/_widgetPreview.twig' with {
+    title: 'Widget Preview'|t('engagement'),
+    instructions: 'Live preview of how the widget will look before and after rating.'|t('engagement'),
+    elementId: 1,
+    fieldId: 1,
+    siteId: 1,
+    label: field.name ?? 'Rating'|t('engagement'),
+    icon: field.icon,
+    emojiIcon: field.emojiIcon,
+    customSvg: field.customSvg,
+    scale: field.scale ?: pluginSettings.defaultScale,
+    average: 3.75,
+    voteCount: 42,
+    headingText: field.headingText,
+    clickToRateText: field.clickToRateText,
+    yourRatingText: field.yourRatingText,
+    afterUserRating: 4,
+} only %}
+
+{% include 'engagement/ratings/_fields/admin/_sectionIconAppearance.twig' with {
+    field: field,
+    pluginSettings: pluginSettings,
+    iconOptions: iconOptions,
+} only %}
+
+{% include 'engagement/ratings/_fields/admin/_sectionRatingBehavior.twig' with {
+    field: field,
+    pluginSettings: pluginSettings,
+} only %}
+
+{% include 'engagement/ratings/_fields/admin/_sectionTextOverrides.twig' with {
+    field: field,
+} only %}
+
+{% include 'engagement/ratings/_fields/admin/_sectionEditorOverrides.twig' with {
+    field: field,
+} only %}
+
+{% include 'engagement/_partials/sharedFieldAssets.twig' %}
