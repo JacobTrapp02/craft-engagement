@@ -1,0 +1,77 @@
+{#
+  Likes Widget HTML
+  Available Twig variables:
+  - widgetUid
+  - widgetPreviewMode
+  - widgetElementId, widgetFieldId, widgetSiteId
+  - widgetActionUrl, widgetLoginUrl
+  - widgetIsLoggedIn, widgetGuestAllowed
+  - widgetUserVote, widgetLikeCount, widgetDislikeCount
+  - widgetIcon, widgetLikeEmojiIcon, widgetDislikeEmojiIcon, widgetCustomSvg
+  - widgetBeforeLikeColor, widgetAfterLikeColor
+  - widgetBeforeDislikeColor, widgetAfterDislikeColor
+  - widgetLikeBeforeBg, widgetLikeAfterBg
+  - widgetDislikeBeforeBg, widgetDislikeAfterBg
+  - widgetHeadingTextRendered, widgetLikeTextRendered, widgetDislikeTextRendered
+#}
+<div
+  data-engagement-likes
+  data-likes-uid="{{ widgetUid }}"
+  data-element-id="{{ widgetElementId|e('html_attr') }}"
+  data-field-id="{{ widgetFieldId|e('html_attr') }}"
+  data-site-id="{{ widgetSiteId|e('html_attr') }}"
+  data-action-url="{{ widgetActionUrl|e('html_attr') }}"
+  data-login-url="{{ widgetLoginUrl|e('html_attr') }}"
+  data-is-logged-in="{{ widgetIsLoggedIn ? '1' : '0' }}"
+  data-guest-allowed="{{ widgetGuestAllowed ? '1' : '0' }}"
+>
+  {% if widgetHeadingTextRendered %}
+    <div data-likes-heading>
+      {{ widgetHeadingTextRendered }}
+    </div>
+  {% endif %}
+
+  <div class="engagement-likes-control">
+    <button
+      type="button"
+      data-like-btn="1"
+      style="border:none; padding:6px 12px; background:{{ widgetUserVote == 1 ? widgetLikeAfterBg : widgetLikeBeforeBg }}; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }}"
+    >
+      {% if widgetIcon != 'none' %}
+        {% set likeIconColor = widgetUserVote == 1 ? (widgetAfterLikeColor ?: '#111827') : (widgetBeforeLikeColor ?: '#111827') %}
+        <span data-like-icon style="color:{{ likeIconColor }};">
+        {% if widgetIcon == 'emoji' %}
+          {{ widgetLikeEmojiIcon }}
+        {% elseif widgetIcon == 'customSvg' and widgetCustomSvg %}
+          <span class="engagement-likes-svg-icon">{{ widgetCustomSvg|raw }}</span>
+        {% else %}
+          👍
+        {% endif %}
+        </span>
+      {% endif %}
+      <span data-like-label>{{ widgetLikeTextRendered }}</span>
+    </button>
+
+    <span aria-hidden="true" class="engagement-likes-divider"></span>
+
+    <button
+      type="button"
+      data-like-btn="-1"
+      style="border:none; padding:6px 12px; background:{{ widgetUserVote == -1 ? widgetDislikeAfterBg : widgetDislikeBeforeBg }}; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }}"
+    >
+      {% if widgetIcon != 'none' %}
+        {% set dislikeIconColor = widgetUserVote == -1 ? (widgetAfterDislikeColor ?: '#111827') : (widgetBeforeDislikeColor ?: '#111827') %}
+        <span data-dislike-icon style="color:{{ dislikeIconColor }};">
+        {% if widgetIcon == 'emoji' %}
+          {{ widgetDislikeEmojiIcon }}
+        {% elseif widgetIcon == 'customSvg' and widgetCustomSvg %}
+          <span class="engagement-likes-svg-icon">{{ widgetCustomSvg|raw }}</span>
+        {% else %}
+          👎
+        {% endif %}
+        </span>
+      {% endif %}
+      <span data-dislike-label>{{ widgetDislikeTextRendered }}</span>
+    </button>
+  </div>
+</div>

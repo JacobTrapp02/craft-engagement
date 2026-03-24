@@ -18,8 +18,6 @@ class FavoritesField extends Field
 {
     public const ICON_EMOJI = 'emoji';
     public const ICON_NONE = 'none';
-    public const DISPLAY_PUBLIC = 'public';
-    public const DISPLAY_PERSONAL = 'personal';
 
     /**
      * @deprecated Back-compat for older saved field configs.
@@ -31,6 +29,16 @@ class FavoritesField extends Field
      */
     public ?bool $allowEntryTextOverrides = null;
 
+    /**
+     * @deprecated Back-compat for older saved field configs.
+     */
+    public ?bool $allowOverrideDisplayMode = null;
+
+    /**
+     * @deprecated Back-compat for older saved field configs.
+     */
+    public ?string $displayMode = null;
+
     public bool $defaultEnabled = true;
     public bool $allowEditorOverrides = true;
     public bool $allowOverrideIconAppearance = true;
@@ -38,11 +46,9 @@ class FavoritesField extends Field
     public bool $allowOverrideWidgetEnabled = true;
     public bool $allowOverrideWidgetPreview = true;
     public bool $allowOverrideGuestInteractions = true;
-    public bool $allowOverrideDisplayMode = true;
     public bool $allowOverrideHeadingText = true;
     public bool $allowOverrideFavoriteText = true;
     public bool $allowOverrideUnfavoriteText = true;
-    public string $displayMode = self::DISPLAY_PUBLIC;
     public string $icon = Settings::ICON_HEART;
     public string $emojiIcon = '⭐';
     public string $beforeFavoriteColor = '';
@@ -91,11 +97,7 @@ class FavoritesField extends Field
     {
         $rules = parent::rules();
 
-        $rules[] = [['displayMode', 'icon'], 'required'];
-        $rules[] = [['displayMode'], 'in', 'range' => [
-            self::DISPLAY_PUBLIC,
-            self::DISPLAY_PERSONAL,
-        ]];
+        $rules[] = [['icon'], 'required'];
         $rules[] = [['icon'], 'in', 'range' => [
             Settings::ICON_HEART,
             Settings::ICON_STAR,
@@ -113,7 +115,6 @@ class FavoritesField extends Field
             'allowOverrideWidgetEnabled',
             'allowOverrideWidgetPreview',
             'allowOverrideGuestInteractions',
-            'allowOverrideDisplayMode',
             'allowOverrideHeadingText',
             'allowOverrideFavoriteText',
             'allowOverrideUnfavoriteText',
@@ -145,7 +146,6 @@ class FavoritesField extends Field
 
         return Json::encode([
             'enabled' => (bool)$favorite->enabled,
-            'displayMode' => (string)$favorite->displayMode,
             'icon' => (string)$favorite->icon,
             'emojiIcon' => (string)$favorite->emojiIcon,
             'beforeFavoriteColor' => (string)$favorite->beforeFavoriteColor,
@@ -165,9 +165,6 @@ class FavoritesField extends Field
         $enabled = ($this->allowEditorOverrides && $this->allowOverrideWidgetEnabled)
             ? ($stored['enabled'] ?? $this->defaultEnabled)
             : $this->defaultEnabled;
-        $displayMode = ($this->allowEditorOverrides && $this->allowOverrideDisplayMode)
-            ? ($stored['displayMode'] ?? $this->displayMode)
-            : $this->displayMode;
         $icon = ($this->allowEditorOverrides && $this->allowOverrideIconAppearance)
             ? ($stored['icon'] ?? $this->icon)
             : $this->icon;
@@ -199,8 +196,6 @@ class FavoritesField extends Field
         if ($element === null || !$element->id) {
             return new Favorite([
                 'enabled' => $enabled,
-                'displayMode' => $displayMode,
-                'showPublicCount' => $displayMode === self::DISPLAY_PUBLIC,
                 'icon' => $icon,
                 'emojiIcon' => $emojiIcon,
                 'beforeFavoriteColor' => $beforeFavoriteColor,
@@ -225,8 +220,6 @@ class FavoritesField extends Field
                 'elementId' => (int)$element->id,
                 'fieldId' => (int)$this->id,
                 'siteId' => (int)$element->siteId,
-                'displayMode' => $displayMode,
-                'showPublicCount' => $displayMode === self::DISPLAY_PUBLIC,
                 'icon' => $icon,
                 'emojiIcon' => $emojiIcon,
                 'beforeFavoriteColor' => $beforeFavoriteColor,
@@ -246,8 +239,6 @@ class FavoritesField extends Field
             'fieldId' => $aggregate->fieldId,
             'siteId' => $aggregate->siteId,
             'favoriteCount' => $aggregate->favoriteCount,
-            'displayMode' => $displayMode,
-            'showPublicCount' => $displayMode === self::DISPLAY_PUBLIC,
             'icon' => $icon,
             'emojiIcon' => $emojiIcon,
             'beforeFavoriteColor' => $beforeFavoriteColor,
@@ -297,25 +288,13 @@ class FavoritesField extends Field
     }
 
     /**
-     * @return array<int, array{label: string, value: string}>
-     */
-    private function displayModeOptions(): array
-    {
-        return [
-            ['label' => Craft::t('engagement', 'Public Count'), 'value' => self::DISPLAY_PUBLIC],
-            ['label' => Craft::t('engagement', 'Personal Only'), 'value' => self::DISPLAY_PERSONAL],
-        ];
-    }
-
-    /**
-     * @return array{enabled?: bool, displayMode?: string, icon?: string, emojiIcon?: string, beforeFavoriteColor?: string, afterFavoriteColor?: string, customSvg?: ?string, allowGuestInteractions?: bool, headingText?: ?string, favoriteText?: ?string, unfavoriteText?: ?string}
+     * @return array{enabled?: bool, icon?: string, emojiIcon?: string, beforeFavoriteColor?: string, afterFavoriteColor?: string, customSvg?: ?string, allowGuestInteractions?: bool, headingText?: ?string, favoriteText?: ?string, unfavoriteText?: ?string}
      */
     private function normalizeStoredValue(mixed $value): array
     {
         if ($value instanceof Favorite) {
             return [
                 'enabled' => $value->enabled,
-                'displayMode' => $value->displayMode,
                 'icon' => $value->icon,
                 'emojiIcon' => $value->emojiIcon,
                 'beforeFavoriteColor' => $value->beforeFavoriteColor,
@@ -346,13 +325,6 @@ class FavoritesField extends Field
 
         if (array_key_exists('enabled', $value)) {
             $stored['enabled'] = (bool)$value['enabled'];
-        }
-
-        if (array_key_exists('displayMode', $value)) {
-            $displayMode = (string)$value['displayMode'];
-            if (in_array($displayMode, [self::DISPLAY_PUBLIC, self::DISPLAY_PERSONAL], true)) {
-                $stored['displayMode'] = $displayMode;
-            }
         }
 
         if (array_key_exists('icon', $value)) {

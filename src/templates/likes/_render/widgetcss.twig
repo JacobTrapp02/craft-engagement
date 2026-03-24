@@ -1,0 +1,52 @@
+{#
+  Likes Widget CSS
+  Rendered with `_context` from `likes/_render/widget.twig`.
+  Available Twig variables include:
+  - widgetUid
+  - widgetPreviewMode
+  - widgetElementId, widgetFieldId, widgetSiteId
+  - widgetActionUrl, widgetLoginUrl
+  - widgetIsLoggedIn, widgetGuestAllowed
+  - widgetUserVote, widgetLikeCount, widgetDislikeCount
+  - widgetIcon, widgetLikeEmojiIcon, widgetDislikeEmojiIcon, widgetCustomSvg
+  - widgetBeforeLikeColor, widgetAfterLikeColor
+  - widgetBeforeDislikeColor, widgetAfterDislikeColor
+  - widgetHeadingTextRendered, widgetLikeTextRendered, widgetDislikeTextRendered
+#}
+[data-engagement-likes] {
+  text-align: center;
+}
+
+[data-engagement-likes] [data-likes-heading] {
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+[data-engagement-likes] .engagement-likes-control {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #fff;
+}
+
+[data-engagement-likes] [data-like-btn] {
+  border: none;
+  padding: 6px 12px;
+}
+
+[data-engagement-likes] .engagement-likes-divider {
+  width: 1px;
+  align-self: stretch;
+  background: #d1d5db;
+}
+
+[data-engagement-likes] .engagement-likes-svg-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}

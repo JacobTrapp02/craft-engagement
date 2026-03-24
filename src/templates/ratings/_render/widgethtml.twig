@@ -1,0 +1,91 @@
+{#
+  Ratings Widget HTML
+  Available Twig variables:
+  - widgetUid
+  - widgetPreviewMode
+  - widgetElementId, widgetFieldId, widgetSiteId
+  - widgetActionUrl, widgetLoginUrl
+  - widgetIsLoggedIn, widgetGuestAllowed
+  - widgetScale, widgetUserRating
+  - widgetIcon, widgetEmojiIcon, widgetCustomSvg
+  - fillPercent, emptyGlyph, filledGlyph
+  - widgetHeadingTextRendered
+  - widgetClickToRateTextRendered, widgetYourRatingTextRendered
+#}
+<div
+  data-engagement-rating
+  data-rating-uid="{{ widgetUid }}"
+  data-element-id="{{ widgetElementId|e('html_attr') }}"
+  data-field-id="{{ widgetFieldId|e('html_attr') }}"
+  data-site-id="{{ widgetSiteId|e('html_attr') }}"
+  data-action-url="{{ widgetActionUrl|e('html_attr') }}"
+  data-login-url="{{ widgetLoginUrl|e('html_attr') }}"
+  data-is-logged-in="{{ widgetIsLoggedIn ? '1' : '0' }}"
+  data-guest-allowed="{{ widgetGuestAllowed ? '1' : '0' }}"
+  data-scale="{{ widgetScale|e('html_attr') }}"
+>
+  {% if widgetHeadingTextRendered is not empty %}
+    <div data-rating-heading>
+      {{ widgetHeadingTextRendered }}
+    </div>
+  {% endif %}
+
+  <div data-overall-wrap>
+    <div style="display:inline-block; position:relative; font-size:24px; line-height:1; letter-spacing:1px; margin-bottom:8px;">
+      {% if widgetIcon == 'customSvg' and widgetCustomSvg %}
+        <span style="display:inline-flex; gap:6px; color:#cbd5e1;">
+          {% for _ in 1..widgetScale %}
+            <span style="display:inline-flex; width:22px; height:22px; opacity:0.35;">{{ widgetCustomSvg|raw }}</span>
+          {% endfor %}
+        </span>
+        <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; color:#f59e0b; width:{{ fillPercent }}%;">
+          <span style="display:inline-flex; gap:6px;">
+            {% for _ in 1..widgetScale %}
+              <span style="display:inline-flex; width:22px; height:22px;">{{ widgetCustomSvg|raw }}</span>
+            {% endfor %}
+          </span>
+        </span>
+      {% elseif widgetIcon == 'emoji' and widgetEmojiIcon %}
+        <span style="display:inline-flex; gap:6px;">
+          {% for _ in 1..widgetScale %}
+            <span style="display:inline-flex; width:22px; height:22px; align-items:center; justify-content:center; opacity:0.3; filter:grayscale(1) saturate(0.2) brightness(0.85);">{{ widgetEmojiIcon }}</span>
+          {% endfor %}
+        </span>
+        <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; width:{{ fillPercent }}%;">
+          <span style="display:inline-flex; gap:6px;">
+            {% for _ in 1..widgetScale %}
+              <span style="display:inline-flex; width:22px; height:22px; align-items:center; justify-content:center;">{{ widgetEmojiIcon }}</span>
+            {% endfor %}
+          </span>
+        </span>
+      {% else %}
+        <span style="color:#cbd5e1;">
+          {% for _ in 1..widgetScale %}{{ emptyGlyph }}{% endfor %}
+        </span>
+        <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; color:#f59e0b; width:{{ fillPercent }}%;">
+          {% for _ in 1..widgetScale %}{{ filledGlyph }}{% endfor %}
+        </span>
+      {% endif %}
+      <div data-rating-stars style="position:absolute; inset:0; display:flex; justify-content:center; gap:6px; align-items:center;">
+        {% for value in 1..widgetScale %}
+          <button
+            type="button"
+            data-rating-value="{{ value }}"
+            aria-label="{{ 'Rate {value}'|t('engagement', { value: value }) }}"
+            style="border:none; background:transparent; padding:0; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }} line-height:1; font-size:28px; opacity:0;"
+          >
+            ★
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div data-rating-user>
+    {% if widgetUserRating is not null %}
+      {{ widgetYourRatingTextRendered }}
+    {% else %}
+      {{ widgetClickToRateTextRendered }}
+    {% endif %}
+  </div>
+</div>

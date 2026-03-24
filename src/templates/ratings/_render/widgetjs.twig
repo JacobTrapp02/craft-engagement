@@ -1,0 +1,168 @@
+{#
+  Ratings Widget JS
+  Rendered with `_context` from `ratings/_render/widget.twig`.
+  Available Twig variables include:
+  - widgetUid
+  - widgetPreviewMode
+  - widgetElementId, widgetFieldId, widgetSiteId
+  - widgetActionUrl, widgetLoginUrl
+  - widgetIsLoggedIn, widgetGuestAllowed
+  - widgetScale, widgetUserRating
+  - widgetAverage, widgetDisplayAverage, voteCount
+  - widgetHeadingText, widgetClickToRateText, widgetYourRatingText
+  - label
+  - craft.app.request.csrfToken
+#}
+(() => {
+  const root = document.querySelector('[data-engagement-rating][data-rating-uid="{{ widgetUid }}"]');
+  if (!root) {
+    return;
+  }
+
+  const buttons = root.querySelectorAll('[data-rating-value]');
+  const headingEl = root.querySelector('[data-rating-heading]');
+  const userEl = root.querySelector('[data-rating-user]');
+  const overallFillEl = root.querySelector('[data-overall-fill]');
+
+  const scale = Number(root.getAttribute('data-scale') || 5);
+  const actionUrl = root.getAttribute('data-action-url');
+  const loginUrl = root.getAttribute('data-login-url') || '/login';
+  const isLoggedIn = root.getAttribute('data-is-logged-in') === '1';
+  const guestAllowed = root.getAttribute('data-guest-allowed') === '1';
+  const elementId = Number(root.getAttribute('data-element-id'));
+  const fieldId = Number(root.getAttribute('data-field-id'));
+  const siteId = Number(root.getAttribute('data-site-id'));
+  const fieldName = {{ (label ?? '')|json_encode|raw }};
+
+  let selected = Number({{ widgetUserRating is not null ? widgetUserRating : 0 }});
+  const headingTemplate = {{ (widgetHeadingText ?? '')|json_encode|raw }};
+  const clickTemplate = {{ (widgetClickToRateText ?? '')|json_encode|raw }};
+  const yourTemplate = {{ (widgetYourRatingText ?? '')|json_encode|raw }};
+  const initialAverage = Number({{ widgetAverage|json_encode|raw }});
+  const initialRoundedAverage = Number({{ widgetDisplayAverage|json_encode|raw }});
+  const initialVotes = Number({{ (voteCount ?? 0)|json_encode|raw }});
+
+  const formatText = (template, extra = {}) => {
+    if (!template || !template.trim()) {
+      return '';
+    }
+
+    const values = {
+      userRating: extra.userRating ?? selected,
+      votes: extra.votes ?? 0,
+      average: extra.average ?? 0,
+      roundedAverage: extra.roundedAverage ?? 0,
+      scale,
+      fieldName,
+      elementId,
+    };
+
+    return template.replace(/\{(userRating|votes|average|roundedAverage|scale|fieldName|elementId)\}/g, (_, token) => {
+      const value = values[token];
+      return value === null || value === undefined ? '' : String(value);
+    });
+  };
+
+  const setUserText = (text) => {
+    if (!userEl) {
+      return;
+    }
+    userEl.textContent = text || '';
+    userEl.style.display = text ? '' : 'none';
+  };
+
+  const setHeadingText = (text) => {
+    if (!headingEl) {
+      return;
+    }
+    headingEl.textContent = text || '';
+    headingEl.style.display = text ? '' : 'none';
+  };
+
+  if (selected > 0) {
+    setUserText(formatText(yourTemplate, { userRating: selected, scale }));
+  } else {
+    setUserText(formatText(clickTemplate, { scale }));
+  }
+  setHeadingText(formatText(headingTemplate, {
+    userRating: selected,
+    votes: initialVotes,
+    average: initialAverage,
+    roundedAverage: initialRoundedAverage,
+    scale,
+  }));
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!isLoggedIn && !guestAllowed) {
+        const goLogin = window.confirm({{ 'Please log in to rate this.'|t('engagement')|json_encode|raw }});
+        if (goLogin) {
+          window.location.href = loginUrl;
+        }
+        return;
+      }
+
+      if (!actionUrl || !elementId || !fieldId) {
+        return;
+      }
+
+      const value = Number(btn.getAttribute('data-rating-value'));
+      if (!value || value < 1 || value > scale) {
+        return;
+      }
+
+      try {
+        const response = await fetch(actionUrl, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'X-CSRF-Token': {{ craft.app.request.csrfToken|json_encode|raw }},
+          },
+          body: JSON.stringify({ elementId, fieldId, siteId, rating: value }),
+        });
+
+        if (!response.ok) {
+          if (userEl) {
+            userEl.textContent = {{ 'Could not submit rating right now.'|t('engagement')|json_encode|raw }};
+          }
+          return;
+        }
+
+        const data = await response.json();
+        selected = Number(data?.vote?.rating || value);
+
+        if (data?.aggregate && overallFillEl) {
+          const avgRaw = Number(data.aggregate.average ?? data.aggregate.roundedAverage ?? 0);
+          const avgQuarter = Math.round(avgRaw * 4) / 4;
+          const fill = scale > 0 ? (avgQuarter / scale) * 100 : 0;
+
+          overallFillEl.style.width = fill + '%';
+
+          setUserText(formatText(yourTemplate, {
+            userRating: selected,
+            votes: Number(data.aggregate.voteCount ?? 0),
+            average: avgRaw,
+            roundedAverage: avgQuarter,
+            scale,
+          }));
+
+          setHeadingText(formatText(headingTemplate, {
+            userRating: selected,
+            votes: Number(data.aggregate.voteCount ?? 0),
+            average: avgRaw,
+            roundedAverage: avgQuarter,
+            scale,
+          }));
+        } else {
+          setUserText(formatText(yourTemplate, { userRating: selected, scale }));
+        }
+      } catch (e) {
+        if (userEl) {
+          userEl.textContent = {{ 'Could not submit rating right now.'|t('engagement')|json_encode|raw }};
+        }
+      }
+    });
+  });
+})();

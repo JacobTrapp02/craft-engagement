@@ -1,0 +1,37 @@
+{#
+  Favorites Widget CSS
+  Rendered with `_context` from `favorites/_render/widget.twig`.
+  Available Twig variables include:
+  - widgetUid
+  - widgetPreviewMode
+  - widgetElementId, widgetFieldId, widgetSiteId
+  - widgetActionUrl, widgetLoginUrl
+  - widgetIsLoggedIn, widgetGuestAllowed
+  - widgetIsFavorited, widgetFavoriteCount
+  - widgetIcon, widgetEmojiIcon, widgetCustomSvg
+  - widgetFavoriteBeforeBg, widgetFavoriteAfterBg
+  - widgetHeadingText, widgetHeadingTextRendered
+  - widgetFavoriteTextRendered, widgetUnfavoriteTextRendered
+#}
+[data-engagement-favorite] {
+  text-align: center;
+}
+
+[data-engagement-favorite] [data-favorite-heading] {
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+[data-engagement-favorite] [data-favorite-btn] {
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+[data-engagement-favorite] .engagement-favorite-svg-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}

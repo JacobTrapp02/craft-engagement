@@ -20,38 +20,38 @@ class TwigService extends Component
     /**
      * Render a widget by inferring field value type (rating/likes/favorites).
      */
-    public function render(mixed $fieldValue): Markup|string
+    public function render(mixed $fieldValue, ?array $options = null): Markup|string
     {
         if ($fieldValue instanceof Rating) {
-            return $this->renderRating($fieldValue);
+            return $this->renderRating($fieldValue, $options);
         }
 
         if ($fieldValue instanceof Like) {
-            return $this->renderLikes($fieldValue);
+            return $this->renderLikes($fieldValue, $options);
         }
 
         if ($fieldValue instanceof Favorite) {
-            return $this->renderFavorite($fieldValue);
+            return $this->renderFavorite($fieldValue, $options);
         }
 
         if (is_array($fieldValue)) {
             if (array_key_exists('scale', $fieldValue) || array_key_exists('voteCount', $fieldValue)) {
-                return $this->renderRating($fieldValue);
+                return $this->renderRating($fieldValue, $options);
             }
 
             if (array_key_exists('likeCount', $fieldValue) || array_key_exists('dislikeCount', $fieldValue)) {
-                return $this->renderLikes($fieldValue);
+                return $this->renderLikes($fieldValue, $options);
             }
 
-            if (array_key_exists('favoriteCount', $fieldValue) || array_key_exists('showPublicCount', $fieldValue)) {
-                return $this->renderFavorite($fieldValue);
+            if (array_key_exists('favoriteCount', $fieldValue) || array_key_exists('isFavorited', $fieldValue)) {
+                return $this->renderFavorite($fieldValue, $options);
             }
         }
 
         return '';
     }
 
-    public function renderRating(mixed $fieldValue): Markup|string
+    public function renderRating(mixed $fieldValue, ?array $options = null): Markup|string
     {
         $data = $this->normalizeRatingFieldData($fieldValue);
         if ($data === null || ($data['enabled'] ?? true) === false) {
@@ -75,7 +75,7 @@ class TwigService extends Component
             }
         }
 
-        $html = $this->renderPluginTemplate('engagement/ratings/_render/favorite.twig', [
+        $html = $this->renderPluginTemplate('engagement/ratings/_render/widget.twig', [
             'elementId' => $data['elementId'] ?? null,
             'fieldId' => $data['fieldId'] ?? null,
             'siteId' => $data['siteId'] ?? Craft::$app->getSites()->getCurrentSite()->id,
@@ -95,12 +95,13 @@ class TwigService extends Component
             'userRating' => $userRating,
             'loginUrl' => UrlHelper::url('login'),
             'actionUrl' => UrlHelper::actionUrl('engagement/ratings/cast-rating'),
+            'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
         ]);
 
         return new Markup($html, Craft::$app->charset ?: 'UTF-8');
     }
 
-    public function renderLikes(mixed $fieldValue): Markup|string
+    public function renderLikes(mixed $fieldValue, ?array $options = null): Markup|string
     {
         $data = $this->normalizeLikesFieldData($fieldValue);
         if ($data === null || ($data['enabled'] ?? true) === false) {
@@ -148,17 +149,18 @@ class TwigService extends Component
             'userVote' => $userVote,
             'loginUrl' => UrlHelper::url('login'),
             'actionUrl' => UrlHelper::actionUrl('engagement/likes/cast-like'),
+            'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
         ]);
 
         return new Markup($html, Craft::$app->charset ?: 'UTF-8');
     }
 
-    public function renderFavorite(mixed $fieldValue): Markup|string
+    public function renderFavorite(mixed $fieldValue, ?array $options = null): Markup|string
     {
         $data = $this->normalizeFavoritesFieldData($fieldValue);
         if ($data === null) {
             // Back-compat for older templates that used renderFavorite() for ratings.
-            return $this->renderRating($fieldValue);
+            return $this->renderRating($fieldValue, $options);
         }
 
         if (($data['enabled'] ?? true) === false) {
@@ -201,6 +203,7 @@ class TwigService extends Component
             'isFavorited' => $isFavorited,
             'loginUrl' => UrlHelper::url('login'),
             'actionUrl' => UrlHelper::actionUrl('engagement/favorites/toggle-favorite'),
+            'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
         ]);
 
         return new Markup($html, Craft::$app->charset ?: 'UTF-8');
@@ -317,7 +320,7 @@ class TwigService extends Component
     }
 
     /**
-     * @return array{id?: ?int, elementId?: ?int, siteId?: ?int, fieldId?: ?int, enabled?: bool, icon?: string, emojiIcon?: string, beforeFavoriteColor?: string, afterFavoriteColor?: string, customSvg?: ?string, favoriteCount?: int, showPublicCount?: bool, headingText?: ?string, favoriteText?: ?string, unfavoriteText?: ?string, isFavorited?: bool, allowGuestInteractions?: bool}|null
+     * @return array{id?: ?int, elementId?: ?int, siteId?: ?int, fieldId?: ?int, enabled?: bool, icon?: string, emojiIcon?: string, beforeFavoriteColor?: string, afterFavoriteColor?: string, customSvg?: ?string, favoriteCount?: int, headingText?: ?string, favoriteText?: ?string, unfavoriteText?: ?string, isFavorited?: bool, allowGuestInteractions?: bool}|null
      */
     private function normalizeFavoritesFieldData(mixed $fieldValue): ?array
     {
@@ -334,7 +337,6 @@ class TwigService extends Component
                 'afterFavoriteColor' => $fieldValue->afterFavoriteColor,
                 'customSvg' => $fieldValue->customSvg,
                 'favoriteCount' => $fieldValue->favoriteCount,
-                'showPublicCount' => $fieldValue->showPublicCount,
                 'headingText' => $fieldValue->headingText,
                 'favoriteText' => $fieldValue->favoriteText,
                 'unfavoriteText' => $fieldValue->unfavoriteText,
@@ -356,7 +358,6 @@ class TwigService extends Component
                 'afterFavoriteColor' => isset($fieldValue['afterFavoriteColor']) ? (string)$fieldValue['afterFavoriteColor'] : '',
                 'customSvg' => $fieldValue['customSvg'] ?? null,
                 'favoriteCount' => isset($fieldValue['favoriteCount']) ? (int)$fieldValue['favoriteCount'] : 0,
-                'showPublicCount' => isset($fieldValue['showPublicCount']) ? (bool)$fieldValue['showPublicCount'] : true,
                 'headingText' => isset($fieldValue['headingText']) ? trim((string)$fieldValue['headingText']) : null,
                 'favoriteText' => isset($fieldValue['favoriteText']) ? trim((string)$fieldValue['favoriteText']) : null,
                 'unfavoriteText' => isset($fieldValue['unfavoriteText']) ? trim((string)$fieldValue['unfavoriteText']) : null,
@@ -377,6 +378,53 @@ class TwigService extends Component
         $field = Craft::$app->getFields()->getFieldById($fieldId);
 
         return $field?->name;
+    }
+
+    /**
+     * @param array<string, mixed>|null $options
+     * @return array{html?: string, css?: string, js?: string}
+     */
+    private function resolveWidgetTemplateOverrides(?array $options): array
+    {
+        if ($options === null) {
+            return [];
+        }
+
+        $overrides = [];
+
+        if (isset($options['widgetTemplates']) && is_array($options['widgetTemplates'])) {
+            $source = $options['widgetTemplates'];
+
+            if (isset($source['html']) && is_string($source['html']) && trim($source['html']) !== '') {
+                $overrides['html'] = trim($source['html']);
+            }
+            if (isset($source['css']) && is_string($source['css']) && trim($source['css']) !== '') {
+                $overrides['css'] = trim($source['css']);
+            }
+            if (isset($source['js']) && is_string($source['js']) && trim($source['js']) !== '') {
+                $overrides['js'] = trim($source['js']);
+            }
+        }
+
+        if (isset($options['htmlTemplate']) && is_string($options['htmlTemplate']) && trim($options['htmlTemplate']) !== '') {
+            $overrides['html'] = trim($options['htmlTemplate']);
+        } elseif (isset($options['html']) && is_string($options['html']) && trim($options['html']) !== '') {
+            $overrides['html'] = trim($options['html']);
+        }
+
+        if (isset($options['cssTemplate']) && is_string($options['cssTemplate']) && trim($options['cssTemplate']) !== '') {
+            $overrides['css'] = trim($options['cssTemplate']);
+        } elseif (isset($options['css']) && is_string($options['css']) && trim($options['css']) !== '') {
+            $overrides['css'] = trim($options['css']);
+        }
+
+        if (isset($options['jsTemplate']) && is_string($options['jsTemplate']) && trim($options['jsTemplate']) !== '') {
+            $overrides['js'] = trim($options['jsTemplate']);
+        } elseif (isset($options['js']) && is_string($options['js']) && trim($options['js']) !== '') {
+            $overrides['js'] = trim($options['js']);
+        }
+
+        return $overrides;
     }
 
     /**

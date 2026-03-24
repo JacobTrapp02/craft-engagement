@@ -1,14 +1,12 @@
 {#
-  Likes Widget Resolver
+  Ratings Widget Resolver
   Available Twig variables (inputs and overrides):
   - previewMode, elementId, fieldId, siteId
   - actionUrl, loginUrl
   - isLoggedIn, guestAllowed
-  - userVote, likeCount, dislikeCount
-  - icon, emojiIcon, likeEmojiIcon, dislikeEmojiIcon, customSvg
-  - beforeLikeColor, afterLikeColor
-  - beforeDislikeColor, afterDislikeColor
-  - headingText, likeText, dislikeText
+  - scale, average, roundedAverage, voteCount, userRating
+  - icon, emojiIcon, customSvg
+  - headingText, clickToRateText, yourRatingText
   - label
   - widgetTemplates (optional per-call overrides: html/css/js)
 #}
@@ -17,47 +15,56 @@
 {% set widgetElementId = elementId ?? null %}
 {% set widgetFieldId = fieldId ?? null %}
 {% set widgetSiteId = siteId ?? craft.app.sites.currentSite.id %}
-{% set widgetActionUrl = actionUrl ?? actionUrl('engagement/likes/cast-like') %}
-{% set widgetLoginUrl = loginUrl ?? url('login') %}
+{% set widgetScale = scale ?? 5 %}
+{% set widgetActionUrl = actionUrl ?? actionUrl('engagement/ratings/cast-rating') %}
+{% set widgetAverage = average ?? 0 %}
+{% set widgetDisplayAverage = ((widgetAverage * 4)|round) / 4 %}
+{% set widgetIcon = icon ?? 'star' %}
+{% set widgetEmojiIcon = emojiIcon ?? '⭐' %}
+{% set widgetCustomSvg = customSvg ?? null %}
 {% set widgetIsLoggedIn = isLoggedIn ?? false %}
 {% set widgetGuestAllowed = guestAllowed ?? false %}
-{% set widgetUserVote = userVote ?? null %}
-{% set widgetLikeCount = likeCount ?? 0 %}
-{% set widgetDislikeCount = dislikeCount ?? 0 %}
-{% set widgetIcon = icon ?? 'thumbs' %}
-{% set widgetLikeEmojiIcon = likeEmojiIcon ?? emojiIcon ?? '👍' %}
-{% set widgetDislikeEmojiIcon = dislikeEmojiIcon ?? '👎' %}
-{% set widgetBeforeLikeColor = beforeLikeColor ?? '' %}
-{% set widgetAfterLikeColor = afterLikeColor ?? '' %}
-{% set widgetBeforeDislikeColor = beforeDislikeColor ?? '' %}
-{% set widgetAfterDislikeColor = afterDislikeColor ?? '' %}
-{% set widgetLikeBeforeBg = widgetBeforeLikeColor ?: '#fff' %}
-{% set widgetLikeAfterBg = widgetAfterLikeColor ?: '#fff' %}
-{% set widgetDislikeBeforeBg = widgetBeforeDislikeColor ?: '#fff' %}
-{% set widgetDislikeAfterBg = widgetAfterDislikeColor ?: '#fff' %}
-{% set widgetCustomSvg = customSvg ?? null %}
-{% set widgetHeadingText = headingText ?? '' %}
-{% set widgetLikeText = likeText ?? '' %}
-{% set widgetDislikeText = dislikeText ?? '' %}
+{% set widgetUserRating = userRating ?? null %}
+{% set widgetLoginUrl = loginUrl ?? url('login') %}
+{% set widgetHeadingText = headingText ?? null %}
+{% set widgetClickToRateText = clickToRateText ?? 'Click to rate'|t('engagement') %}
+{% set widgetYourRatingText = yourRatingText ?? 'Your rating: {userRating} / {scale}'|t('engagement') %}
+{% set previewUserRating = widgetUserRating ?? 0 %}
 {% set tokenMap = {
-  '{likes}': widgetLikeCount,
-  '{dislikes}': widgetDislikeCount,
+  '{userRating}': previewUserRating,
+  '{votes}': voteCount ?? 0,
+  '{average}': widgetAverage,
+  '{roundedAverage}': widgetDisplayAverage,
+  '{scale}': widgetScale,
   '{fieldName}': label ?? '',
   '{elementId}': widgetElementId ?? '',
-  '{userVote}': widgetUserVote ?? 0,
 } %}
 {% set widgetHeadingTextRendered = widgetHeadingText is not empty ? widgetHeadingText|replace(tokenMap) : '' %}
-{% set widgetLikeTextRendered = widgetLikeText is not empty ? widgetLikeText|replace(tokenMap) : '' %}
-{% set widgetDislikeTextRendered = widgetDislikeText is not empty ? widgetDislikeText|replace(tokenMap) : '' %}
+{% set widgetClickToRateTextRendered = widgetClickToRateText is not empty ? widgetClickToRateText|replace(tokenMap) : '' %}
+{% set widgetYourRatingTextRendered = widgetYourRatingText is not empty ? widgetYourRatingText|replace(tokenMap) : '' %}
+
+{% set fillPercent = (widgetUserRating is not null and widgetScale > 0) ? (widgetDisplayAverage / widgetScale * 100) : 0 %}
+{% set emptyGlyph = '☆' %}
+{% set filledGlyph = '★' %}
+{% if widgetIcon == 'heart' %}
+  {% set emptyGlyph = '♡' %}
+  {% set filledGlyph = '♥' %}
+{% elseif widgetIcon == 'thumbs' %}
+  {% set emptyGlyph = '👍' %}
+  {% set filledGlyph = '👍' %}
+{% elseif widgetIcon == 'emoji' %}
+  {% set emptyGlyph = widgetEmojiIcon %}
+  {% set filledGlyph = widgetEmojiIcon %}
+{% endif %}
 
 {% set widgetDefaults = {
-  html: 'engagement/likes/_render/widgethtml',
-  css: 'engagement/likes/_render/widgetcss',
-  js: 'engagement/likes/_render/widgetjs',
+  html: 'engagement/ratings/_render/widgethtml',
+  css: 'engagement/ratings/_render/widgetcss',
+  js: 'engagement/ratings/_render/widgetjs',
 } %}
 {% set engagementConfig = craft.app.config.getConfigFromFile('engagement') ?? {} %}
 {% set configWidgetTemplates = engagementConfig.widgetTemplates ?? {} %}
-{% set configOverrides = attribute(configWidgetTemplates, 'likes') ?? {} %}
+{% set configOverrides = attribute(configWidgetTemplates, 'ratings') ?? {} %}
 {% set requestedTemplates = widgetDefaults|merge(configOverrides)|merge(widgetTemplates ?? {}) %}
 {% set templateModeSite = constant('craft\\web\\View::TEMPLATE_MODE_SITE') %}
 {% set templateModeCp = constant('craft\\web\\View::TEMPLATE_MODE_CP') %}

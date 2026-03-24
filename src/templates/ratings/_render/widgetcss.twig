@@ -1,0 +1,30 @@
+{#
+  Ratings Widget CSS
+  Rendered with `_context` from `ratings/_render/widget.twig`.
+  Available Twig variables include:
+  - widgetUid
+  - widgetPreviewMode
+  - widgetElementId, widgetFieldId, widgetSiteId
+  - widgetActionUrl, widgetLoginUrl
+  - widgetIsLoggedIn, widgetGuestAllowed
+  - widgetScale, widgetUserRating
+  - widgetIcon, widgetEmojiIcon, widgetCustomSvg
+  - fillPercent, emptyGlyph, filledGlyph
+  - widgetHeadingTextRendered
+  - widgetClickToRateTextRendered, widgetYourRatingTextRendered
+#}
+[data-engagement-rating] {
+  text-align: center;
+}
+
+[data-engagement-rating] [data-rating-heading] {
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+[data-engagement-rating] [data-rating-user] {
+  font-size: 13px;
+  color: #334155;
+  min-height: 18px;
+}
