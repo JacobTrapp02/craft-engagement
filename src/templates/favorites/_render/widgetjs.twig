@@ -5,7 +5,7 @@
   - widgetUid
   - widgetPreviewMode
   - widgetElementId, widgetFieldId, widgetSiteId
-  - widgetActionUrl, widgetLoginUrl
+  - widgetActionUrl, widgetLoginUrl, widgetRegisterUrl
   - widgetIsLoggedIn, widgetGuestAllowed
   - widgetIsFavorited, widgetFavoriteCount
   - widgetHeadingText, widgetFavoriteText, widgetUnfavoriteText
@@ -34,6 +34,7 @@
 
   const actionUrl = root.getAttribute('data-action-url');
   const loginUrl = root.getAttribute('data-login-url') || '/login';
+  const registerUrl = root.getAttribute('data-register-url') || '';
   const isLoggedIn = root.getAttribute('data-is-logged-in') === '1';
   const guestAllowed = root.getAttribute('data-guest-allowed') === '1';
   const elementId = Number(root.getAttribute('data-element-id'));
@@ -108,9 +109,13 @@
 
   button?.addEventListener('click', async () => {
     if (!isLoggedIn && !guestAllowed) {
-      const goLogin = window.confirm({{ 'Please log in to interact.'|t('engagement')|json_encode|raw }});
+      const goLogin = window.confirm(registerUrl
+        ? {{ 'Please log in to interact. Click OK to log in or Cancel to register.'|t('engagement')|json_encode|raw }}
+        : {{ 'Please log in to interact.'|t('engagement')|json_encode|raw }});
       if (goLogin) {
         window.location.href = loginUrl;
+      } else if (registerUrl) {
+        window.location.href = registerUrl;
       }
       return;
     }

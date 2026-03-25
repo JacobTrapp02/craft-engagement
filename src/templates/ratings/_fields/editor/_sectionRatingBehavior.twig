@@ -5,7 +5,7 @@
   {% if canOverrideScale %}
     {{ forms.textField({
         label: 'Scale'|t('engagement'),
-        instructions: 'Set the scale for this element.'|t('engagement'),
+        instructions: 'Controls how many rating steps/icons are shown for this element (for example, 5 means users can rate from 1 to 5). Must be between 1 and {max}.'|t('engagement', { max: maxScale }),
         id: prefix ~ '-scale',
         name: prefix ~ '[scale]',
         type: 'number',

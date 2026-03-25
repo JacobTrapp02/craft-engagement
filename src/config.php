@@ -7,6 +7,9 @@
  * then adjust template handles to point at your site templates.
  */
 return [
+    // Max allowed value for rating scale inputs (clamped to 1..100).
+    'maxScale' => 100,
+
     'widgetTemplates' => [
         'favorites' => [
             'html' => 'engagement/favorites/_render/widgethtml',

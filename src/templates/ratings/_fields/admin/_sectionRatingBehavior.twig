@@ -4,13 +4,13 @@
   <summary>{{ 'Rating Behavior'|t('engagement') }}</summary>
   {{ forms.textField({
       label: 'Scale'|t('engagement'),
-      instructions: 'Default scale for this field. Must be between 1 and plugin Max Scale ({max}).'|t('engagement', { max: pluginSettings.maxScale }),
+      instructions: 'Controls how many rating steps/icons are shown (for example, 5 means users can rate from 1 to 5). Must be between 1 and {max}.'|t('engagement', { max: maxScale }),
       id: 'scale',
       name: 'scale',
       type: 'number',
       min: 1,
-      max: pluginSettings.maxScale,
-      value: field.scale ?: pluginSettings.defaultScale,
+      max: maxScale,
+      value: field.scale ?: 5,
       required: true,
       errors: field.getErrors('scale'),
   }) }}

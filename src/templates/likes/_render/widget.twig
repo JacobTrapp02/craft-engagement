@@ -2,7 +2,7 @@
   Likes Widget Resolver
   Available Twig variables (inputs and overrides):
   - previewMode, elementId, fieldId, siteId
-  - actionUrl, loginUrl
+  - actionUrl, loginUrl, registerUrl
   - isLoggedIn, guestAllowed
   - userVote, likeCount, dislikeCount
   - icon, emojiIcon, likeEmojiIcon, dislikeEmojiIcon, customSvg
@@ -19,6 +19,7 @@
 {% set widgetSiteId = siteId ?? craft.app.sites.currentSite.id %}
 {% set widgetActionUrl = actionUrl ?? actionUrl('engagement/likes/cast-like') %}
 {% set widgetLoginUrl = loginUrl ?? url('login') %}
+{% set widgetRegisterUrl = registerUrl ?? null %}
 {% set widgetIsLoggedIn = isLoggedIn ?? false %}
 {% set widgetGuestAllowed = guestAllowed ?? false %}
 {% set widgetUserVote = userVote ?? null %}

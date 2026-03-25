@@ -142,7 +142,6 @@ class LikesField extends Field
             'engagement/likes/_fields/admin.twig',
             [
                 'field' => $this,
-                'pluginSettings' => $this->pluginSettings(),
                 'iconOptions' => $this->iconOptions(),
             ]
         );
@@ -304,14 +303,6 @@ class LikesField extends Field
                 'iconOptions' => $this->iconOptions(),
             ]
         );
-    }
-
-    private function pluginSettings(): Settings
-    {
-        /** @var Settings $settings */
-        $settings = Plugin::getInstance()->getSettings();
-
-        return $settings;
     }
 
     /**

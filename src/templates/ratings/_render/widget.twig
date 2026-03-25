@@ -2,7 +2,7 @@
   Ratings Widget Resolver
   Available Twig variables (inputs and overrides):
   - previewMode, elementId, fieldId, siteId
-  - actionUrl, loginUrl
+  - actionUrl, loginUrl, registerUrl
   - isLoggedIn, guestAllowed
   - scale, average, roundedAverage, voteCount, userRating
   - icon, emojiIcon, customSvg
@@ -26,6 +26,7 @@
 {% set widgetGuestAllowed = guestAllowed ?? false %}
 {% set widgetUserRating = userRating ?? null %}
 {% set widgetLoginUrl = loginUrl ?? url('login') %}
+{% set widgetRegisterUrl = registerUrl ?? null %}
 {% set widgetHeadingText = headingText ?? null %}
 {% set widgetClickToRateText = clickToRateText ?? 'Click to rate'|t('engagement') %}
 {% set widgetYourRatingText = yourRatingText ?? 'Your rating: {userRating} / {scale}'|t('engagement') %}

@@ -134,7 +134,6 @@ class FavoritesField extends Field
             'engagement/favorites/_fields/admin.twig',
             [
                 'field' => $this,
-                'pluginSettings' => $this->pluginSettings(),
                 'iconOptions' => $this->iconOptions(),
             ]
         );
@@ -263,14 +262,6 @@ class FavoritesField extends Field
                 'iconOptions' => $this->iconOptions(),
             ]
         );
-    }
-
-    private function pluginSettings(): Settings
-    {
-        /** @var Settings $settings */
-        $settings = Plugin::getInstance()->getSettings();
-
-        return $settings;
     }
 
     /**

@@ -1,5 +1,5 @@
 {# @var field \jtdev\craftengagement\fields\RatingField #}
-{# @var pluginSettings \jtdev\craftengagement\models\Settings #}
+{# @var maxScale int #}
 
 {% include 'engagement/ratings/_fields/_widgetPreview.twig' with {
     title: 'Widget Preview'|t('engagement'),
@@ -11,7 +11,7 @@
     icon: field.icon,
     emojiIcon: field.emojiIcon,
     customSvg: field.customSvg,
-    scale: field.scale ?: pluginSettings.defaultScale,
+    scale: field.scale ?: 5,
     average: 3.75,
     voteCount: 42,
     headingText: field.headingText,
@@ -22,13 +22,12 @@
 
 {% include 'engagement/ratings/_fields/admin/_sectionIconAppearance.twig' with {
     field: field,
-    pluginSettings: pluginSettings,
     iconOptions: iconOptions,
 } only %}
 
 {% include 'engagement/ratings/_fields/admin/_sectionRatingBehavior.twig' with {
     field: field,
-    pluginSettings: pluginSettings,
+    maxScale: maxScale,
 } only %}
 
 {% include 'engagement/ratings/_fields/admin/_sectionTextOverrides.twig' with {

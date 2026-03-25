@@ -17,6 +17,8 @@ use yii\db\Schema;
 class RatingField extends Field
 {
     public const ICON_EMOJI = 'emoji';
+    private const DEFAULT_SCALE = 5;
+    private const DEFAULT_MAX_SCALE = 100;
 
     /**
      * @deprecated Back-compat for older saved field configs.
@@ -80,18 +82,18 @@ class RatingField extends Field
         }
 
         if ($this->scale <= 0) {
-            $this->scale = $this->pluginSettings()->defaultScale;
+            $this->scale = self::DEFAULT_SCALE;
         }
 
         if ($this->icon === '') {
-            $this->icon = $this->pluginSettings()->defaultIcon;
+            $this->icon = Settings::ICON_STAR;
         }
     }
 
     public function rules(): array
     {
         $rules = parent::rules();
-        $maxScale = $this->pluginSettings()->maxScale;
+        $maxScale = $this->maxScale();
 
         $rules[] = [['scale'], 'required'];
         $rules[] = [['scale'], 'integer', 'min' => 1, 'max' => 100];
@@ -130,11 +132,10 @@ class RatingField extends Field
 
     public function beforeSave(bool $isNew): bool
     {
-        $settings = $this->pluginSettings();
-
-        // Keep existing fields valid if plugin maxScale is reduced.
-        if ($this->scale > $settings->maxScale) {
-            $this->scale = $settings->maxScale;
+        // Keep existing fields valid if the configured maxScale is reduced.
+        $maxScale = $this->maxScale();
+        if ($this->scale > $maxScale) {
+            $this->scale = $maxScale;
         }
 
         return parent::beforeSave($isNew);
@@ -146,7 +147,7 @@ class RatingField extends Field
             'engagement/ratings/_fields/admin.twig',
             [
                 'field' => $this,
-                'pluginSettings' => $this->pluginSettings(),
+                'maxScale' => $this->maxScale(),
                 'iconOptions' => $this->iconOptions(),
             ]
         );
@@ -278,17 +279,9 @@ class RatingField extends Field
                 'field' => $this,
                 'rating' => $rating,
                 'iconOptions' => $this->iconOptions(),
-                'maxScale' => $this->pluginSettings()->maxScale,
+                'maxScale' => $this->maxScale(),
             ]
         );
-    }
-
-    private function pluginSettings(): Settings
-    {
-        /** @var Settings $settings */
-        $settings = Plugin::getInstance()->getSettings();
-
-        return $settings;
     }
 
     /**
@@ -346,7 +339,7 @@ class RatingField extends Field
         }
 
         if (array_key_exists('scale', $value)) {
-            $stored['scale'] = max(1, min((int)$value['scale'], $this->pluginSettings()->maxScale));
+            $stored['scale'] = max(1, min((int)$value['scale'], $this->maxScale()));
         }
 
         if (array_key_exists('icon', $value)) {
@@ -391,6 +384,18 @@ class RatingField extends Field
         }
 
         return $stored;
+    }
+
+    private function maxScale(): int
+    {
+        $config = Craft::$app->getConfig()->getConfigFromFile('engagement');
+        $configured = self::DEFAULT_MAX_SCALE;
+
+        if (is_array($config) && array_key_exists('maxScale', $config)) {
+            $configured = (int)$config['maxScale'];
+        }
+
+        return max(1, min($configured, self::DEFAULT_MAX_SCALE));
     }
 
 }

@@ -4,7 +4,7 @@
   - widgetUid
   - widgetPreviewMode
   - widgetElementId, widgetFieldId, widgetSiteId
-  - widgetActionUrl, widgetLoginUrl
+  - widgetActionUrl, widgetLoginUrl, widgetRegisterUrl
   - widgetIsLoggedIn, widgetGuestAllowed
   - widgetScale, widgetUserRating
   - widgetIcon, widgetEmojiIcon, widgetCustomSvg
@@ -20,6 +20,7 @@
   data-site-id="{{ widgetSiteId|e('html_attr') }}"
   data-action-url="{{ widgetActionUrl|e('html_attr') }}"
   data-login-url="{{ widgetLoginUrl|e('html_attr') }}"
+  data-register-url="{{ widgetRegisterUrl ? widgetRegisterUrl|e('html_attr') : '' }}"
   data-is-logged-in="{{ widgetIsLoggedIn ? '1' : '0' }}"
   data-guest-allowed="{{ widgetGuestAllowed ? '1' : '0' }}"
   data-scale="{{ widgetScale|e('html_attr') }}"

@@ -9,6 +9,7 @@ use craft\web\View;
 use jtdev\craftengagement\models\Favorite;
 use jtdev\craftengagement\models\Like;
 use jtdev\craftengagement\models\Rating;
+use jtdev\craftengagement\models\Settings;
 use jtdev\craftengagement\Plugin;
 use Twig\Markup;
 
@@ -93,7 +94,8 @@ class TwigService extends Component
             'isLoggedIn' => $isLoggedIn,
             'guestAllowed' => (bool)($data['allowGuestRatings'] ?? false),
             'userRating' => $userRating,
-            'loginUrl' => UrlHelper::url('login'),
+            'loginUrl' => $this->resolveLoginUrl(),
+            'registerUrl' => $this->resolveRegisterUrl(),
             'actionUrl' => UrlHelper::actionUrl('engagement/ratings/cast-rating'),
             'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
         ]);
@@ -147,7 +149,8 @@ class TwigService extends Component
             'isLoggedIn' => $isLoggedIn,
             'guestAllowed' => (bool)($data['allowGuestInteractions'] ?? false),
             'userVote' => $userVote,
-            'loginUrl' => UrlHelper::url('login'),
+            'loginUrl' => $this->resolveLoginUrl(),
+            'registerUrl' => $this->resolveRegisterUrl(),
             'actionUrl' => UrlHelper::actionUrl('engagement/likes/cast-like'),
             'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
         ]);
@@ -201,7 +204,8 @@ class TwigService extends Component
             'isLoggedIn' => $isLoggedIn,
             'guestAllowed' => (bool)($data['allowGuestInteractions'] ?? false),
             'isFavorited' => $isFavorited,
-            'loginUrl' => UrlHelper::url('login'),
+            'loginUrl' => $this->resolveLoginUrl(),
+            'registerUrl' => $this->resolveRegisterUrl(),
             'actionUrl' => UrlHelper::actionUrl('engagement/favorites/toggle-favorite'),
             'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
         ]);
@@ -378,6 +382,56 @@ class TwigService extends Component
         $field = Craft::$app->getFields()->getFieldById($fieldId);
 
         return $field?->name;
+    }
+
+    private function resolveLoginUrl(): string
+    {
+        $settings = $this->settings();
+        $url = $this->normalizeUrl($settings->loginUrl) ?: UrlHelper::url('login');
+        $redirectParam = trim($settings->loginRedirectParam);
+
+        if ($redirectParam !== '') {
+            $redirectTo = Craft::$app->getRequest()->getAbsoluteUrl();
+            $url = UrlHelper::urlWithParams($url, [
+                $redirectParam => $redirectTo,
+            ]);
+        }
+
+        return $url;
+    }
+
+    private function resolveRegisterUrl(): ?string
+    {
+        $settings = $this->settings();
+        $registerUrl = $settings->registerUrl;
+
+        if (!is_string($registerUrl) || trim($registerUrl) === '') {
+            return null;
+        }
+
+        return $this->normalizeUrl($registerUrl);
+    }
+
+    private function normalizeUrl(string $value): string
+    {
+        $trimmed = trim($value);
+        if ($trimmed === '') {
+            return '';
+        }
+
+        if (str_starts_with($trimmed, 'http://') || str_starts_with($trimmed, 'https://')) {
+            return $trimmed;
+        }
+
+        return UrlHelper::url(ltrim($trimmed, '/'));
+    }
+
+    private function settings(): Settings
+    {
+        /** @var Settings $settings */
+        $settings = Plugin::getInstance()->getSettings();
+
+        return $settings;
     }
 
     /**
