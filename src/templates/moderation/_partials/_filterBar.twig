@@ -1,0 +1,58 @@
+{% import '_includes/forms' as forms %}
+
+<form method="get" accept-charset="UTF-8" data-eng-auto-filter="1" class="flex fields" style="gap: 12px; align-items: flex-end; margin: 0 0 12px;">
+  {{ forms.selectField({
+    first: true,
+    label: 'Sort'|t('engagement'),
+    id: 'sort',
+    name: 'sort',
+    value: sort,
+    options: sortOptions,
+    fieldClass: 'nowrap',
+    inputAttributes: {
+      'data-eng-auto-submit': '1',
+    },
+  }) }}
+
+  {{ forms.selectField({
+    label: 'Per Page'|t('engagement'),
+    id: 'perPage',
+    name: 'perPage',
+    value: perPage,
+    options: [
+      { label: '25', value: 25 },
+      { label: '50', value: 50 },
+      { label: '100', value: 100 },
+    ],
+    fieldClass: 'nowrap',
+    inputAttributes: {
+      'data-eng-auto-submit': '1',
+    },
+  }) }}
+
+  <noscript>
+    <button class="btn submit">{{ 'Apply'|t('engagement') }}</button>
+  </noscript>
+</form>
+
+{% js %}
+  (() => {
+    const forms = document.querySelectorAll('form[data-eng-auto-filter="1"]');
+    if (!forms.length) {
+      return;
+    }
+
+    forms.forEach((form) => {
+      const controls = form.querySelectorAll('select[data-eng-auto-submit="1"]');
+      controls.forEach((control) => {
+        control.addEventListener('change', () => {
+          if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit();
+          } else {
+            form.submit();
+          }
+        });
+      });
+    });
+  })();
+{% endjs %}

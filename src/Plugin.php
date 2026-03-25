@@ -7,7 +7,9 @@ use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
 use craft\elements\db\ElementQuery;
 use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterUrlRulesEvent;
 use craft\services\Fields;
+use craft\web\UrlManager;
 use craft\web\twig\variables\CraftVariable;
 use jtdev\craftengagement\fields\FavoritesField;
 use jtdev\craftengagement\fields\LikesField;
@@ -48,6 +50,7 @@ class Plugin extends BasePlugin
 {
     public string $schemaVersion = '1.0.0';
     public bool $hasCpSettings = true;
+    public bool $hasCpSection = true;
 
     public static function config(): array
     {
@@ -98,6 +101,16 @@ class Plugin extends BasePlugin
         ]);
     }
 
+    // public function getCpNavItem(): array
+    // {
+    //     $item = parent::getCpNavItem();
+    //     $item['subnav'] = [
+    //         'moderation' => ['label' => Craft::t('engagement', 'Moderation'), 'url' => 'engagement/moderation'],
+    //     ];
+
+    //     return $item;
+    // }
+
     private function attachEventHandlers(): void
     {
         Event::on(
@@ -127,6 +140,17 @@ class Plugin extends BasePlugin
                 /** @var ElementQuery $query */
                 $query = $event->sender;
                 EngagementQueryHelper::rewriteOrderBy($query);
+            }
+        );
+
+        Event::on(
+            UrlManager::class,
+            UrlManager::EVENT_REGISTER_CP_URL_RULES,
+            static function(RegisterUrlRulesEvent $event): void {
+                $event->rules['engagement'] = 'engagement/moderation/index';
+                $event->rules['engagement/moderation'] = 'engagement/moderation/index';
+                $event->rules['engagement/moderation/<tab:(all|ratings|likes|favorites)>'] = 'engagement/moderation/index';
+                $event->rules['engagement/moderation/<type:(ratings|likes|favorites)>/<id:\\d+>'] = 'engagement/moderation/detail';
             }
         );
     }

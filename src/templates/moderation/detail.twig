@@ -1,0 +1,113 @@
+{% extends '_layouts/cp' %}
+
+{% set typeLabel = type == 'ratings' ? 'Ratings' : (type == 'likes' ? 'Likes' : 'Favorites') %}
+{% set title = typeLabel ~ ' Aggregate #' ~ aggregate.id %}
+
+{% block actionButton %}
+  <a class="btn" href="{{ cpUrl('engagement/moderation/' ~ type) }}">{{ 'Back to {type}'|t('engagement', { type: typeLabel }) }}</a>
+{% endblock %}
+
+{% block content %}
+  <div class="pane">
+    <h2>{{ typeLabel }} {{ 'Aggregate'|t('engagement') }} #{{ aggregate.id }}</h2>
+    <p>
+      {{ 'Entry:'|t('engagement') }}
+      {% if aggregate.entry %}
+        <a href="{{ aggregate.entry.cpEditUrl }}">{{ aggregate.entry.title }}</a>
+      {% else %}
+        <span class="light">#{{ aggregate.elementId }}</span>
+      {% endif %}
+      &nbsp;•&nbsp;
+      {{ 'Field:'|t('engagement') }}
+      {% if aggregate.field %}
+        {% if aggregate.fieldCpUrl %}
+          <a href="{{ aggregate.fieldCpUrl }}">{{ aggregate.field.name }}</a>
+        {% else %}
+          {{ aggregate.field.name }}
+        {% endif %}
+      {% else %}
+        <span class="light">#{{ aggregate.fieldId }}</span>
+      {% endif %}
+      &nbsp;•&nbsp;
+      {{ 'Site ID:'|t('engagement') }} {{ aggregate.siteId }}
+    </p>
+
+    {% if type == 'ratings' %}
+      <p>
+        {{ 'Average:'|t('engagement') }} {{ aggregate.roundedAverage }}
+        &nbsp;•&nbsp;
+        {{ 'Votes:'|t('engagement') }} {{ aggregate.voteCount }}
+      </p>
+    {% elseif type == 'likes' %}
+      <p>
+        {{ 'Likes:'|t('engagement') }} {{ aggregate.likeCount }}
+        &nbsp;•&nbsp;
+        {{ 'Dislikes:'|t('engagement') }} {{ aggregate.dislikeCount }}
+        &nbsp;•&nbsp;
+        {{ 'Total Votes:'|t('engagement') }} {{ aggregate.totalVotes }}
+        &nbsp;•&nbsp;
+        {{ 'Score:'|t('engagement') }} {{ aggregate.score }}
+      </p>
+    {% else %}
+      <p>
+        {{ 'Favorites:'|t('engagement') }} {{ aggregate.favoriteCount }}
+      </p>
+    {% endif %}
+  </div>
+
+  <div class="pane">
+    <h3>
+      {% if type == 'favorites' %}
+        {{ 'Favorite Entries'|t('engagement') }}
+      {% else %}
+        {{ 'Votes'|t('engagement') }}
+      {% endif %}
+    </h3>
+
+    <table class="data fullwidth">
+      <thead>
+        <tr>
+          <th>ID</th>
+          {% if type == 'ratings' %}
+            <th>{{ 'Rating'|t('engagement') }}</th>
+          {% elseif type == 'likes' %}
+            <th>{{ 'Vote'|t('engagement') }}</th>
+          {% endif %}
+          <th>{{ 'User'|t('engagement') }}</th>
+          <th>{{ 'Session'|t('engagement') }}</th>
+          <th>{{ 'Created'|t('engagement') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.id }}</td>
+            {% if type == 'ratings' %}
+              <td>{{ row.rating }}</td>
+            {% elseif type == 'likes' %}
+              <td>{{ row.value == 1 ? 'Like'|t('engagement') : 'Dislike'|t('engagement') }}</td>
+            {% endif %}
+            <td>
+              {% if row.userId and users[row.userId] is defined %}
+                {% set user = users[row.userId] %}
+                <a href="{{ cpUrl('users/' ~ user.id) }}">{{ user.fullName ?: user.username }}</a>
+              {% elseif row.userId %}
+                <span class="light">#{{ row.userId }}</span>
+              {% else %}
+                <span class="light">{{ 'Guest'|t('engagement') }}</span>
+              {% endif %}
+            </td>
+            <td><span class="code">{{ row.sessionId ?: '—' }}</span></td>
+            <td>{{ row.dateCreated|datetime('short') }}</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="{{ type == 'favorites' ? 4 : 5 }}">
+              <span class="light">{{ 'No rows found.'|t('engagement') }}</span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

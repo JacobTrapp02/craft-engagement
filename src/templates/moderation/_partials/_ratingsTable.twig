@@ -1,0 +1,30 @@
+{% import 'engagement/moderation/_partials/_ui.twig' as h %}
+
+<div class="tablepane">
+<table class="data fullwidth">
+  <thead>
+    <tr>
+      <th>{{ 'Entry'|t('engagement') }}</th>
+      <th>{{ 'Field'|t('engagement') }}</th>
+      <th>{{ 'Average'|t('engagement') }}</th>
+      <th>{{ 'Vote Count'|t('engagement') }}</th>
+      <th>{{ 'Updated'|t('engagement') }}</th>
+      <th>{{ 'Details'|t('engagement') }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for aggregate in ratings %}
+      <tr>
+        <td>{{ h.entryLink(aggregate) }}</td>
+        <td>{{ h.fieldLabel(aggregate) }}</td>
+        <td>{{ aggregate.roundedAverage }}</td>
+        <td>{{ aggregate.voteCount }}</td>
+        <td>{{ aggregate.dateUpdated|datetime('short') }}</td>
+        <td><a href="{{ cpUrl('engagement/moderation/ratings/' ~ aggregate.id) }}">{{ 'View'|t('engagement') }}</a></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6"><span class="light">{{ emptyMessage ?? 'No rows found.'|t('engagement') }}</span></td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
