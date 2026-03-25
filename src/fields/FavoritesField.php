@@ -6,9 +6,11 @@ use Craft;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\helpers\Json;
+use jtdev\craftengagement\helpers\EngagementQueryHelper;
 use jtdev\craftengagement\models\Favorite;
 use jtdev\craftengagement\models\Settings;
 use jtdev\craftengagement\Plugin;
+use yii\db\ExpressionInterface;
 use yii\db\Schema;
 
 /**
@@ -250,6 +252,67 @@ class FavoritesField extends Field
         ]);
     }
 
+    public static function queryCondition(array $instances, mixed $value, array &$params): array|string|ExpressionInterface|false|null
+    {
+        if (!is_array($value)) {
+            return null;
+        }
+
+        /** @var self|null $field */
+        $field = $instances[0] ?? null;
+        if ($field === null || $field->id === null) {
+            return null;
+        }
+
+        $siteId = EngagementQueryHelper::toInt($value['siteId'] ?? null);
+        $conditions = ['and'];
+
+        if ($siteId !== null) {
+            $conditions[] = ['elements_sites.siteId' => $siteId];
+        }
+
+        if (array_key_exists('enabled', $value)) {
+            $enabled = EngagementQueryHelper::toBool($value['enabled']);
+            if ($enabled !== null) {
+                $enabledCondition = self::enabledQueryCondition($instances, $params, $enabled);
+                if ($enabledCondition === false) {
+                    return false;
+                }
+
+                if ($enabledCondition !== null) {
+                    $conditions[] = $enabledCondition;
+                }
+            }
+        }
+
+        $minFavorites = EngagementQueryHelper::toInt($value['minFavorites'] ?? null);
+        $maxFavorites = EngagementQueryHelper::toInt($value['maxFavorites'] ?? null);
+        if ($minFavorites !== null && $maxFavorites !== null && $minFavorites > $maxFavorites) {
+            return false;
+        }
+
+        $favoriteCountSql = EngagementQueryHelper::favoritesMetricSql((int)$field->id, 'count', $siteId);
+
+        if ($minFavorites !== null) {
+            $conditions[] = ['>=', new \yii\db\Expression($favoriteCountSql), $minFavorites];
+        }
+
+        if ($maxFavorites !== null) {
+            $conditions[] = ['<=', new \yii\db\Expression($favoriteCountSql), $maxFavorites];
+        }
+
+        if (array_key_exists('hasFavorites', $value)) {
+            $hasFavorites = EngagementQueryHelper::toBool($value['hasFavorites']);
+            if ($hasFavorites !== null) {
+                $conditions[] = $hasFavorites
+                    ? ['>', new \yii\db\Expression($favoriteCountSql), 0]
+                    : ['=', new \yii\db\Expression($favoriteCountSql), 0];
+            }
+        }
+
+        return count($conditions) > 1 ? $conditions : null;
+    }
+
     protected function inputHtml(mixed $value, ?ElementInterface $element = null, bool $inline = false): string
     {
         $favorite = $value instanceof Favorite ? $value : $this->normalizeValue($value, $element);
@@ -364,5 +427,31 @@ class FavoritesField extends Field
         }
 
         return $stored;
+    }
+
+    private static function enabledQueryCondition(array $instances, array &$params, bool $enabled): array|string|false|null
+    {
+        /** @var self $field */
+        $field = $instances[0] ?? null;
+        if ($field === null) {
+            return null;
+        }
+
+        $canOverride = $field->allowEditorOverrides && $field->allowOverrideWidgetEnabled;
+        $defaultEnabled = $field->defaultEnabled;
+
+        if (!$canOverride) {
+            return $defaultEnabled === $enabled ? null : false;
+        }
+
+        $valueSql = self::valueSql($instances, null, $params);
+        $needle = $enabled ? '"enabled":true' : '"enabled":false';
+        $condition = "(($valueSql) LIKE '%$needle%')";
+
+        if ($defaultEnabled === $enabled) {
+            $condition .= " OR (($valueSql) IS NULL OR ($valueSql) = '' OR ($valueSql) NOT LIKE '%\"enabled\":%')";
+        }
+
+        return "($condition)";
     }
 }

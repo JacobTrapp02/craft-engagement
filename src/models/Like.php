@@ -44,4 +44,14 @@ class Like extends Model
             [['userVote'], 'in', 'range' => [-1, 0, 1]],
         ];
     }
+
+    public function getTotalVotes(): int
+    {
+        return $this->likeCount + $this->dislikeCount;
+    }
+
+    public function getScore(): int
+    {
+        return $this->likeCount - $this->dislikeCount;
+    }
 }

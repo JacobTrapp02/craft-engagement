@@ -6,9 +6,11 @@ use Craft;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\helpers\Json;
+use jtdev\craftengagement\helpers\EngagementQueryHelper;
 use jtdev\craftengagement\models\Like;
 use jtdev\craftengagement\models\Settings;
 use jtdev\craftengagement\Plugin;
+use yii\db\ExpressionInterface;
 use yii\db\Schema;
 
 /**
@@ -291,6 +293,113 @@ class LikesField extends Field
         ]);
     }
 
+    public static function queryCondition(array $instances, mixed $value, array &$params): array|string|ExpressionInterface|false|null
+    {
+        if (!is_array($value)) {
+            return null;
+        }
+
+        /** @var self|null $field */
+        $field = $instances[0] ?? null;
+        if ($field === null || $field->id === null) {
+            return null;
+        }
+
+        $siteId = EngagementQueryHelper::toInt($value['siteId'] ?? null);
+        $conditions = ['and'];
+
+        if ($siteId !== null) {
+            $conditions[] = ['elements_sites.siteId' => $siteId];
+        }
+
+        if (array_key_exists('enabled', $value)) {
+            $enabled = EngagementQueryHelper::toBool($value['enabled']);
+            if ($enabled !== null) {
+                $enabledCondition = self::enabledQueryCondition($instances, $params, $enabled);
+                if ($enabledCondition === false) {
+                    return false;
+                }
+
+                if ($enabledCondition !== null) {
+                    $conditions[] = $enabledCondition;
+                }
+            }
+        }
+
+        $minLikes = EngagementQueryHelper::toInt($value['minLikes'] ?? null);
+        $maxLikes = EngagementQueryHelper::toInt($value['maxLikes'] ?? null);
+        if ($minLikes !== null && $maxLikes !== null && $minLikes > $maxLikes) {
+            return false;
+        }
+
+        $minDislikes = EngagementQueryHelper::toInt($value['minDislikes'] ?? null);
+        $maxDislikes = EngagementQueryHelper::toInt($value['maxDislikes'] ?? null);
+        if ($minDislikes !== null && $maxDislikes !== null && $minDislikes > $maxDislikes) {
+            return false;
+        }
+
+        $minTotalVotes = EngagementQueryHelper::toInt($value['minTotalVotes'] ?? null);
+        $maxTotalVotes = EngagementQueryHelper::toInt($value['maxTotalVotes'] ?? null);
+        $exactTotalVotes = EngagementQueryHelper::toInt($value['totalVotes'] ?? null);
+        if ($exactTotalVotes !== null) {
+            $minTotalVotes = $minTotalVotes ?? $exactTotalVotes;
+            $maxTotalVotes = $maxTotalVotes ?? $exactTotalVotes;
+        }
+        if ($minTotalVotes !== null && $maxTotalVotes !== null && $minTotalVotes > $maxTotalVotes) {
+            return false;
+        }
+
+        $minScore = EngagementQueryHelper::toInt($value['minScore'] ?? null);
+        $maxScore = EngagementQueryHelper::toInt($value['maxScore'] ?? null);
+        $exactScore = EngagementQueryHelper::toInt($value['score'] ?? null);
+        if ($exactScore !== null) {
+            $minScore = $minScore ?? $exactScore;
+            $maxScore = $maxScore ?? $exactScore;
+        }
+        if ($minScore !== null && $maxScore !== null && $minScore > $maxScore) {
+            return false;
+        }
+
+        $likesSql = EngagementQueryHelper::likesMetricSql((int)$field->id, 'likes', $siteId);
+        $dislikesSql = EngagementQueryHelper::likesMetricSql((int)$field->id, 'dislikes', $siteId);
+        $totalVotesSql = EngagementQueryHelper::likesMetricSql((int)$field->id, 'totalVotes', $siteId);
+        $scoreSql = EngagementQueryHelper::likesMetricSql((int)$field->id, 'score', $siteId);
+
+        if ($minLikes !== null) {
+            $conditions[] = ['>=', new \yii\db\Expression($likesSql), $minLikes];
+        }
+
+        if ($maxLikes !== null) {
+            $conditions[] = ['<=', new \yii\db\Expression($likesSql), $maxLikes];
+        }
+
+        if ($minDislikes !== null) {
+            $conditions[] = ['>=', new \yii\db\Expression($dislikesSql), $minDislikes];
+        }
+
+        if ($maxDislikes !== null) {
+            $conditions[] = ['<=', new \yii\db\Expression($dislikesSql), $maxDislikes];
+        }
+
+        if ($minTotalVotes !== null) {
+            $conditions[] = ['>=', new \yii\db\Expression($totalVotesSql), $minTotalVotes];
+        }
+
+        if ($maxTotalVotes !== null) {
+            $conditions[] = ['<=', new \yii\db\Expression($totalVotesSql), $maxTotalVotes];
+        }
+
+        if ($minScore !== null) {
+            $conditions[] = ['>=', new \yii\db\Expression($scoreSql), $minScore];
+        }
+
+        if ($maxScore !== null) {
+            $conditions[] = ['<=', new \yii\db\Expression($scoreSql), $maxScore];
+        }
+
+        return count($conditions) > 1 ? $conditions : null;
+    }
+
     protected function inputHtml(mixed $value, ?ElementInterface $element = null, bool $inline = false): string
     {
         $like = $value instanceof Like ? $value : $this->normalizeValue($value, $element);
@@ -428,5 +537,31 @@ class LikesField extends Field
         }
 
         return $stored;
+    }
+
+    private static function enabledQueryCondition(array $instances, array &$params, bool $enabled): array|string|false|null
+    {
+        /** @var self $field */
+        $field = $instances[0] ?? null;
+        if ($field === null) {
+            return null;
+        }
+
+        $canOverride = $field->allowEditorOverrides && $field->allowOverrideWidgetEnabled;
+        $defaultEnabled = $field->defaultEnabled;
+
+        if (!$canOverride) {
+            return $defaultEnabled === $enabled ? null : false;
+        }
+
+        $valueSql = self::valueSql($instances, null, $params);
+        $needle = $enabled ? '"enabled":true' : '"enabled":false';
+        $condition = "(($valueSql) LIKE '%$needle%')";
+
+        if ($defaultEnabled === $enabled) {
+            $condition .= " OR (($valueSql) IS NULL OR ($valueSql) = '' OR ($valueSql) NOT LIKE '%\"enabled\":%')";
+        }
+
+        return "($condition)";
     }
 }

@@ -85,6 +85,165 @@ In plugin settings, you can configure authentication links used by widgets:
 
 If a register URL is set, guest prompts can offer registration as an alternative to login.
 
+## Querying Entries by Engagement Field
+
+Engagement fields support Craft-native field-handle querying directly on element queries:
+
+```twig
+{% set entries = craft.entries()
+  .section('reviews')
+  .rating({
+    enabled: true,
+    minAverage: 4,
+    minVoteCount: 10
+  })
+  .all() %}
+```
+
+This uses your actual field handle (`rating`, `likes`, `favorites`, etc.) and works alongside normal Craft query methods (`section()`, `site()`, `orderBy()`, `limit()`, etc.).
+
+### Field Value Access (Unchanged)
+
+These read values still work the same in Twig:
+
+- `entry.rating.average`
+- `entry.rating.voteCount`
+- `entry.likes.likeCount`
+- `entry.likes.dislikeCount`
+- `entry.likes.totalVotes` (derived: `likeCount + dislikeCount`)
+- `entry.likes.score` (derived: `likeCount - dislikeCount`)
+- `entry.favorites.favoriteCount`
+
+### Shared Criteria Keys
+
+All three engagement field types support:
+
+- `enabled`: Effective enabled state for that entry’s field value.
+  - Uses entry override when widget-enabled override is allowed.
+  - Falls back to field default enabled state otherwise.
+- `siteId`: Filter against a specific site’s aggregate values.
+
+### Rating Criteria
+
+Use these keys inside `.<ratingHandle>({...})`:
+
+- `minAverage`, `maxAverage`
+- `minVoteCount`, `maxVoteCount`
+- `hasVotes` (`true` or `false`)
+
+Example:
+
+```twig
+{% set topRated = craft.entries()
+  .section('reviews')
+  .rating({
+    enabled: true,
+    minAverage: 4.2,
+    minVoteCount: 25,
+    hasVotes: true
+  })
+  .all() %}
+```
+
+### Likes Criteria
+
+Use these keys inside `.<likesHandle>({...})`:
+
+- `minLikes`, `maxLikes`
+- `minDislikes`, `maxDislikes`
+- `minTotalVotes`, `maxTotalVotes`
+- `minScore`, `maxScore` (`score = likeCount - dislikeCount`)
+
+`totalVotes` is a derived metric, not a physical database column. It is computed from `likeCount + dislikeCount`.
+
+Example:
+
+```twig
+{% set trending = craft.entries()
+  .section('news')
+  .likes({
+    enabled: true,
+    minTotalVotes: 15,
+    minScore: 5
+  })
+  .all() %}
+```
+
+### Favorites Criteria
+
+Use these keys inside `.<favoritesHandle>({...})`:
+
+- `minFavorites`, `maxFavorites`
+- `hasFavorites` (`true` or `false`)
+
+Example:
+
+```twig
+{% set bookmarked = craft.entries()
+  .section('articles')
+  .favorites({
+    enabled: true,
+    minFavorites: 10
+  })
+  .all() %}
+```
+
+### No-Aggregate Defaults
+
+If an entry has no aggregate row yet:
+
+- Counts are treated as `0`
+- Ratings average is treated as `0`
+
+This keeps filtering behavior predictable for new entries with no interactions.
+
+### Sorting by Engagement Metrics
+
+Use native Craft `orderBy(...)` with handle-aware metric keys:
+
+- Ratings:
+  - `<handle>__average`
+  - `<handle>__voteCount`
+- Likes:
+  - `<handle>__likes`
+  - `<handle>__dislikes`
+  - `<handle>__score`
+  - `<handle>__totalVotes`
+- Favorites:
+  - `<handle>__count`
+
+Examples:
+
+```twig
+{% set byRating = craft.entries()
+  .section('reviews')
+  .rating({ minVoteCount: 5 })
+  .orderBy('rating__average desc')
+  .all() %}
+
+{% set byLikeScore = craft.entries()
+  .section('news')
+  .likes({ minTotalVotes: 10 })
+  .orderBy('likes__score desc')
+  .all() %}
+
+{% set byFavorites = craft.entries()
+  .section('articles')
+  .favorites({ hasFavorites: true })
+  .orderBy('favorites__count desc')
+  .all() %}
+```
+
+The handle prefix makes sorting unambiguous if multiple engagement fields exist.
+
+### Validation Behavior
+
+Criteria parsing is intentionally forgiving:
+
+- Unknown keys are ignored
+- Invalid values are ignored for that key
+- If a min is greater than its max (for the same metric), the query returns no results
+
 ## Recount Commands
 
 You can force recount and recovery for a single aggregate row by ID:

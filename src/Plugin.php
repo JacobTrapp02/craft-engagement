@@ -5,12 +5,14 @@ namespace jtdev\craftengagement;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
+use craft\elements\db\ElementQuery;
 use craft\events\RegisterComponentTypesEvent;
 use craft\services\Fields;
 use craft\web\twig\variables\CraftVariable;
 use jtdev\craftengagement\fields\FavoritesField;
 use jtdev\craftengagement\fields\LikesField;
 use jtdev\craftengagement\fields\RatingField;
+use jtdev\craftengagement\helpers\EngagementQueryHelper;
 use jtdev\craftengagement\models\Settings;
 use jtdev\craftengagement\services\FavoritesAggregateService;
 use jtdev\craftengagement\services\FavoritesEntryService;
@@ -115,6 +117,16 @@ class Plugin extends BasePlugin
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('engagement', EngagementVariable::class);
+            }
+        );
+
+        Event::on(
+            ElementQuery::class,
+            ElementQuery::EVENT_BEFORE_PREPARE,
+            static function(Event $event): void {
+                /** @var ElementQuery $query */
+                $query = $event->sender;
+                EngagementQueryHelper::rewriteOrderBy($query);
             }
         );
     }

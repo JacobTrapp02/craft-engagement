@@ -6,9 +6,11 @@ use Craft;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\helpers\Json;
+use jtdev\craftengagement\helpers\EngagementQueryHelper;
 use jtdev\craftengagement\models\Rating;
 use jtdev\craftengagement\models\Settings;
 use jtdev\craftengagement\Plugin;
+use yii\db\ExpressionInterface;
 use yii\db\Schema;
 
 /**
@@ -269,6 +271,82 @@ class RatingField extends Field
         ]);
     }
 
+    public static function queryCondition(array $instances, mixed $value, array &$params): array|string|ExpressionInterface|false|null
+    {
+        if (!is_array($value)) {
+            return null;
+        }
+
+        /** @var self|null $field */
+        $field = $instances[0] ?? null;
+        if ($field === null || $field->id === null) {
+            return null;
+        }
+
+        $siteId = EngagementQueryHelper::toInt($value['siteId'] ?? null);
+        $conditions = ['and'];
+
+        if ($siteId !== null) {
+            $conditions[] = ['elements_sites.siteId' => $siteId];
+        }
+
+        if (array_key_exists('enabled', $value)) {
+            $enabled = EngagementQueryHelper::toBool($value['enabled']);
+            if ($enabled !== null) {
+                $enabledCondition = self::enabledQueryCondition($instances, $params, $enabled);
+                if ($enabledCondition === false) {
+                    return false;
+                }
+
+                if ($enabledCondition !== null) {
+                    $conditions[] = $enabledCondition;
+                }
+            }
+        }
+
+        $minAverage = EngagementQueryHelper::toFloat($value['minAverage'] ?? null);
+        $maxAverage = EngagementQueryHelper::toFloat($value['maxAverage'] ?? null);
+        if ($minAverage !== null && $maxAverage !== null && $minAverage > $maxAverage) {
+            return false;
+        }
+
+        $minVoteCount = EngagementQueryHelper::toInt($value['minVoteCount'] ?? null);
+        $maxVoteCount = EngagementQueryHelper::toInt($value['maxVoteCount'] ?? null);
+        if ($minVoteCount !== null && $maxVoteCount !== null && $minVoteCount > $maxVoteCount) {
+            return false;
+        }
+
+        $averageSql = EngagementQueryHelper::ratingMetricSql((int)$field->id, 'average', $siteId);
+        $voteCountSql = EngagementQueryHelper::ratingMetricSql((int)$field->id, 'voteCount', $siteId);
+
+        if ($minAverage !== null) {
+            $conditions[] = ['>=', new \yii\db\Expression($averageSql), $minAverage];
+        }
+
+        if ($maxAverage !== null) {
+            $conditions[] = ['<=', new \yii\db\Expression($averageSql), $maxAverage];
+        }
+
+        if ($minVoteCount !== null) {
+            $conditions[] = ['>=', new \yii\db\Expression($voteCountSql), $minVoteCount];
+        }
+
+        if ($maxVoteCount !== null) {
+            $conditions[] = ['<=', new \yii\db\Expression($voteCountSql), $maxVoteCount];
+        }
+
+        if (array_key_exists('hasVotes', $value)) {
+            $hasVotes = EngagementQueryHelper::toBool($value['hasVotes']);
+            if ($hasVotes !== null) {
+                $conditions[] = $hasVotes
+                    ? ['>', new \yii\db\Expression($voteCountSql), 0]
+                    : ['=', new \yii\db\Expression($voteCountSql), 0];
+            }
+        }
+
+        return count($conditions) > 1 ? $conditions : null;
+    }
+
     protected function inputHtml(mixed $value, ?ElementInterface $element = null, bool $inline = false): string
     {
         $rating = $value instanceof Rating ? $value : $this->normalizeValue($value, $element);
@@ -396,6 +474,32 @@ class RatingField extends Field
         }
 
         return max(1, min($configured, self::DEFAULT_MAX_SCALE));
+    }
+
+    private static function enabledQueryCondition(array $instances, array &$params, bool $enabled): array|string|false|null
+    {
+        /** @var self $field */
+        $field = $instances[0] ?? null;
+        if ($field === null) {
+            return null;
+        }
+
+        $canOverride = $field->allowEditorOverrides && $field->allowOverrideWidgetEnabled;
+        $defaultEnabled = $field->defaultEnabled;
+
+        if (!$canOverride) {
+            return $defaultEnabled === $enabled ? null : false;
+        }
+
+        $valueSql = self::valueSql($instances, null, $params);
+        $needle = $enabled ? '"enabled":true' : '"enabled":false';
+        $condition = "(($valueSql) LIKE '%$needle%')";
+
+        if ($defaultEnabled === $enabled) {
+            $condition .= " OR (($valueSql) IS NULL OR ($valueSql) = '' OR ($valueSql) NOT LIKE '%\"enabled\":%')";
+        }
+
+        return "($condition)";
     }
 
 }
