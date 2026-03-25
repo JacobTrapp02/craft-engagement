@@ -8,6 +8,8 @@ use jtdev\craftengagement\fields\LikesField;
 use jtdev\craftengagement\models\LikesAggregate;
 use jtdev\craftengagement\models\LikesVote;
 use jtdev\craftengagement\Plugin;
+use jtdev\craftengagement\records\LikesAggregateRecord;
+use Throwable;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -109,27 +111,67 @@ class LikesController extends Controller
             throw new ForbiddenHttpException('Changing an existing like/dislike is disabled for this field.');
         }
 
-        $savedVote = null;
-        $userVote = null;
+        $db = Craft::$app->getDb();
+        $transaction = $db->beginTransaction();
 
-        if ($existingVote !== null && (int)$existingVote->value === $value) {
-            $voteService->delete($existingVote->id);
-        } elseif ($existingVote !== null) {
-            $savedVote = $voteService->update($existingVote->id, ['value' => $value]);
-            $userVote = $savedVote?->value;
-        } else {
-            $savedVote = $voteService->add(new LikesVote([
-                'aggregateId' => $aggregate->id,
-                'userId' => $currentUser !== null ? (int)$currentUser->id : null,
-                'sessionId' => $currentUser === null ? (string)$sessionId : null,
-                'value' => $value,
-            ]));
-            $userVote = $savedVote?->value;
-        }
+        try {
+            $savedVote = null;
+            $userVote = null;
+            $likeCountDelta = 0;
+            $dislikeCountDelta = 0;
 
-        $aggregate = $this->recalculateAggregate($aggregate->id);
-        if ($aggregate === null) {
-            throw new BadRequestHttpException('Could not recalculate likes aggregate.');
+            if ($existingVote !== null && (int)$existingVote->value === $value) {
+                $voteService->delete($existingVote->id);
+                if ($value === 1) {
+                    $likeCountDelta = -1;
+                } else {
+                    $dislikeCountDelta = -1;
+                }
+            } elseif ($existingVote !== null) {
+                $savedVote = $voteService->update($existingVote->id, ['value' => $value]);
+                if ($savedVote === null) {
+                    throw new BadRequestHttpException('Could not save like/dislike vote.');
+                }
+                $userVote = $savedVote?->value;
+                if ((int)$existingVote->value === 1) {
+                    $likeCountDelta = -1;
+                    $dislikeCountDelta = 1;
+                } else {
+                    $likeCountDelta = 1;
+                    $dislikeCountDelta = -1;
+                }
+            } else {
+                $savedVote = $voteService->add(new LikesVote([
+                    'aggregateId' => $aggregate->id,
+                    'userId' => $currentUser !== null ? (int)$currentUser->id : null,
+                    'sessionId' => $currentUser === null ? (string)$sessionId : null,
+                    'value' => $value,
+                ]));
+                if ($savedVote === null) {
+                    throw new BadRequestHttpException('Could not save like/dislike vote.');
+                }
+                $userVote = $savedVote?->value;
+                if ($value === 1) {
+                    $likeCountDelta = 1;
+                } else {
+                    $dislikeCountDelta = 1;
+                }
+            }
+
+            LikesAggregateRecord::updateAllCounters([
+                'likeCount' => $likeCountDelta,
+                'dislikeCount' => $dislikeCountDelta,
+            ], ['id' => $aggregate->id]);
+            $aggregate = $aggregateService->getById($aggregate->id);
+
+            if ($aggregate === null) {
+                throw new BadRequestHttpException('Could not update likes aggregate.');
+            }
+
+            $transaction->commit();
+        } catch (Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
         }
 
         return $this->asJson([
@@ -146,34 +188,6 @@ class LikesController extends Controller
                 'id' => $savedVote?->id,
                 'value' => $userVote,
             ],
-        ]);
-    }
-
-    private function recalculateAggregate(int $aggregateId): ?LikesAggregate
-    {
-        $aggregateService = Plugin::getInstance()->likesAggregates;
-        $voteService = Plugin::getInstance()->likesVotes;
-
-        $aggregate = $aggregateService->getById($aggregateId);
-        if ($aggregate === null) {
-            return null;
-        }
-
-        $votes = $voteService->getByAggregateId($aggregateId);
-        $likeCount = 0;
-        $dislikeCount = 0;
-
-        foreach ($votes as $vote) {
-            if ((int)$vote->value === 1) {
-                $likeCount++;
-            } elseif ((int)$vote->value === -1) {
-                $dislikeCount++;
-            }
-        }
-
-        return $aggregateService->update($aggregateId, [
-            'likeCount' => $likeCount,
-            'dislikeCount' => $dislikeCount,
         ]);
     }
 }

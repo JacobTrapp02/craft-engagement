@@ -11,7 +11,7 @@ use DateTime;
 class RatingVote extends Model
 {
     public ?int $id = null;
-    public int $topId;
+    public int $aggregateId;
     public ?int $userId = null;
     public ?string $sessionId = null;
     public int $rating;
@@ -21,8 +21,8 @@ class RatingVote extends Model
     public function rules(): array
     {
         return [
-            [['topId', 'rating'], 'required'],
-            [['id', 'topId', 'userId', 'rating'], 'integer', 'min' => 0],
+            [['aggregateId', 'rating'], 'required'],
+            [['id', 'aggregateId', 'userId', 'rating'], 'integer', 'min' => 0],
             [['sessionId'], 'string', 'max' => 255],
             [['rating'], 'integer', 'min' => 1],
             [['dateCreated', 'dateUpdated'], 'safe'],

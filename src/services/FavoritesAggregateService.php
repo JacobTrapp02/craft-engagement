@@ -4,6 +4,7 @@ namespace jtdev\craftengagement\services;
 
 use craft\base\Component;
 use jtdev\craftengagement\models\FavoritesAggregate;
+use jtdev\craftengagement\Plugin;
 use jtdev\craftengagement\records\FavoritesAggregateRecord;
 
 /**
@@ -151,6 +152,20 @@ class FavoritesAggregateService extends Component
         }
 
         return (bool)$record->delete();
+    }
+
+    public function forceRecount(int $aggregateId): ?FavoritesAggregate
+    {
+        $aggregate = $this->getById($aggregateId);
+        if ($aggregate === null) {
+            return null;
+        }
+
+        $entries = Plugin::getInstance()->favoritesEntries->getByAggregateId($aggregateId);
+
+        return $this->update($aggregateId, [
+            'favoriteCount' => count($entries),
+        ]);
     }
 
     private function recordToModel(FavoritesAggregateRecord $record): FavoritesAggregate

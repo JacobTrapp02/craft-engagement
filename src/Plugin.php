@@ -70,6 +70,10 @@ class Plugin extends BasePlugin
     {
         parent::init();
 
+        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
+            $this->controllerNamespace = 'jtdev\\craftengagement\\console\\controllers';
+        }
+
         $this->attachEventHandlers();
 
         // Any code that creates an element query or loads Twig should be deferred until

@@ -21,9 +21,9 @@ class RatingVoteService extends Component
     /**
      * @return RatingVote[]
      */
-    public function getByAggregateId(int $topId): array
+    public function getByAggregateId(int $aggregateId): array
     {
-        return $this->getMany(['topId' => $topId]);
+        return $this->getMany(['aggregateId' => $aggregateId]);
     }
 
     /**
@@ -42,11 +42,11 @@ class RatingVoteService extends Component
         return $this->getMany(['sessionId' => $sessionId]);
     }
 
-    public function getByAggregateAndUserId(int $topId, int $userId): ?RatingVote
+    public function getByAggregateAndUserId(int $aggregateId, int $userId): ?RatingVote
     {
         $record = RatingVoteRecord::find()
             ->where([
-                'topId' => $topId,
+                'aggregateId' => $aggregateId,
                 'userId' => $userId,
             ])
             ->one();
@@ -54,11 +54,11 @@ class RatingVoteService extends Component
         return $record ? $this->recordToModel($record) : null;
     }
 
-    public function getByAggregateAndSessionId(int $topId, string $sessionId): ?RatingVote
+    public function getByAggregateAndSessionId(int $aggregateId, string $sessionId): ?RatingVote
     {
         $record = RatingVoteRecord::find()
             ->where([
-                'topId' => $topId,
+                'aggregateId' => $aggregateId,
                 'sessionId' => $sessionId,
             ])
             ->one();
@@ -101,7 +101,7 @@ class RatingVoteService extends Component
     {
         $record = new RatingVoteRecord();
 
-        $record->topId = $vote->topId;
+        $record->aggregateId = $vote->aggregateId;
         $record->userId = $vote->userId;
         $record->sessionId = $vote->sessionId;
         $record->rating = $vote->rating;
@@ -149,7 +149,7 @@ class RatingVoteService extends Component
     {
         return new RatingVote([
             'id' => (int)$record->id,
-            'topId' => (int)$record->topId,
+            'aggregateId' => (int)$record->aggregateId,
             'userId' => $record->userId !== null ? (int)$record->userId : null,
             'sessionId' => $record->sessionId,
             'rating' => (int)$record->rating,

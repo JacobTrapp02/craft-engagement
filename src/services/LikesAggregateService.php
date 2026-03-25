@@ -4,6 +4,7 @@ namespace jtdev\craftengagement\services;
 
 use craft\base\Component;
 use jtdev\craftengagement\models\LikesAggregate;
+use jtdev\craftengagement\Plugin;
 use jtdev\craftengagement\records\LikesAggregateRecord;
 
 /**
@@ -152,6 +153,31 @@ class LikesAggregateService extends Component
         }
 
         return (bool)$record->delete();
+    }
+
+    public function forceRecount(int $aggregateId): ?LikesAggregate
+    {
+        $aggregate = $this->getById($aggregateId);
+        if ($aggregate === null) {
+            return null;
+        }
+
+        $votes = Plugin::getInstance()->likesVotes->getByAggregateId($aggregateId);
+        $likeCount = 0;
+        $dislikeCount = 0;
+
+        foreach ($votes as $vote) {
+            if ((int)$vote->value === 1) {
+                $likeCount++;
+            } elseif ((int)$vote->value === -1) {
+                $dislikeCount++;
+            }
+        }
+
+        return $this->update($aggregateId, [
+            'likeCount' => $likeCount,
+            'dislikeCount' => $dislikeCount,
+        ]);
     }
 
     private function recordToModel(LikesAggregateRecord $record): LikesAggregate

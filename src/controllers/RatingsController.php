@@ -8,6 +8,8 @@ use jtdev\craftengagement\fields\RatingField;
 use jtdev\craftengagement\models\RatingAggregate;
 use jtdev\craftengagement\models\RatingVote;
 use jtdev\craftengagement\Plugin;
+use jtdev\craftengagement\records\RatingAggregateRecord;
+use Throwable;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -76,7 +78,7 @@ class RatingsController extends Controller
                 'elementId' => $elementId,
                 'fieldId' => $fieldId,
                 'siteId' => $siteId,
-                'average' => 0,
+                'ratingSum' => 0,
                 'voteCount' => 0,
                 'scale' => $normalized->scale,
             ]));
@@ -111,27 +113,52 @@ class RatingsController extends Controller
             throw new ForbiddenHttpException('Changing an existing rating is disabled for this field.');
         }
 
-        if ($existingVote === null) {
-            $newVote = new RatingVote([
-                'topId' => $aggregate->id,
-                'userId' => $currentUser !== null ? (int)$currentUser->id : null,
-                'sessionId' => $currentUser === null ? Craft::$app->getSession()->getId() : null,
-                'rating' => $ratingValue,
-            ]);
+        $savedVote = null;
+        $db = Craft::$app->getDb();
+        $transaction = $db->beginTransaction();
 
-            $savedVote = $voteService->add($newVote);
-        } else {
-            $savedVote = $voteService->update($existingVote->id, ['rating' => $ratingValue]);
-        }
+        try {
+            $voteCountDelta = 0;
+            $ratingSumDelta = 0;
 
-        if ($savedVote === null) {
-            throw new BadRequestHttpException('Could not save vote.');
-        }
+            if ($existingVote === null) {
+                $newVote = new RatingVote([
+                    'aggregateId' => $aggregate->id,
+                    'userId' => $currentUser !== null ? (int)$currentUser->id : null,
+                    'sessionId' => $currentUser === null ? Craft::$app->getSession()->getId() : null,
+                    'rating' => $ratingValue,
+                ]);
 
-        $aggregate = $this->recalculateAggregate($aggregate->id);
+                $savedVote = $voteService->add($newVote);
+                $voteCountDelta = 1;
+                $ratingSumDelta = $ratingValue;
+            } else {
+                $savedVote = $voteService->update($existingVote->id, ['rating' => $ratingValue]);
+                $ratingSumDelta = $ratingValue - (int)$existingVote->rating;
+            }
 
-        if ($aggregate === null) {
-            throw new BadRequestHttpException('Could not recalculate aggregate.');
+            if ($savedVote === null) {
+                throw new BadRequestHttpException('Could not save vote.');
+            }
+
+            if ($voteCountDelta !== 0 || $ratingSumDelta !== 0) {
+                RatingAggregateRecord::updateAllCounters([
+                    'voteCount' => $voteCountDelta,
+                    'ratingSum' => $ratingSumDelta,
+                ], ['id' => $aggregate->id]);
+                $aggregate = $aggregateService->getById($aggregate->id);
+            } else {
+                $aggregate = $aggregateService->getById($aggregate->id);
+            }
+
+            if ($aggregate === null) {
+                throw new BadRequestHttpException('Could not update aggregate.');
+            }
+
+            $transaction->commit();
+        } catch (Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
         }
 
         return $this->asJson([
@@ -151,39 +178,6 @@ class RatingsController extends Controller
                 'id' => $savedVote->id,
                 'rating' => $savedVote->rating,
             ],
-        ]);
-    }
-
-    private function recalculateAggregate(int $aggregateId): ?RatingAggregate
-    {
-        $aggregateService = Plugin::getInstance()->ratingAggregates;
-        $voteService = Plugin::getInstance()->ratingVotes;
-
-        $aggregate = $aggregateService->getById($aggregateId);
-        if ($aggregate === null) {
-            return null;
-        }
-
-        $votes = $voteService->getByAggregateId($aggregateId);
-        $count = count($votes);
-
-        if ($count === 0) {
-            return $aggregateService->update($aggregateId, [
-                'average' => 0,
-                'voteCount' => 0,
-            ]);
-        }
-
-        $sum = 0;
-        foreach ($votes as $vote) {
-            $sum += (int)$vote->rating;
-        }
-
-        $average = round($sum / $count, 4);
-
-        return $aggregateService->update($aggregateId, [
-            'average' => $average,
-            'voteCount' => $count,
         ]);
     }
 }

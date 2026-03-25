@@ -3,6 +3,7 @@
 namespace jtdev\craftengagement\services;
 
 use craft\base\Component;
+use jtdev\craftengagement\Plugin;
 use jtdev\craftengagement\models\RatingAggregate;
 use jtdev\craftengagement\records\RatingAggregateRecord;
 
@@ -112,7 +113,7 @@ class RatingAggregateService extends Component
         $record->elementId = $aggregate->elementId;
         $record->fieldId = $aggregate->fieldId;
         $record->siteId = $aggregate->siteId;
-        $record->average = $aggregate->average;
+        $record->ratingSum = $aggregate->ratingSum;
         $record->voteCount = $aggregate->voteCount;
         $record->scale = $aggregate->scale;
 
@@ -155,6 +156,34 @@ class RatingAggregateService extends Component
         return (bool)$record->delete();
     }
 
+    public function forceRecount(int $aggregateId): ?RatingAggregate
+    {
+        $aggregate = $this->getById($aggregateId);
+        if ($aggregate === null) {
+            return null;
+        }
+
+        $votes = Plugin::getInstance()->ratingVotes->getByAggregateId($aggregateId);
+        $count = count($votes);
+
+        if ($count === 0) {
+            return $this->update($aggregateId, [
+                'ratingSum' => 0,
+                'voteCount' => 0,
+            ]);
+        }
+
+        $sum = 0;
+        foreach ($votes as $vote) {
+            $sum += (int)$vote->rating;
+        }
+
+        return $this->update($aggregateId, [
+            'ratingSum' => $sum,
+            'voteCount' => $count,
+        ]);
+    }
+
     private function recordToModel(RatingAggregateRecord $record): RatingAggregate
     {
         return new RatingAggregate([
@@ -162,7 +191,7 @@ class RatingAggregateService extends Component
             'elementId' => (int)$record->elementId,
             'fieldId' => (int)$record->fieldId,
             'siteId' => (int)$record->siteId,
-            'average' => (float)$record->average,
+            'ratingSum' => (int)$record->ratingSum,
             'voteCount' => (int)$record->voteCount,
             'scale' => (int)$record->scale,
         ]);

@@ -14,7 +14,7 @@ class RatingAggregate extends Model
     public int $elementId;
     public int $fieldId;
     public int $siteId;
-    public float $average = 0.0;
+    public int $ratingSum = 0;
     public int $voteCount = 0;
     public int $scale = 5;
     public ?DateTime $dateCreated = null;
@@ -24,11 +24,19 @@ class RatingAggregate extends Model
     {
         return [
             [['elementId', 'fieldId', 'siteId', 'scale'], 'required'],
-            [['id', 'elementId', 'fieldId', 'siteId', 'voteCount', 'scale'], 'integer', 'min' => 0],
-            [['average'], 'number', 'min' => 0],
+            [['id', 'elementId', 'fieldId', 'siteId', 'ratingSum', 'voteCount', 'scale'], 'integer', 'min' => 0],
             [['scale'], 'integer', 'min' => 1, 'max' => 100],
             [['dateCreated', 'dateUpdated'], 'safe'],
         ];
+    }
+
+    public function getAverage(): float
+    {
+        if ($this->voteCount <= 0) {
+            return 0.0;
+        }
+
+        return round($this->ratingSum / $this->voteCount, 4);
     }
 
     public function getPercentage(): float

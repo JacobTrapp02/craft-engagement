@@ -12,13 +12,13 @@ class Install extends Migration
 {
     public function safeUp(): bool
     {
-        if (!$this->db->tableExists('{{%ratings_aggregate}}')) {
-            $this->createTable('{{%ratings_aggregate}}', [
+        if (!$this->db->tableExists('{{%engagement_ratings_aggregate}}')) {
+            $this->createTable('{{%engagement_ratings_aggregate}}', [
                 'id' => $this->primaryKey(),
                 'elementId' => $this->integer()->notNull(),
                 'fieldId' => $this->integer()->notNull(),
                 'siteId' => $this->integer()->notNull(),
-                'average' => $this->decimal(10, 4)->notNull()->defaultValue(0),
+                'ratingSum' => $this->bigInteger()->unsigned()->notNull()->defaultValue(0),
                 'voteCount' => $this->bigInteger()->unsigned()->notNull()->defaultValue(0),
                 'scale' => $this->tinyInteger()->unsigned()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
@@ -28,13 +28,13 @@ class Install extends Migration
 
             $this->createIndex(
                 null,
-                '{{%ratings_aggregate}}',
+                '{{%engagement_ratings_aggregate}}',
                 ['elementId', 'fieldId', 'siteId'],
                 true
             );
             $this->addForeignKey(
                 null,
-                '{{%ratings_aggregate}}',
+                '{{%engagement_ratings_aggregate}}',
                 ['elementId'],
                 Table::ELEMENTS,
                 ['id'],
@@ -43,7 +43,7 @@ class Install extends Migration
             );
             $this->addForeignKey(
                 null,
-                '{{%ratings_aggregate}}',
+                '{{%engagement_ratings_aggregate}}',
                 ['fieldId'],
                 Table::FIELDS,
                 ['id'],
@@ -52,7 +52,7 @@ class Install extends Migration
             );
             $this->addForeignKey(
                 null,
-                '{{%ratings_aggregate}}',
+                '{{%engagement_ratings_aggregate}}',
                 ['siteId'],
                 Table::SITES,
                 ['id'],
@@ -61,10 +61,10 @@ class Install extends Migration
             );
         }
 
-        if (!$this->db->tableExists('{{%ratings_votes}}')) {
-            $this->createTable('{{%ratings_votes}}', [
+        if (!$this->db->tableExists('{{%engagement_ratings_votes}}')) {
+            $this->createTable('{{%engagement_ratings_votes}}', [
                 'id' => $this->primaryKey(),
-                'topId' => $this->integer()->notNull(),
+                'aggregateId' => $this->integer()->notNull(),
                 'userId' => $this->integer(),
                 'sessionId' => $this->string(),
                 'rating' => $this->integer()->notNull(),
@@ -73,28 +73,34 @@ class Install extends Migration
                 'uid' => $this->uid(),
             ]);
 
-            $this->createIndex(null, '{{%ratings_votes}}', ['topId'], false);
-            $this->createIndex(null, '{{%ratings_votes}}', ['userId'], false);
-            $this->createIndex(null, '{{%ratings_votes}}', ['sessionId'], false);
+            $this->createIndex(null, '{{%engagement_ratings_votes}}', ['aggregateId'], false);
+            $this->createIndex(null, '{{%engagement_ratings_votes}}', ['userId'], false);
+            $this->createIndex(null, '{{%engagement_ratings_votes}}', ['sessionId'], false);
             $this->createIndex(
                 null,
-                '{{%ratings_votes}}',
-                ['topId', 'userId'],
+                '{{%engagement_ratings_votes}}',
+                ['aggregateId', 'userId'],
+                true
+            );
+            $this->createIndex(
+                null,
+                '{{%engagement_ratings_votes}}',
+                ['aggregateId', 'sessionId'],
                 true
             );
 
             $this->addForeignKey(
                 null,
-                '{{%ratings_votes}}',
-                ['topId'],
-                '{{%ratings_aggregate}}',
+                '{{%engagement_ratings_votes}}',
+                ['aggregateId'],
+                '{{%engagement_ratings_aggregate}}',
                 ['id'],
                 'CASCADE',
                 'CASCADE'
             );
             $this->addForeignKey(
                 null,
-                '{{%ratings_votes}}',
+                '{{%engagement_ratings_votes}}',
                 ['userId'],
                 Table::USERS,
                 ['id'],
@@ -304,8 +310,8 @@ class Install extends Migration
         $this->dropTableIfExists('{{%engagement_favorites_aggregate}}');
         $this->dropTableIfExists('{{%engagement_likes_votes}}');
         $this->dropTableIfExists('{{%engagement_likes_aggregate}}');
-        $this->dropTableIfExists('{{%ratings_votes}}');
-        $this->dropTableIfExists('{{%ratings_aggregate}}');
+        $this->dropTableIfExists('{{%engagement_ratings_votes}}');
+        $this->dropTableIfExists('{{%engagement_ratings_aggregate}}');
 
         return true;
     }
