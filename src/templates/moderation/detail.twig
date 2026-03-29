@@ -8,106 +8,263 @@
 {% endblock %}
 
 {% block content %}
-  <div class="pane">
-    <h2>{{ typeLabel }} {{ 'Aggregate'|t('engagement') }} #{{ aggregate.id }}</h2>
-    <p>
-      {{ 'Entry:'|t('engagement') }}
-      {% if aggregate.entry %}
-        <a href="{{ aggregate.entry.cpEditUrl }}">{{ aggregate.entry.title }}</a>
-      {% else %}
-        <span class="light">#{{ aggregate.elementId }}</span>
-      {% endif %}
-      &nbsp;•&nbsp;
-      {{ 'Field:'|t('engagement') }}
-      {% if aggregate.field %}
-        {% if aggregate.fieldCpUrl %}
-          <a href="{{ aggregate.fieldCpUrl }}">{{ aggregate.field.name }}</a>
-        {% else %}
-          {{ aggregate.field.name }}
-        {% endif %}
-      {% else %}
-        <span class="light">#{{ aggregate.fieldId }}</span>
-      {% endif %}
-      &nbsp;•&nbsp;
-      {{ 'Site ID:'|t('engagement') }} {{ aggregate.siteId }}
-    </p>
+  {% css %}
+    .eng-detail .eng-index-shell {
+      background: #f3f6fb;
+      border: 1px solid #d7dee8;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
 
-    {% if type == 'ratings' %}
-      <p>
-        {{ 'Average:'|t('engagement') }} {{ aggregate.roundedAverage }}
-        &nbsp;•&nbsp;
-        {{ 'Votes:'|t('engagement') }} {{ aggregate.voteCount }}
-      </p>
-    {% elseif type == 'likes' %}
-      <p>
-        {{ 'Likes:'|t('engagement') }} {{ aggregate.likeCount }}
-        &nbsp;•&nbsp;
-        {{ 'Dislikes:'|t('engagement') }} {{ aggregate.dislikeCount }}
-        &nbsp;•&nbsp;
-        {{ 'Total Votes:'|t('engagement') }} {{ aggregate.totalVotes }}
-        &nbsp;•&nbsp;
-        {{ 'Score:'|t('engagement') }} {{ aggregate.score }}
-      </p>
-    {% else %}
-      <p>
-        {{ 'Favorites:'|t('engagement') }} {{ aggregate.favoriteCount }}
-      </p>
-    {% endif %}
-  </div>
+    .eng-detail .eng-summary-shell {
+      margin-bottom: 12px;
+    }
 
-  <div class="pane">
-    <h3>
-      {% if type == 'favorites' %}
-        {{ 'Favorite Entries'|t('engagement') }}
-      {% else %}
-        {{ 'Votes'|t('engagement') }}
-      {% endif %}
-    </h3>
+    .eng-detail .eng-summary {
+      padding: 2px 0 8px;
+    }
 
-    <table class="data fullwidth">
-      <thead>
-        <tr>
-          <th>ID</th>
-          {% if type == 'ratings' %}
-            <th>{{ 'Rating'|t('engagement') }}</th>
-          {% elseif type == 'likes' %}
-            <th>{{ 'Vote'|t('engagement') }}</th>
-          {% endif %}
-          <th>{{ 'User'|t('engagement') }}</th>
-          <th>{{ 'Session'|t('engagement') }}</th>
-          <th>{{ 'Created'|t('engagement') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in rows %}
-          <tr>
-            <td>{{ row.id }}</td>
-            {% if type == 'ratings' %}
-              <td>{{ row.rating }}</td>
-            {% elseif type == 'likes' %}
-              <td>{{ row.value == 1 ? 'Like'|t('engagement') : 'Dislike'|t('engagement') }}</td>
+    .eng-detail .eng-summary-line {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      min-width: 0;
+    }
+
+    .eng-detail .eng-summary-title {
+      font-size: 24px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .eng-detail .eng-summary-stat {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 5px;
+      background: #f3f6fb;
+      border: 1px solid #d7dee8;
+      border-radius: 999px;
+      padding: 4px 10px;
+      line-height: 1.1;
+    }
+
+    .eng-detail .eng-summary-stat .label {
+      color: #627181;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .eng-detail .eng-summary-stat .value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #29323d;
+    }
+
+    .eng-detail .eng-summary-field {
+      margin-left: auto;
+      color: #627181;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .eng-detail .eng-summary-field a {
+      color: inherit;
+    }
+
+    .eng-detail .eng-table-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .eng-detail .eng-tablepane {
+      padding: 0 12px 12px;
+    }
+
+    .eng-detail .eng-tablepane table.data.fullwidth {
+      background: #fff;
+      border: 1px solid #d7dee8;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 1000px) {
+      .eng-detail .eng-summary-line {
+        flex-wrap: wrap;
+      }
+
+      .eng-detail .eng-summary-field {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+  {% endcss %}
+
+  <div class="eng-detail">
+    <section class="eng-summary-shell">
+      <div class="eng-summary">
+        <div class="eng-summary-line">
+          <div class="eng-summary-title">
+            {% if aggregate.entry %}
+              <a href="{{ aggregate.entry.cpEditUrl }}">{{ aggregate.entry.title }}</a>
+            {% else %}
+              #{{ aggregate.elementId }}
             {% endif %}
-            <td>
-              {% if row.userId and users[row.userId] is defined %}
-                {% set user = users[row.userId] %}
-                <a href="{{ cpUrl('users/' ~ user.id) }}">{{ user.fullName ?: user.username }}</a>
-              {% elseif row.userId %}
-                <span class="light">#{{ row.userId }}</span>
+          </div>
+
+          {% if type == 'ratings' %}
+            <span class="eng-summary-stat"><span class="label">{{ 'Average'|t('engagement') }}</span><span class="value">{{ aggregate.roundedAverage }}</span></span>
+            <span class="eng-summary-stat"><span class="label">{{ 'Votes'|t('engagement') }}</span><span class="value">{{ aggregate.voteCount }}</span></span>
+          {% elseif type == 'likes' %}
+            <span class="eng-summary-stat"><span class="label">{{ 'Votes'|t('engagement') }}</span><span class="value">{{ aggregate.totalVotes }}</span></span>
+            <span class="eng-summary-stat"><span class="label">{{ 'Score'|t('engagement') }}</span><span class="value">{{ aggregate.score }}</span></span>
+          {% else %}
+            <span class="eng-summary-stat"><span class="label">{{ 'Favorites'|t('engagement') }}</span><span class="value">{{ aggregate.favoriteCount }}</span></span>
+          {% endif %}
+
+          <div class="eng-summary-field">
+            {{ 'Field:'|t('engagement') }}
+            {% if aggregate.field %}
+              {% if aggregate.fieldCpUrl %}
+                <a href="{{ aggregate.fieldCpUrl }}">{{ aggregate.field.name }}</a>
               {% else %}
-                <span class="light">{{ 'Guest'|t('engagement') }}</span>
+                {{ aggregate.field.name }}
               {% endif %}
-            </td>
-            <td><span class="code">{{ row.sessionId ?: '—' }}</span></td>
-            <td>{{ row.dateCreated|datetime('short') }}</td>
-          </tr>
-        {% else %}
-          <tr>
-            <td colspan="{{ type == 'favorites' ? 4 : 5 }}">
-              <span class="light">{{ 'No rows found.'|t('engagement') }}</span>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+            {% else %}
+              <span class="light">#{{ aggregate.fieldId }}</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="eng-index-shell">
+      <form method="post" action="{{ cpUrl('engagement/moderation/' ~ type ~ '/' ~ aggregate.id ~ '/delete') }}" data-eng-delete-form="1">
+        {{ csrfInput() }}
+        {{ redirectInput(cpUrl('engagement/moderation/' ~ type ~ '/' ~ aggregate.id)) }}
+
+        <div class="eng-table-toolbar">
+          <strong>
+            {% if type == 'favorites' %}
+              {{ 'Favorite Entries'|t('engagement') }}
+            {% else %}
+              {{ 'Votes'|t('engagement') }}
+            {% endif %}
+          </strong>
+          <button class="btn submit disabled" type="submit" data-eng-delete-btn disabled>{{ 'Delete Selected'|t('engagement') }}</button>
+          <span class="light" data-eng-selected-count>{{ '0 selected'|t('engagement') }}</span>
+        </div>
+
+        <div class="eng-tablepane">
+          <table class="data fullwidth">
+            <thead>
+              <tr>
+                <th class="thin"><input type="checkbox" data-eng-select-all aria-label="{{ 'Select all rows'|t('engagement') }}"></th>
+                <th>ID</th>
+                {% if type == 'ratings' %}
+                  <th>{{ 'Rating'|t('engagement') }}</th>
+                {% elseif type == 'likes' %}
+                  <th>{{ 'Vote'|t('engagement') }}</th>
+                {% endif %}
+                <th>{{ 'User'|t('engagement') }}</th>
+                <th>{{ 'Session'|t('engagement') }}</th>
+                <th>{{ 'Created'|t('engagement') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in rows %}
+                <tr>
+                  <td><input type="checkbox" name="rowIds[]" value="{{ row.id }}" data-eng-row-checkbox></td>
+                  <td>{{ row.id }}</td>
+                  {% if type == 'ratings' %}
+                    <td>{{ row.rating }}</td>
+                  {% elseif type == 'likes' %}
+                    <td>{{ row.value == 1 ? 'Like'|t('engagement') : 'Dislike'|t('engagement') }}</td>
+                  {% endif %}
+                  <td>
+                    {% if row.userId and users[row.userId] is defined %}
+                      {% set user = users[row.userId] %}
+                      <a href="{{ cpUrl('users/' ~ user.id) }}">{{ user.fullName ?: user.username }}</a>
+                    {% elseif row.userId %}
+                      <span class="light">#{{ row.userId }}</span>
+                    {% else %}
+                      <span class="light">{{ 'Guest'|t('engagement') }}</span>
+                    {% endif %}
+                  </td>
+                  <td><span class="code">{{ row.sessionId ?: '—' }}</span></td>
+                  <td>{{ row.dateCreated|datetime('short') }}</td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="{{ type == 'favorites' ? 5 : 6 }}">
+                    <span class="light">{{ 'No rows found.'|t('engagement') }}</span>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </form>
+    </section>
   </div>
+
+  {% js %}
+    (() => {
+      const form = document.querySelector('form[data-eng-delete-form="1"]');
+      if (!form) {
+        return;
+      }
+
+      const selectAll = form.querySelector('[data-eng-select-all]');
+      const checkboxes = Array.from(form.querySelectorAll('[data-eng-row-checkbox]'));
+      const deleteBtn = form.querySelector('[data-eng-delete-btn]');
+      const selectedCount = form.querySelector('[data-eng-selected-count]');
+
+      const updateState = () => {
+        const selected = checkboxes.filter((checkbox) => checkbox.checked).length;
+        if (selectedCount) {
+          selectedCount.textContent = `${selected} selected`;
+        }
+        if (deleteBtn) {
+          deleteBtn.disabled = selected === 0;
+          deleteBtn.classList.toggle('disabled', selected === 0);
+        }
+        if (selectAll) {
+          selectAll.checked = selected > 0 && selected === checkboxes.length;
+          selectAll.indeterminate = selected > 0 && selected < checkboxes.length;
+        }
+      };
+
+      checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', updateState);
+      });
+
+      if (selectAll) {
+        selectAll.addEventListener('change', () => {
+          checkboxes.forEach((checkbox) => {
+            checkbox.checked = selectAll.checked;
+          });
+          updateState();
+        });
+      }
+
+      form.addEventListener('submit', (event) => {
+        const selected = checkboxes.filter((checkbox) => checkbox.checked).length;
+        if (selected === 0) {
+          event.preventDefault();
+          return;
+        }
+        if (!confirm('Delete selected rows?')) {
+          event.preventDefault();
+        }
+      });
+
+      updateState();
+    })();
+  {% endjs %}
 {% endblock %}

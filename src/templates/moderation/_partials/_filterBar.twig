@@ -1,34 +1,32 @@
-{% import '_includes/forms' as forms %}
+<form method="get" accept-charset="UTF-8" data-eng-auto-filter="1" class="eng-toolbar">
+  <div class="eng-toolbar-search">
+    <span class="eng-search-icon" aria-hidden="true">⌕</span>
+    <input
+      class="text fullwidth"
+      type="text"
+      id="q"
+      name="q"
+      value="{{ q ?? '' }}"
+      placeholder="{{ 'Search'|t('engagement') }}"
+      data-eng-auto-submit="1"
+      data-eng-auto-submit-type="text"
+      autocomplete="off"
+    >
+  </div>
 
-<form method="get" accept-charset="UTF-8" data-eng-auto-filter="1" class="flex fields" style="gap: 12px; align-items: flex-end; margin: 0 0 12px;">
-  {{ forms.selectField({
-    first: true,
-    label: 'Sort'|t('engagement'),
-    id: 'sort',
-    name: 'sort',
-    value: sort,
-    options: sortOptions,
-    fieldClass: 'nowrap',
-    inputAttributes: {
-      'data-eng-auto-submit': '1',
-    },
-  }) }}
+  <div class="eng-toolbar-selects">
+    <select id="sort" name="sort" data-eng-auto-submit="1">
+      {% for option in sortOptions %}
+        <option value="{{ option.value }}" {{ option.value == sort ? 'selected' : '' }}>{{ option.label }}</option>
+      {% endfor %}
+    </select>
 
-  {{ forms.selectField({
-    label: 'Per Page'|t('engagement'),
-    id: 'perPage',
-    name: 'perPage',
-    value: perPage,
-    options: [
-      { label: '25', value: 25 },
-      { label: '50', value: 50 },
-      { label: '100', value: 100 },
-    ],
-    fieldClass: 'nowrap',
-    inputAttributes: {
-      'data-eng-auto-submit': '1',
-    },
-  }) }}
+    <select id="perPage" name="perPage" data-eng-auto-submit="1">
+      {% for value in [25, 50, 100] %}
+        <option value="{{ value }}" {{ value == perPage ? 'selected' : '' }}>{{ value }}</option>
+      {% endfor %}
+    </select>
+  </div>
 
   <noscript>
     <button class="btn submit">{{ 'Apply'|t('engagement') }}</button>
@@ -37,21 +35,34 @@
 
 {% js %}
   (() => {
-    const forms = document.querySelectorAll('form[data-eng-auto-filter="1"]');
-    if (!forms.length) {
+    const form = document.querySelector('form[data-eng-auto-filter="1"]');
+    if (!form) {
       return;
     }
 
-    forms.forEach((form) => {
-      const controls = form.querySelectorAll('select[data-eng-auto-submit="1"]');
-      controls.forEach((control) => {
-        control.addEventListener('change', () => {
+    const controls = form.querySelectorAll('select[data-eng-auto-submit="1"]');
+    controls.forEach((control) => {
+      control.addEventListener('change', () => {
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.submit();
+        }
+      });
+    });
+
+    const textControls = form.querySelectorAll('input[data-eng-auto-submit-type="text"]');
+    textControls.forEach((control) => {
+      let timeoutId;
+      control.addEventListener('input', () => {
+        window.clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(() => {
           if (typeof form.requestSubmit === 'function') {
             form.requestSubmit();
           } else {
             form.submit();
           }
-        });
+        }, 250);
       });
     });
   })();

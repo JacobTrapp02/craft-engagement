@@ -151,6 +151,7 @@ class Plugin extends BasePlugin
                 $event->rules['engagement/moderation'] = 'engagement/moderation/index';
                 $event->rules['engagement/moderation/<tab:(all|ratings|likes|favorites)>'] = 'engagement/moderation/index';
                 $event->rules['engagement/moderation/<type:(ratings|likes|favorites)>/<id:\\d+>'] = 'engagement/moderation/detail';
+                $event->rules['engagement/moderation/<type:(ratings|likes|favorites)>/<id:\\d+>/delete'] = 'engagement/moderation/delete-rows';
             }
         );
     }

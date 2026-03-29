@@ -18,7 +18,7 @@
   {% endif %}
 {% endmacro %}
 
-{% macro pager(tab, sort, perPage, pagination) %}
+{% macro pager(tab, sort, q, perPage, pagination) %}
   {% if pagination is defined and pagination.getPageCount() > 1 %}
     <div class="flex" style="margin-top:12px;">
       <div class="light">
@@ -26,10 +26,10 @@
       </div>
       <div style="margin-left:auto;">
         {% if pagination.getPage() > 0 %}
-          <a class="btn small" href="{{ cpUrl('engagement/moderation/' ~ tab, { sort: sort, perPage: perPage, p: pagination.getPage() }) }}">{{ 'Previous'|t('engagement') }}</a>
+          <a class="btn small" href="{{ cpUrl('engagement/moderation/' ~ tab, { sort: sort, q: q, perPage: perPage, p: pagination.getPage() }) }}">{{ 'Previous'|t('engagement') }}</a>
         {% endif %}
         {% if pagination.getPage() + 1 < pagination.getPageCount() %}
-          <a class="btn small" href="{{ cpUrl('engagement/moderation/' ~ tab, { sort: sort, perPage: perPage, p: pagination.getPage() + 2 }) }}">{{ 'Next'|t('engagement') }}</a>
+          <a class="btn small" href="{{ cpUrl('engagement/moderation/' ~ tab, { sort: sort, q: q, perPage: perPage, p: pagination.getPage() + 2 }) }}">{{ 'Next'|t('engagement') }}</a>
         {% endif %}
       </div>
     </div>

@@ -8,6 +8,7 @@
       <th>{{ 'Entry'|t('engagement') }}</th>
       <th>{{ 'Field'|t('engagement') }}</th>
       <th>{{ 'Favorites'|t('engagement') }}</th>
+      <th>{{ 'Element ID'|t('engagement') }}</th>
       <th>{{ 'Updated'|t('engagement') }}</th>
     </tr>
   </thead>
@@ -18,10 +19,11 @@
         <td>{{ h.entryLink(aggregate) }}</td>
         <td>{{ h.fieldLabel(aggregate) }}</td>
         <td>{{ aggregate.favoriteCount }}</td>
+        <td>{{ aggregate.elementId }}</td>
         <td>{{ aggregate.dateUpdated|datetime('short') }}</td>
       </tr>
     {% else %}
-      <tr><td colspan="5"><span class="light">{{ emptyMessage ?? 'No rows found.'|t('engagement') }}</span></td></tr>
+      <tr><td colspan="6"><span class="light">{{ emptyMessage ?? 'No rows found.'|t('engagement') }}</span></td></tr>
     {% endfor %}
   </tbody>
 </table>

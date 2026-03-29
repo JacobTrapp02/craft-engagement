@@ -47,85 +47,235 @@
     text-align: center;
     margin: 12px 0 0;
   }
+
+  .eng-moderation .eng-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid #d7dee8;
+    border-radius: 10px;
+    background: #f3f6fb;
+    margin: 0 0 12px;
+  }
+
+  .eng-moderation .eng-toolbar-search {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 240px;
+  }
+
+  .eng-moderation .eng-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #5f6b7a;
+    pointer-events: none;
+  }
+
+  .eng-moderation .eng-toolbar-search input[type="text"] {
+    height: 40px;
+    padding: 0 12px 0 34px;
+    border-radius: 10px;
+    border: 1px solid #c9d3e0;
+    background: #fff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .eng-moderation .eng-toolbar-search input[type="text"]:focus {
+    border-color: #1183d6;
+    box-shadow: 0 0 0 2px rgba(17, 131, 214, 0.25);
+  }
+
+  .eng-moderation .eng-toolbar-selects {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+
+  .eng-moderation .eng-toolbar-selects select {
+    height: 40px;
+    border: 1px solid #c9d3e0;
+    border-radius: 10px;
+    background: #fff;
+    padding: 0 34px 0 12px;
+    min-width: 140px;
+  }
+
+  .eng-moderation .eng-toolbar-selects select#perPage {
+    min-width: 88px;
+  }
+
+  .eng-moderation .eng-index-shell {
+    background: #f3f6fb;
+    border: 1px solid #d7dee8;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .eng-moderation .eng-index-shell .eng-toolbar {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding: 12px;
+  }
+
+  .eng-moderation .eng-index-shell .tablepane {
+    margin: 0;
+    padding: 0 12px 12px;
+    background: transparent;
+  }
+
+  .eng-moderation .eng-index-shell .tablepane table.data.fullwidth {
+    background: #fff;
+    border: 1px solid #d7dee8;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .eng-moderation .eng-overview-shell {
+    margin-bottom: 18px;
+  }
+
+  .eng-moderation .eng-overview-shell .eng-overview-title {
+    margin: 0;
+    padding: 14px 14px 8px;
+    font-size: 18px;
+    line-height: 1.2;
+  }
+
+  .eng-moderation .eng-overview-shell .eng-view-more {
+    padding: 14px 0 16px;
+    margin: 0;
+  }
+
+  .eng-moderation .eng-row-open {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    border: 1px solid #c9d3e0;
+    color: #3f4d5d;
+    font-size: 13px;
+    line-height: 1;
+    text-decoration: none;
+    background: #fff;
+  }
+
+  .eng-moderation .eng-row-open:hover {
+    border-color: #1183d6;
+    color: #1183d6;
+  }
+
+  @media (max-width: 980px) {
+    .eng-moderation .eng-toolbar {
+      flex-wrap: wrap;
+    }
+  }
 {% endcss %}
 
 {% block content %}
   <div class="eng-moderation">
     {% if tab == 'all' %}
-      <h3>{{ 'Ratings'|t('engagement') }}</h3>
-      {% include 'engagement/moderation/_partials/_ratingsTable.twig' with {
-        ratings: ratings,
-        emptyMessage: 'No ratings aggregates found.'|t('engagement'),
-      } only %}
-      <p class="eng-view-more"><a class="btn submit" href="{{ cpUrl('engagement/moderation/ratings') }}">{{ 'View More Ratings'|t('engagement') }}</a></p>
+      <section class="eng-index-shell eng-overview-shell">
+        <h3 class="eng-overview-title">{{ 'Ratings'|t('engagement') }}</h3>
+        {% include 'engagement/moderation/_partials/_ratingsOverviewTable.twig' with {
+          ratings: ratings,
+          emptyMessage: 'No ratings aggregates found.'|t('engagement'),
+        } only %}
+        <p class="eng-view-more"><a class="btn submit" href="{{ cpUrl('engagement/moderation/ratings') }}">{{ 'View More Ratings'|t('engagement') }}</a></p>
+      </section>
 
-      <h3 class="eng-section-title">{{ 'Likes'|t('engagement') }}</h3>
-      {% include 'engagement/moderation/_partials/_likesTable.twig' with {
-        likes: likes,
-        emptyMessage: 'No likes aggregates found.'|t('engagement'),
-      } only %}
-      <p class="eng-view-more"><a class="btn submit" href="{{ cpUrl('engagement/moderation/likes') }}">{{ 'View More Likes'|t('engagement') }}</a></p>
+      <section class="eng-index-shell eng-overview-shell">
+        <h3 class="eng-overview-title">{{ 'Likes'|t('engagement') }}</h3>
+        {% include 'engagement/moderation/_partials/_likesOverviewTable.twig' with {
+          likes: likes,
+          emptyMessage: 'No likes aggregates found.'|t('engagement'),
+        } only %}
+        <p class="eng-view-more"><a class="btn submit" href="{{ cpUrl('engagement/moderation/likes') }}">{{ 'View More Likes'|t('engagement') }}</a></p>
+      </section>
 
-      <h3 class="eng-section-title">{{ 'Favorites'|t('engagement') }}</h3>
-      {% include 'engagement/moderation/_partials/_favoritesTable.twig' with {
-        favorites: favorites,
-        emptyMessage: 'No favorites aggregates found.'|t('engagement'),
-      } only %}
-      <p class="eng-view-more"><a class="btn submit" href="{{ cpUrl('engagement/moderation/favorites') }}">{{ 'View More Favorites'|t('engagement') }}</a></p>
+      <section class="eng-index-shell eng-overview-shell">
+        <h3 class="eng-overview-title">{{ 'Favorites'|t('engagement') }}</h3>
+        {% include 'engagement/moderation/_partials/_favoritesOverviewTable.twig' with {
+          favorites: favorites,
+          emptyMessage: 'No favorites aggregates found.'|t('engagement'),
+        } only %}
+        <p class="eng-view-more"><a class="btn submit" href="{{ cpUrl('engagement/moderation/favorites') }}">{{ 'View More Favorites'|t('engagement') }}</a></p>
+      </section>
     {% endif %}
 
     {% if tab == 'ratings' %}
-      {% include 'engagement/moderation/_partials/_filterBar.twig' with {
-        sort: sort,
-        perPage: perPage,
-        sortOptions: ratingSortOptions,
-      } only %}
+      <div class="eng-index-shell">
+        {% include 'engagement/moderation/_partials/_filterBar.twig' with {
+          sort: sort,
+          perPage: perPage,
+          q: q,
+          sortOptions: ratingSortOptions,
+        } only %}
 
-      {% include 'engagement/moderation/_partials/_ratingsTable.twig' with {
-        ratings: ratings,
-      } only %}
+        {% include 'engagement/moderation/_partials/_ratingsTable.twig' with {
+          ratings: ratings,
+        } only %}
+      </div>
 
       {% include 'engagement/moderation/_partials/_pager.twig' with {
         tab: tab,
         sort: sort,
+        q: q,
         perPage: perPage,
         pagination: pagination,
       } only %}
     {% endif %}
 
     {% if tab == 'likes' %}
-      {% include 'engagement/moderation/_partials/_filterBar.twig' with {
-        sort: sort,
-        perPage: perPage,
-        sortOptions: likesSortOptions,
-      } only %}
+      <div class="eng-index-shell">
+        {% include 'engagement/moderation/_partials/_filterBar.twig' with {
+          sort: sort,
+          perPage: perPage,
+          q: q,
+          sortOptions: likesSortOptions,
+        } only %}
 
-      {% include 'engagement/moderation/_partials/_likesTable.twig' with {
-        likes: likes,
-      } only %}
+        {% include 'engagement/moderation/_partials/_likesTable.twig' with {
+          likes: likes,
+        } only %}
+      </div>
 
       {% include 'engagement/moderation/_partials/_pager.twig' with {
         tab: tab,
         sort: sort,
+        q: q,
         perPage: perPage,
         pagination: pagination,
       } only %}
     {% endif %}
 
     {% if tab == 'favorites' %}
-      {% include 'engagement/moderation/_partials/_filterBar.twig' with {
-        sort: sort,
-        perPage: perPage,
-        sortOptions: favoritesSortOptions,
-      } only %}
+      <div class="eng-index-shell">
+        {% include 'engagement/moderation/_partials/_filterBar.twig' with {
+          sort: sort,
+          perPage: perPage,
+          q: q,
+          sortOptions: favoritesSortOptions,
+        } only %}
 
-      {% include 'engagement/moderation/_partials/_favoritesTable.twig' with {
-        favorites: favorites,
-      } only %}
+        {% include 'engagement/moderation/_partials/_favoritesTable.twig' with {
+          favorites: favorites,
+        } only %}
+      </div>
 
       {% include 'engagement/moderation/_partials/_pager.twig' with {
         tab: tab,
         sort: sort,
+        q: q,
         perPage: perPage,
         pagination: pagination,
       } only %}
