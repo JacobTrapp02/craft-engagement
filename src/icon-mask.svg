@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Engagement plugin icon mask">
+  <path fill="#000" d="M64 14 78.4 43.2 110.6 47.9 87.3 70.7 92.8 102.8 64 87.7 35.2 102.8 40.7 70.7 17.4 47.9 49.6 43.2 64 14Z"/>
+  <g transform="translate(43.4 44.7) scale(1.85)">
+    <path fill="#000" d="M9 10V6a2.5 2.5 0 1 1 5 0v3h4a2 2 0 0 1 1.92 2.56l-1.5 5A2.5 2.5 0 0 1 16 18.5H9a2 2 0 0 1-2-2V10h2z"/>
+    <path fill="#000" d="M4 10h3v8H4z"/>
+  </g>
+</svg>

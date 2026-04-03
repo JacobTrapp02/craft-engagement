@@ -6,7 +6,7 @@
   - guestInteractionMode, guestInteractionMessage, guestInteractionMessageHtml
   - isLoggedIn, guestAllowed
   - userVote, likeCount, dislikeCount
-  - icon, emojiIcon, likeEmojiIcon, dislikeEmojiIcon, customSvg
+  - icon, emojiIcon, likeEmojiIcon, dislikeEmojiIcon, likeCustomSvg, dislikeCustomSvg
   - beforeLikeColor, afterLikeColor
   - beforeDislikeColor, afterDislikeColor
   - headingText, likeText, dislikeText
@@ -39,7 +39,8 @@
 {% set widgetLikeAfterBg = widgetAfterLikeColor ?: '#fff' %}
 {% set widgetDislikeBeforeBg = widgetBeforeDislikeColor ?: '#fff' %}
 {% set widgetDislikeAfterBg = widgetAfterDislikeColor ?: '#fff' %}
-{% set widgetCustomSvg = customSvg ?? null %}
+{% set widgetLikeCustomSvg = likeCustomSvg ?? null %}
+{% set widgetDislikeCustomSvg = dislikeCustomSvg ?? null %}
 {% set widgetHeadingText = headingText ?? '' %}
 {% set widgetLikeText = likeText ?? '' %}
 {% set widgetDislikeText = dislikeText ?? '' %}

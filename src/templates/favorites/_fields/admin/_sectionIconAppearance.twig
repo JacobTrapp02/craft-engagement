@@ -38,22 +38,24 @@
       {{ forms.textareaField({ label: 'Custom SVG Markup'|t('engagement'), id: 'customSvg', name: 'customSvg', value: field.customSvg, errors: field.getErrors('customSvg'), rows: 6 }) }}
     </div>
 
-    {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
-        label: 'Before Favorite Color'|t('engagement'),
-        id: 'beforeFavoriteColor',
-        name: 'beforeFavoriteColor',
-        value: field.beforeFavoriteColor,
-        errors: field.getErrors('beforeFavoriteColor'),
-        defaultColor: '#64748b',
-    } only %}
+    <div style="margin-top:10px;">
+      {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+          label: 'Before Favorite Color'|t('engagement'),
+          id: 'beforeFavoriteColor',
+          name: 'beforeFavoriteColor',
+          value: field.beforeFavoriteColor,
+          errors: field.getErrors('beforeFavoriteColor'),
+          defaultColor: '#64748b',
+      } only %}
 
-    {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
-        label: 'After Favorite Color'|t('engagement'),
-        id: 'afterFavoriteColor',
-        name: 'afterFavoriteColor',
-        value: field.afterFavoriteColor,
-        errors: field.getErrors('afterFavoriteColor'),
-        defaultColor: '#dc2626',
-    } only %}
+      {% include 'engagement/_partials/colorFieldWithPicker.twig' with {
+          label: 'After Favorite Color'|t('engagement'),
+          id: 'afterFavoriteColor',
+          name: 'afterFavoriteColor',
+          value: field.afterFavoriteColor,
+          errors: field.getErrors('afterFavoriteColor'),
+          defaultColor: '#dc2626',
+      } only %}
+    </div>
   </div>
 </details>

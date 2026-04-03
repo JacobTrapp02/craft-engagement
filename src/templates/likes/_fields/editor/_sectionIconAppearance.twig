@@ -32,7 +32,8 @@
       </div>
 
       <div data-entry-icon-mode-panel="customSvg" style="{{ like.icon == 'customSvg' ? '' : 'display:none;' }}">
-        {{ forms.textareaField({ label: 'Custom SVG'|t('engagement'), id: prefix ~ '-custom-svg', name: prefix ~ '[customSvg]', value: like.customSvg }) }}
+        {{ forms.textareaField({ label: 'Like Custom SVG'|t('engagement'), id: prefix ~ '-like-custom-svg', name: prefix ~ '[likeCustomSvg]', value: like.likeCustomSvg }) }}
+        {{ forms.textareaField({ label: 'Dislike Custom SVG'|t('engagement'), id: prefix ~ '-dislike-custom-svg', name: prefix ~ '[dislikeCustomSvg]', value: like.dislikeCustomSvg }) }}
       </div>
     {% endif %}
 

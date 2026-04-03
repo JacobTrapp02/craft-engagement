@@ -143,7 +143,8 @@ class TwigService extends Component
             'afterLikeColor' => $data['afterLikeColor'] ?? '',
             'beforeDislikeColor' => $data['beforeDislikeColor'] ?? '',
             'afterDislikeColor' => $data['afterDislikeColor'] ?? '',
-            'customSvg' => $data['customSvg'] ?? null,
+            'likeCustomSvg' => $data['likeCustomSvg'] ?? null,
+            'dislikeCustomSvg' => $data['dislikeCustomSvg'] ?? null,
             'likeCount' => $data['likeCount'] ?? 0,
             'dislikeCount' => $data['dislikeCount'] ?? 0,
             'headingText' => $data['headingText'] ?? null,
@@ -271,7 +272,7 @@ class TwigService extends Component
     }
 
     /**
-     * @return array{id?: ?int, elementId?: ?int, siteId?: ?int, fieldId?: ?int, enabled?: bool, icon?: string, emojiIcon?: string, likeEmojiIcon?: string, dislikeEmojiIcon?: string, beforeLikeColor?: string, afterLikeColor?: string, beforeDislikeColor?: string, afterDislikeColor?: string, customSvg?: ?string, likeCount?: int, dislikeCount?: int, headingText?: ?string, likeText?: ?string, dislikeText?: ?string, allowGuestInteractions?: bool, allowVoteChange?: bool}|null
+     * @return array{id?: ?int, elementId?: ?int, siteId?: ?int, fieldId?: ?int, enabled?: bool, icon?: string, emojiIcon?: string, likeEmojiIcon?: string, dislikeEmojiIcon?: string, beforeLikeColor?: string, afterLikeColor?: string, beforeDislikeColor?: string, afterDislikeColor?: string, likeCustomSvg?: ?string, dislikeCustomSvg?: ?string, likeCount?: int, dislikeCount?: int, headingText?: ?string, likeText?: ?string, dislikeText?: ?string, allowGuestInteractions?: bool, allowVoteChange?: bool}|null
      */
     private function normalizeLikesFieldData(mixed $fieldValue): ?array
     {
@@ -290,7 +291,8 @@ class TwigService extends Component
                 'afterLikeColor' => $fieldValue->afterLikeColor,
                 'beforeDislikeColor' => $fieldValue->beforeDislikeColor,
                 'afterDislikeColor' => $fieldValue->afterDislikeColor,
-                'customSvg' => $fieldValue->customSvg,
+                'likeCustomSvg' => $fieldValue->likeCustomSvg,
+                'dislikeCustomSvg' => $fieldValue->dislikeCustomSvg,
                 'likeCount' => $fieldValue->likeCount,
                 'dislikeCount' => $fieldValue->dislikeCount,
                 'headingText' => $fieldValue->headingText,
@@ -316,7 +318,8 @@ class TwigService extends Component
                 'afterLikeColor' => isset($fieldValue['afterLikeColor']) ? (string)$fieldValue['afterLikeColor'] : '',
                 'beforeDislikeColor' => isset($fieldValue['beforeDislikeColor']) ? (string)$fieldValue['beforeDislikeColor'] : '',
                 'afterDislikeColor' => isset($fieldValue['afterDislikeColor']) ? (string)$fieldValue['afterDislikeColor'] : '',
-                'customSvg' => $fieldValue['customSvg'] ?? null,
+                'likeCustomSvg' => $fieldValue['likeCustomSvg'] ?? null,
+                'dislikeCustomSvg' => $fieldValue['dislikeCustomSvg'] ?? null,
                 'likeCount' => isset($fieldValue['likeCount']) ? (int)$fieldValue['likeCount'] : 0,
                 'dislikeCount' => isset($fieldValue['dislikeCount']) ? (int)$fieldValue['dislikeCount'] : 0,
                 'headingText' => isset($fieldValue['headingText']) ? trim((string)$fieldValue['headingText']) : null,

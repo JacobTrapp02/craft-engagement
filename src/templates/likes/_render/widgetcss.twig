@@ -8,7 +8,7 @@
   - widgetActionUrl, widgetLoginUrl
   - widgetIsLoggedIn, widgetGuestAllowed
   - widgetUserVote, widgetLikeCount, widgetDislikeCount
-  - widgetIcon, widgetLikeEmojiIcon, widgetDislikeEmojiIcon, widgetCustomSvg
+  - widgetIcon, widgetLikeEmojiIcon, widgetDislikeEmojiIcon, widgetLikeCustomSvg, widgetDislikeCustomSvg
   - widgetBeforeLikeColor, widgetAfterLikeColor
   - widgetBeforeDislikeColor, widgetAfterDislikeColor
   - widgetHeadingTextRendered, widgetLikeTextRendered, widgetDislikeTextRendered
@@ -41,6 +41,11 @@
   justify-content: center;
   gap: 8px;
   line-height: 1;
+}
+
+[data-engagement-likes] [data-like-label]:empty,
+[data-engagement-likes] [data-dislike-label]:empty {
+  display: none;
 }
 
 [data-engagement-likes] .engagement-likes-divider {

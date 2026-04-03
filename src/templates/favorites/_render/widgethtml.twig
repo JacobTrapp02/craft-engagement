@@ -55,6 +55,7 @@
   <button
     type="button"
     data-favorite-btn
+    data-has-label="{{ (widgetFavoriteTextRendered is not empty or widgetUnfavoriteTextRendered is not empty) ? '1' : '0' }}"
     style="background:{{ widgetIsFavorited ? widgetFavoriteAfterBg : widgetFavoriteBeforeBg }}; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }}"
   >
     {% if widgetIcon != 'none' %}

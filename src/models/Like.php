@@ -27,7 +27,8 @@ class Like extends Model
     public string $afterLikeColor = '';
     public string $beforeDislikeColor = '';
     public string $afterDislikeColor = '';
-    public ?string $customSvg = null;
+    public ?string $likeCustomSvg = null;
+    public ?string $dislikeCustomSvg = null;
     public bool $allowGuestInteractions = false;
     public bool $allowVoteChange = true;
     public ?string $headingText = null;
@@ -40,7 +41,7 @@ class Like extends Model
         return [
             [['enabled', 'allowGuestInteractions', 'allowVoteChange'], 'boolean'],
             [['id', 'elementId', 'fieldId', 'siteId', 'likeCount', 'dislikeCount'], 'integer', 'min' => 0],
-            [['icon', 'emojiIcon', 'likeEmojiIcon', 'dislikeEmojiIcon', 'beforeLikeColor', 'afterLikeColor', 'beforeDislikeColor', 'afterDislikeColor', 'customSvg', 'headingText', 'likeText', 'dislikeText'], 'string'],
+            [['icon', 'emojiIcon', 'likeEmojiIcon', 'dislikeEmojiIcon', 'beforeLikeColor', 'afterLikeColor', 'beforeDislikeColor', 'afterDislikeColor', 'likeCustomSvg', 'dislikeCustomSvg', 'headingText', 'likeText', 'dislikeText'], 'string'],
             [['userVote'], 'in', 'range' => [-1, 0, 1]],
         ];
     }

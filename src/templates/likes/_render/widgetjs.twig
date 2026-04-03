@@ -131,11 +131,14 @@
         likeIconEl.setAttribute('data-thumb-active', userVote === 1 ? '1' : '0');
         const outline = likeIconEl.querySelector('[data-thumb-outline]');
         const fill = likeIconEl.querySelector('[data-thumb-fill]');
+        const likeTextColor = contrastTextColor(likeBg) || '#111827';
         if (outline instanceof HTMLElement) {
           outline.style.opacity = userVote === 1 ? '0' : '1';
+          outline.style.color = userVote === 1 ? likeTextColor : '#94a3b8';
         }
         if (fill instanceof HTMLElement) {
           fill.style.opacity = userVote === 1 ? '1' : '0';
+          fill.style.color = likeTextColor;
         }
       } else {
         likeIconEl.style.color = (userVote === 1 ? afterLikeColor : beforeLikeColor) || contrastTextColor(likeBg) || '#111827';
@@ -146,11 +149,14 @@
         dislikeIconEl.setAttribute('data-thumb-active', userVote === -1 ? '1' : '0');
         const outline = dislikeIconEl.querySelector('[data-thumb-outline]');
         const fill = dislikeIconEl.querySelector('[data-thumb-fill]');
+        const dislikeTextColor = contrastTextColor(dislikeBg) || '#111827';
         if (outline instanceof HTMLElement) {
           outline.style.opacity = userVote === -1 ? '0' : '1';
+          outline.style.color = userVote === -1 ? dislikeTextColor : '#94a3b8';
         }
         if (fill instanceof HTMLElement) {
           fill.style.opacity = userVote === -1 ? '1' : '0';
+          fill.style.color = dislikeTextColor;
         }
       } else {
         dislikeIconEl.style.color = (userVote === -1 ? afterDislikeColor : beforeDislikeColor) || contrastTextColor(dislikeBg) || '#111827';

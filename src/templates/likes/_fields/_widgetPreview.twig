@@ -1,4 +1,7 @@
 {# Shared likes widget preview block for settings + entry editor #}
+{% set likeCustomSvg = likeCustomSvg ?? null %}
+{% set dislikeCustomSvg = dislikeCustomSvg ?? null %}
+
 <div class="field eng-group-card">
   <div class="heading"><label>{{ title }}</label></div>
   {% if instructions is defined and instructions %}
@@ -20,7 +23,8 @@
           afterLikeColor: afterLikeColor,
           beforeDislikeColor: beforeDislikeColor,
           afterDislikeColor: afterDislikeColor,
-          customSvg: customSvg,
+          likeCustomSvg: likeCustomSvg,
+          dislikeCustomSvg: dislikeCustomSvg,
           likeCount: likeCount,
           dislikeCount: dislikeCount,
           headingText: headingText,
@@ -48,7 +52,8 @@
           afterLikeColor: afterLikeColor,
           beforeDislikeColor: beforeDislikeColor,
           afterDislikeColor: afterDislikeColor,
-          customSvg: customSvg,
+          likeCustomSvg: likeCustomSvg,
+          dislikeCustomSvg: dislikeCustomSvg,
           likeCount: likeCount,
           dislikeCount: dislikeCount,
           headingText: headingText,

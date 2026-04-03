@@ -53,9 +53,10 @@ class LikesField extends Field
     public string $afterLikeColor = '';
     public string $beforeDislikeColor = '';
     public string $afterDislikeColor = '';
+    public ?string $likeCustomSvg = null;
+    public ?string $dislikeCustomSvg = null;
     public bool $allowGuestInteractions = false;
     public bool $allowUserVoteChange = true;
-    public ?string $customSvg = null;
     public ?string $headingText = null;
     public ?string $likeText = null;
     public ?string $dislikeText = null;
@@ -130,8 +131,8 @@ class LikesField extends Field
             'allowOverrideDislikeText',
         ], 'boolean'];
         $rules[] = [['allowGuestInteractions', 'allowUserVoteChange'], 'boolean'];
-        $rules[] = [['emojiIcon', 'likeEmojiIcon', 'dislikeEmojiIcon', 'beforeLikeColor', 'afterLikeColor', 'beforeDislikeColor', 'afterDislikeColor', 'customSvg', 'headingText', 'likeText', 'dislikeText'], 'string'];
-        $rules[] = [['customSvg'], 'required', 'when' => function(): bool {
+        $rules[] = [['emojiIcon', 'likeEmojiIcon', 'dislikeEmojiIcon', 'beforeLikeColor', 'afterLikeColor', 'beforeDislikeColor', 'afterDislikeColor', 'likeCustomSvg', 'dislikeCustomSvg', 'headingText', 'likeText', 'dislikeText'], 'string'];
+        $rules[] = [['likeCustomSvg', 'dislikeCustomSvg'], 'required', 'when' => function(): bool {
             return $this->icon === Settings::ICON_CUSTOM_SVG;
         }];
 
@@ -163,7 +164,8 @@ class LikesField extends Field
             'afterLikeColor' => (string)$like->afterLikeColor,
             'beforeDislikeColor' => (string)$like->beforeDislikeColor,
             'afterDislikeColor' => (string)$like->afterDislikeColor,
-            'customSvg' => $like->customSvg,
+            'likeCustomSvg' => $like->likeCustomSvg,
+            'dislikeCustomSvg' => $like->dislikeCustomSvg,
             'allowGuestInteractions' => (bool)$like->allowGuestInteractions,
             'allowUserVoteChange' => (bool)$like->allowVoteChange,
             'headingText' => $like->headingText,
@@ -200,9 +202,12 @@ class LikesField extends Field
         $afterDislikeColor = ($this->allowEditorOverrides && $this->allowOverrideIconColors)
             ? ($stored['afterDislikeColor'] ?? $this->afterDislikeColor)
             : $this->afterDislikeColor;
-        $customSvg = ($this->allowEditorOverrides && $this->allowOverrideIconAppearance)
-            ? ($stored['customSvg'] ?? $this->customSvg)
-            : $this->customSvg;
+        $likeCustomSvg = ($this->allowEditorOverrides && $this->allowOverrideIconAppearance)
+            ? ($stored['likeCustomSvg'] ?? $this->likeCustomSvg)
+            : $this->likeCustomSvg;
+        $dislikeCustomSvg = ($this->allowEditorOverrides && $this->allowOverrideIconAppearance)
+            ? ($stored['dislikeCustomSvg'] ?? $this->dislikeCustomSvg)
+            : $this->dislikeCustomSvg;
         $allowGuestInteractions = ($this->allowEditorOverrides && $this->allowOverrideGuestInteractions)
             ? ($stored['allowGuestInteractions'] ?? $this->allowGuestInteractions)
             : $this->allowGuestInteractions;
@@ -230,7 +235,8 @@ class LikesField extends Field
                 'afterLikeColor' => $afterLikeColor,
                 'beforeDislikeColor' => $beforeDislikeColor,
                 'afterDislikeColor' => $afterDislikeColor,
-                'customSvg' => $customSvg,
+                'likeCustomSvg' => $likeCustomSvg,
+                'dislikeCustomSvg' => $dislikeCustomSvg,
                 'allowGuestInteractions' => $allowGuestInteractions,
                 'allowVoteChange' => $allowUserVoteChange,
                 'headingText' => $headingText,
@@ -259,7 +265,8 @@ class LikesField extends Field
                 'afterLikeColor' => $afterLikeColor,
                 'beforeDislikeColor' => $beforeDislikeColor,
                 'afterDislikeColor' => $afterDislikeColor,
-                'customSvg' => $customSvg,
+                'likeCustomSvg' => $likeCustomSvg,
+                'dislikeCustomSvg' => $dislikeCustomSvg,
                 'allowGuestInteractions' => $allowGuestInteractions,
                 'allowVoteChange' => $allowUserVoteChange,
                 'headingText' => $headingText,
@@ -284,7 +291,8 @@ class LikesField extends Field
             'afterLikeColor' => $afterLikeColor,
             'beforeDislikeColor' => $beforeDislikeColor,
             'afterDislikeColor' => $afterDislikeColor,
-            'customSvg' => $customSvg,
+            'likeCustomSvg' => $likeCustomSvg,
+            'dislikeCustomSvg' => $dislikeCustomSvg,
             'allowGuestInteractions' => $allowGuestInteractions,
             'allowVoteChange' => $allowUserVoteChange,
             'headingText' => $headingText,
@@ -428,7 +436,7 @@ class LikesField extends Field
     }
 
     /**
-     * @return array{enabled?: bool, icon?: string, emojiIcon?: string, likeEmojiIcon?: string, dislikeEmojiIcon?: string, beforeLikeColor?: string, afterLikeColor?: string, beforeDislikeColor?: string, afterDislikeColor?: string, customSvg?: ?string, allowGuestInteractions?: bool, allowUserVoteChange?: bool, headingText?: ?string, likeText?: ?string, dislikeText?: ?string}
+     * @return array{enabled?: bool, icon?: string, emojiIcon?: string, likeEmojiIcon?: string, dislikeEmojiIcon?: string, beforeLikeColor?: string, afterLikeColor?: string, beforeDislikeColor?: string, afterDislikeColor?: string, likeCustomSvg?: ?string, dislikeCustomSvg?: ?string, allowGuestInteractions?: bool, allowUserVoteChange?: bool, headingText?: ?string, likeText?: ?string, dislikeText?: ?string}
      */
     private function normalizeStoredValue(mixed $value): array
     {
@@ -443,7 +451,8 @@ class LikesField extends Field
                 'afterLikeColor' => $value->afterLikeColor,
                 'beforeDislikeColor' => $value->beforeDislikeColor,
                 'afterDislikeColor' => $value->afterDislikeColor,
-                'customSvg' => $value->customSvg,
+                'likeCustomSvg' => $value->likeCustomSvg,
+                'dislikeCustomSvg' => $value->dislikeCustomSvg,
                 'allowGuestInteractions' => $value->allowGuestInteractions,
                 'allowUserVoteChange' => $value->allowVoteChange,
                 'headingText' => $value->headingText,
@@ -512,8 +521,12 @@ class LikesField extends Field
             $stored['afterDislikeColor'] = trim((string)$value['afterDislikeColor']);
         }
 
-        if (array_key_exists('customSvg', $value)) {
-            $stored['customSvg'] = trim((string)$value['customSvg']);
+        if (array_key_exists('likeCustomSvg', $value)) {
+            $stored['likeCustomSvg'] = trim((string)$value['likeCustomSvg']);
+        }
+
+        if (array_key_exists('dislikeCustomSvg', $value)) {
+            $stored['dislikeCustomSvg'] = trim((string)$value['dislikeCustomSvg']);
         }
 
         if (array_key_exists('allowGuestInteractions', $value)) {

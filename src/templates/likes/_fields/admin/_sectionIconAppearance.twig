@@ -4,7 +4,8 @@
   field.getErrors('icon')|length
   or field.getErrors('likeEmojiIcon')|length
   or field.getErrors('dislikeEmojiIcon')|length
-  or field.getErrors('customSvg')|length
+  or field.getErrors('likeCustomSvg')|length
+  or field.getErrors('dislikeCustomSvg')|length
   or field.getErrors('beforeLikeColor')|length
   or field.getErrors('afterLikeColor')|length
   or field.getErrors('beforeDislikeColor')|length
@@ -49,11 +50,19 @@
 
     <div data-icon-mode-panel="customSvg" style="{{ field.icon == 'customSvg' ? '' : 'display:none;' }}">
       {{ forms.textareaField({
-          label: 'Custom SVG Markup'|t('engagement'),
-          id: 'customSvg',
-          name: 'customSvg',
-          value: field.customSvg,
-          errors: field.getErrors('customSvg'),
+          label: 'Like Custom SVG Markup'|t('engagement'),
+          id: 'likeCustomSvg',
+          name: 'likeCustomSvg',
+          value: field.likeCustomSvg,
+          errors: field.getErrors('likeCustomSvg'),
+          rows: 6,
+      }) }}
+      {{ forms.textareaField({
+          label: 'Dislike Custom SVG Markup'|t('engagement'),
+          id: 'dislikeCustomSvg',
+          name: 'dislikeCustomSvg',
+          value: field.dislikeCustomSvg,
+          errors: field.getErrors('dislikeCustomSvg'),
           rows: 6,
       }) }}
     </div>
