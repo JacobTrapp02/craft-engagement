@@ -10,6 +10,7 @@ use jtdev\craftengagement\models\RatingVote;
 use jtdev\craftengagement\Plugin;
 use jtdev\craftengagement\records\RatingAggregateRecord;
 use Throwable;
+use yii\db\IntegrityException;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -74,14 +75,18 @@ class RatingsController extends Controller
 
         $aggregate = $aggregateService->getByElementFieldSite($elementId, $fieldId, $siteId);
         if ($aggregate === null) {
-            $aggregate = $aggregateService->add(new RatingAggregate([
-                'elementId' => $elementId,
-                'fieldId' => $fieldId,
-                'siteId' => $siteId,
-                'ratingSum' => 0,
-                'voteCount' => 0,
-                'scale' => $normalized->scale,
-            ]));
+            try {
+                $aggregate = $aggregateService->add(new RatingAggregate([
+                    'elementId' => $elementId,
+                    'fieldId' => $fieldId,
+                    'siteId' => $siteId,
+                    'ratingSum' => 0,
+                    'voteCount' => 0,
+                    'scale' => $normalized->scale,
+                ]));
+            } catch (IntegrityException) {
+                $aggregate = null;
+            }
 
             // Handle race conditions where another request inserted it first.
             if ($aggregate === null) {
@@ -95,6 +100,7 @@ class RatingsController extends Controller
 
         $currentUser = Craft::$app->getUser()->getIdentity();
         $existingVote = null;
+        $sessionId = null;
 
         if ($currentUser !== null) {
             $existingVote = $voteService->getByAggregateAndUserId($aggregate->id, (int)$currentUser->id);
@@ -105,7 +111,7 @@ class RatingsController extends Controller
 
             $session = Craft::$app->getSession();
             $session->open();
-            $sessionId = $session->getId();
+            $sessionId = (string)$session->getId();
             $existingVote = $voteService->getByAggregateAndSessionId($aggregate->id, $sessionId);
         }
 
@@ -125,13 +131,35 @@ class RatingsController extends Controller
                 $newVote = new RatingVote([
                     'aggregateId' => $aggregate->id,
                     'userId' => $currentUser !== null ? (int)$currentUser->id : null,
-                    'sessionId' => $currentUser === null ? Craft::$app->getSession()->getId() : null,
+                    'sessionId' => $currentUser === null ? $sessionId : null,
                     'rating' => $ratingValue,
                 ]);
 
-                $savedVote = $voteService->add($newVote);
-                $voteCountDelta = 1;
-                $ratingSumDelta = $ratingValue;
+                try {
+                    $savedVote = $voteService->add($newVote);
+                    $voteCountDelta = 1;
+                    $ratingSumDelta = $ratingValue;
+                } catch (IntegrityException) {
+                    $concurrentVote = $currentUser !== null
+                        ? $voteService->getByAggregateAndUserId($aggregate->id, (int)$currentUser->id)
+                        : $voteService->getByAggregateAndSessionId($aggregate->id, (string)$sessionId);
+
+                    if ($concurrentVote === null) {
+                        throw new BadRequestHttpException('Could not save vote.');
+                    }
+
+                    if (!$normalized->allowUserRatingChange) {
+                        $savedVote = $concurrentVote;
+                    } elseif ((int)$concurrentVote->rating !== $ratingValue) {
+                        $savedVote = $voteService->update($concurrentVote->id, ['rating' => $ratingValue]);
+                        if ($savedVote === null) {
+                            throw new BadRequestHttpException('Could not save vote.');
+                        }
+                        $ratingSumDelta = $ratingValue - (int)$concurrentVote->rating;
+                    } else {
+                        $savedVote = $concurrentVote;
+                    }
+                }
             } else {
                 $savedVote = $voteService->update($existingVote->id, ['rating' => $ratingValue]);
                 $ratingSumDelta = $ratingValue - (int)$existingVote->rating;

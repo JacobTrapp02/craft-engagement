@@ -5,6 +5,7 @@
   - widgetPreviewMode
   - widgetElementId, widgetFieldId, widgetSiteId
   - widgetActionUrl, widgetLoginUrl, widgetRegisterUrl
+  - widgetGuestInteractionMode, widgetGuestInteractionMessageHtml
   - widgetIsLoggedIn, widgetGuestAllowed
   - widgetUserVote, widgetLikeCount, widgetDislikeCount
   - widgetIcon, widgetLikeEmojiIcon, widgetDislikeEmojiIcon, widgetCustomSvg
@@ -23,9 +24,29 @@
   data-action-url="{{ widgetActionUrl|e('html_attr') }}"
   data-login-url="{{ widgetLoginUrl|e('html_attr') }}"
   data-register-url="{{ widgetRegisterUrl ? widgetRegisterUrl|e('html_attr') : '' }}"
+  data-guest-interaction-mode="{{ widgetGuestInteractionMode|e('html_attr') }}"
   data-is-logged-in="{{ widgetIsLoggedIn ? '1' : '0' }}"
   data-guest-allowed="{{ widgetGuestAllowed ? '1' : '0' }}"
+  data-icon-mode="{{ widgetIcon|e('html_attr') }}"
 >
+  {% set thumbOutlineUpSvg %}
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;">
+      <path d="M9 10V6a2.5 2.5 0 1 1 5 0v3h4a2 2 0 0 1 1.92 2.56l-1.5 5A2.5 2.5 0 0 1 16 18.5H9a2 2 0 0 1-2-2V10h2z"/>
+      <path d="M4 10h3v8H4z"/>
+    </svg>
+  {% endset %}
+  {% set thumbFilledUpSvg %}
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="display:block; width:100%; height:100%; fill:currentColor;">
+      <path d="M9 10V6a2.5 2.5 0 1 1 5 0v3h4a2 2 0 0 1 1.92 2.56l-1.5 5A2.5 2.5 0 0 1 16 18.5H9a2 2 0 0 1-2-2V10h2z"/>
+      <path d="M4 10h3v8H4z"/>
+    </svg>
+  {% endset %}
+  {% set thumbOutlineDownSvg %}
+    <span style="display:block; width:100%; height:100%; transform:rotate(180deg); transform-origin:center;">{{ thumbOutlineUpSvg|raw }}</span>
+  {% endset %}
+  {% set thumbFilledDownSvg %}
+    <span style="display:block; width:100%; height:100%; transform:rotate(180deg); transform-origin:center;">{{ thumbFilledUpSvg|raw }}</span>
+  {% endset %}
   {% if widgetHeadingTextRendered %}
     <div data-likes-heading>
       {{ widgetHeadingTextRendered }}
@@ -39,13 +60,19 @@
       style="border:none; padding:6px 12px; background:{{ widgetUserVote == 1 ? widgetLikeAfterBg : widgetLikeBeforeBg }}; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }}"
     >
       {% if widgetIcon != 'none' %}
-        {% set likeIconColor = widgetUserVote == 1 ? (widgetAfterLikeColor ?: '#111827') : (widgetBeforeLikeColor ?: '#111827') %}
+        {% set likeIconColor = widgetUserVote == 1 ? (widgetAfterLikeColor ?: '#111827') : (widgetBeforeLikeColor ?: '#64748b') %}
+        {% if widgetIcon == 'thumbs' %}
+        <span data-like-icon data-thumb-active="{{ widgetUserVote == 1 ? '1' : '0' }}" style="position:relative; display:inline-flex; width:18px; height:18px; color:#111827;">
+          <span data-thumb-outline style="position:absolute; inset:0; color:#94a3b8; opacity:{{ widgetUserVote == 1 ? '0' : '1' }};">{{ thumbOutlineUpSvg|raw }}</span>
+          <span data-thumb-fill style="position:absolute; inset:0; color:#111827; opacity:{{ widgetUserVote == 1 ? '1' : '0' }};">{{ thumbFilledUpSvg|raw }}</span>
+        {% else %}
         <span data-like-icon style="color:{{ likeIconColor }};">
+        {% endif %}
         {% if widgetIcon == 'emoji' %}
           {{ widgetLikeEmojiIcon }}
         {% elseif widgetIcon == 'customSvg' and widgetCustomSvg %}
           <span class="engagement-likes-svg-icon">{{ widgetCustomSvg|raw }}</span>
-        {% else %}
+        {% elseif widgetIcon != 'thumbs' %}
           👍
         {% endif %}
         </span>
@@ -61,13 +88,19 @@
       style="border:none; padding:6px 12px; background:{{ widgetUserVote == -1 ? widgetDislikeAfterBg : widgetDislikeBeforeBg }}; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }}"
     >
       {% if widgetIcon != 'none' %}
-        {% set dislikeIconColor = widgetUserVote == -1 ? (widgetAfterDislikeColor ?: '#111827') : (widgetBeforeDislikeColor ?: '#111827') %}
+        {% set dislikeIconColor = widgetUserVote == -1 ? (widgetAfterDislikeColor ?: '#111827') : (widgetBeforeDislikeColor ?: '#64748b') %}
+        {% if widgetIcon == 'thumbs' %}
+        <span data-dislike-icon data-thumb-active="{{ widgetUserVote == -1 ? '1' : '0' }}" style="position:relative; display:inline-flex; width:18px; height:18px; color:#111827;">
+          <span data-thumb-outline style="position:absolute; inset:0; color:#94a3b8; opacity:{{ widgetUserVote == -1 ? '0' : '1' }};">{{ thumbOutlineDownSvg|raw }}</span>
+          <span data-thumb-fill style="position:absolute; inset:0; color:#111827; opacity:{{ widgetUserVote == -1 ? '1' : '0' }};">{{ thumbFilledDownSvg|raw }}</span>
+        {% else %}
         <span data-dislike-icon style="color:{{ dislikeIconColor }};">
+        {% endif %}
         {% if widgetIcon == 'emoji' %}
           {{ widgetDislikeEmojiIcon }}
         {% elseif widgetIcon == 'customSvg' and widgetCustomSvg %}
           <span class="engagement-likes-svg-icon">{{ widgetCustomSvg|raw }}</span>
-        {% else %}
+        {% elseif widgetIcon != 'thumbs' %}
           👎
         {% endif %}
         </span>

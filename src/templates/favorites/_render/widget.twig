@@ -3,6 +3,7 @@
   Available Twig variables (inputs and overrides):
   - previewMode, elementId, fieldId, siteId
   - actionUrl, loginUrl, registerUrl
+  - guestInteractionMode, guestInteractionMessage, guestInteractionMessageHtml
   - isLoggedIn, guestAllowed
   - isFavorited, favoriteCount
   - icon, emojiIcon, customSvg
@@ -19,6 +20,9 @@
 {% set widgetActionUrl = actionUrl ?? actionUrl('engagement/favorites/toggle-favorite') %}
 {% set widgetLoginUrl = loginUrl ?? url('login') %}
 {% set widgetRegisterUrl = registerUrl ?? null %}
+{% set widgetGuestInteractionMode = guestInteractionMode ?? 'message' %}
+{% set widgetGuestInteractionMessage = guestInteractionMessage ?? 'Please log in or register to interact.'|t('engagement') %}
+{% set widgetGuestInteractionMessageHtml = guestInteractionMessageHtml ?? widgetGuestInteractionMessage %}
 {% set widgetIsLoggedIn = isLoggedIn ?? false %}
 {% set widgetGuestAllowed = guestAllowed ?? false %}
 {% set widgetIsFavorited = isFavorited ?? false %}

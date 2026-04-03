@@ -13,10 +13,14 @@ class Settings extends Model
     public const ICON_HEART = 'heart';
     public const ICON_THUMBS = 'thumbs';
     public const ICON_CUSTOM_SVG = 'customSvg';
+    public const GUEST_INTERACTION_MODE_MESSAGE = 'message';
+    public const GUEST_INTERACTION_MODE_REDIRECT = 'redirect';
 
     public string $loginUrl = 'login';
     public string $loginRedirectParam = 'redirect';
     public ?string $registerUrl = null;
+    public string $guestInteractionMode = self::GUEST_INTERACTION_MODE_MESSAGE;
+    public string $guestInteractionMessage = 'Please log in or register to interact.';
 
     /**
      * @return array<string, mixed>
@@ -25,7 +29,12 @@ class Settings extends Model
     {
         return [
             [['loginUrl'], 'required'],
-            [['loginUrl', 'loginRedirectParam', 'registerUrl'], 'string'],
+            [['guestInteractionMode'], 'required'],
+            [['loginUrl', 'loginRedirectParam', 'registerUrl', 'guestInteractionMode', 'guestInteractionMessage'], 'string'],
+            [['guestInteractionMode'], 'in', 'range' => [
+                self::GUEST_INTERACTION_MODE_MESSAGE,
+                self::GUEST_INTERACTION_MODE_REDIRECT,
+            ]],
         ];
     }
 
@@ -37,6 +46,8 @@ class Settings extends Model
         if ($this->registerUrl === '') {
             $this->registerUrl = null;
         }
+        $this->guestInteractionMode = trim($this->guestInteractionMode);
+        $this->guestInteractionMessage = trim($this->guestInteractionMessage);
 
         return parent::beforeValidate();
     }

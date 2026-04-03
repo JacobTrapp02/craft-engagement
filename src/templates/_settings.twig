@@ -30,3 +30,26 @@
     value: settings.registerUrl,
     errors: settings.getErrors('registerUrl'),
 }) }}
+
+{{ forms.selectField({
+    label: 'Guest Interaction Behavior'|t('engagement'),
+    instructions: 'When guests click ratings, likes, or favorites that require login, choose whether to show a message or immediately redirect to login.'|t('engagement'),
+    id: 'guestInteractionMode',
+    name: 'guestInteractionMode',
+    value: settings.guestInteractionMode,
+    options: [
+        { label: 'Show Message on Click'|t('engagement'), value: 'message' },
+        { label: 'Auto-Redirect to Login'|t('engagement'), value: 'redirect' },
+    ],
+    errors: settings.getErrors('guestInteractionMode'),
+}) }}
+
+{{ forms.textareaField({
+    label: 'Guest Interaction Message'|t('engagement'),
+    instructions: 'Message shown inline when Guest Interaction Behavior is set to Show Message on Click. Supports basic HTML links (for example, <a href="/login">Log in</a>).'|t('engagement'),
+    id: 'guestInteractionMessage',
+    name: 'guestInteractionMessage',
+    value: settings.guestInteractionMessage,
+    rows: 2,
+    errors: settings.getErrors('guestInteractionMessage'),
+}) }}

@@ -36,6 +36,11 @@
 [data-engagement-likes] [data-like-btn] {
   border: none;
   padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
 }
 
 [data-engagement-likes] .engagement-likes-divider {
@@ -44,9 +49,35 @@
   background: #d1d5db;
 }
 
+[data-engagement-likes] [data-like-icon],
+[data-engagement-likes] [data-dislike-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
 [data-engagement-likes] .engagement-likes-svg-icon {
   display: inline-flex;
   width: 16px;
   height: 16px;
   vertical-align: middle;
+}
+
+[data-engagement-likes] .engagement-guest-message {
+  display: inline-block;
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.4;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+[data-engagement-likes] .engagement-guest-message a {
+  color: #1d4ed8;
+  text-decoration: underline;
 }

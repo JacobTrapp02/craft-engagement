@@ -5,6 +5,7 @@
   - widgetPreviewMode
   - widgetElementId, widgetFieldId, widgetSiteId
   - widgetActionUrl, widgetLoginUrl, widgetRegisterUrl
+  - widgetGuestInteractionMode, widgetGuestInteractionMessageHtml
   - widgetIsLoggedIn, widgetGuestAllowed
   - widgetIsFavorited, widgetFavoriteCount
   - widgetIcon, widgetEmojiIcon, widgetCustomSvg
@@ -12,6 +13,9 @@
   - widgetHeadingText, widgetHeadingTextRendered
   - widgetFavoriteTextRendered, widgetUnfavoriteTextRendered
 #}
+{% set favoriteEmojiLooksThumb = widgetEmojiIcon starts with '👍' or widgetEmojiIcon starts with '👎' %}
+{% set favoriteEmojiIsThumbDown = widgetEmojiIcon starts with '👎' %}
+
 <div
   data-engagement-favorite
   data-favorite-uid="{{ widgetUid }}"
@@ -21,9 +25,30 @@
   data-action-url="{{ widgetActionUrl|e('html_attr') }}"
   data-login-url="{{ widgetLoginUrl|e('html_attr') }}"
   data-register-url="{{ widgetRegisterUrl ? widgetRegisterUrl|e('html_attr') : '' }}"
+  data-guest-interaction-mode="{{ widgetGuestInteractionMode|e('html_attr') }}"
   data-is-logged-in="{{ widgetIsLoggedIn ? '1' : '0' }}"
   data-guest-allowed="{{ widgetGuestAllowed ? '1' : '0' }}"
+  data-icon-mode="{{ widgetIcon|e('html_attr') }}"
+  data-emoji-is-thumb="{{ favoriteEmojiLooksThumb ? '1' : '0' }}"
 >
+  {% set thumbOutlineUpSvg %}
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;">
+      <path d="M9 10V6a2.5 2.5 0 1 1 5 0v3h4a2 2 0 0 1 1.92 2.56l-1.5 5A2.5 2.5 0 0 1 16 18.5H9a2 2 0 0 1-2-2V10h2z"/>
+      <path d="M4 10h3v8H4z"/>
+    </svg>
+  {% endset %}
+  {% set thumbFilledUpSvg %}
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="display:block; width:100%; height:100%; fill:currentColor;">
+      <path d="M9 10V6a2.5 2.5 0 1 1 5 0v3h4a2 2 0 0 1 1.92 2.56l-1.5 5A2.5 2.5 0 0 1 16 18.5H9a2 2 0 0 1-2-2V10h2z"/>
+      <path d="M4 10h3v8H4z"/>
+    </svg>
+  {% endset %}
+  {% set thumbOutlineDownSvg %}
+    <span style="display:block; width:100%; height:100%; transform:rotate(180deg); transform-origin:center;">{{ thumbOutlineUpSvg|raw }}</span>
+  {% endset %}
+  {% set thumbFilledDownSvg %}
+    <span style="display:block; width:100%; height:100%; transform:rotate(180deg); transform-origin:center;">{{ thumbFilledUpSvg|raw }}</span>
+  {% endset %}
   {% if widgetHeadingText %}
     <div data-favorite-heading>{{ widgetHeadingTextRendered }}</div>
   {% endif %}
@@ -34,6 +59,12 @@
     style="background:{{ widgetIsFavorited ? widgetFavoriteAfterBg : widgetFavoriteBeforeBg }}; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }}"
   >
     {% if widgetIcon != 'none' %}
+      {% if widgetIcon == 'emoji' and favoriteEmojiLooksThumb %}
+      <span data-favorite-icon data-thumb-active="{{ widgetIsFavorited ? '1' : '0' }}" style="position:relative; display:inline-flex; width:18px; height:18px; color:#111827;">
+        <span data-thumb-outline style="position:absolute; inset:0; color:#94a3b8; opacity:{{ widgetIsFavorited ? '0' : '1' }};">{{ favoriteEmojiIsThumbDown ? thumbOutlineDownSvg|raw : thumbOutlineUpSvg|raw }}</span>
+        <span data-thumb-fill style="position:absolute; inset:0; color:#111827; opacity:{{ widgetIsFavorited ? '1' : '0' }};">{{ favoriteEmojiIsThumbDown ? thumbFilledDownSvg|raw : thumbFilledUpSvg|raw }}</span>
+      </span>
+      {% else %}
       <span data-favorite-icon>
         {% if widgetIcon == 'emoji' %}
           {{ widgetEmojiIcon }}
@@ -45,6 +76,7 @@
           {{ widgetIsFavorited ? '♥' : '♡' }}
         {% endif %}
       </span>
+      {% endif %}
     {% endif %}
     <span data-favorite-label>{{ widgetIsFavorited ? widgetUnfavoriteTextRendered : widgetFavoriteTextRendered }}</span>
   </button>

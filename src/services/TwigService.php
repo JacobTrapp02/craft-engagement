@@ -12,6 +12,7 @@ use jtdev\craftengagement\models\Rating;
 use jtdev\craftengagement\models\Settings;
 use jtdev\craftengagement\Plugin;
 use Twig\Markup;
+use yii\helpers\HtmlPurifier;
 
 /**
  * Twig rendering helpers exposed via craft.engagement.*
@@ -96,6 +97,9 @@ class TwigService extends Component
             'userRating' => $userRating,
             'loginUrl' => $this->resolveLoginUrl(),
             'registerUrl' => $this->resolveRegisterUrl(),
+            'guestInteractionMode' => $this->resolveGuestInteractionMode(),
+            'guestInteractionMessage' => $this->resolveGuestInteractionMessage(),
+            'guestInteractionMessageHtml' => $this->resolveGuestInteractionMessageHtml(),
             'actionUrl' => UrlHelper::actionUrl('engagement/ratings/cast-rating'),
             'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
         ]);
@@ -151,6 +155,9 @@ class TwigService extends Component
             'userVote' => $userVote,
             'loginUrl' => $this->resolveLoginUrl(),
             'registerUrl' => $this->resolveRegisterUrl(),
+            'guestInteractionMode' => $this->resolveGuestInteractionMode(),
+            'guestInteractionMessage' => $this->resolveGuestInteractionMessage(),
+            'guestInteractionMessageHtml' => $this->resolveGuestInteractionMessageHtml(),
             'actionUrl' => UrlHelper::actionUrl('engagement/likes/cast-like'),
             'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
         ]);
@@ -206,6 +213,9 @@ class TwigService extends Component
             'isFavorited' => $isFavorited,
             'loginUrl' => $this->resolveLoginUrl(),
             'registerUrl' => $this->resolveRegisterUrl(),
+            'guestInteractionMode' => $this->resolveGuestInteractionMode(),
+            'guestInteractionMessage' => $this->resolveGuestInteractionMessage(),
+            'guestInteractionMessageHtml' => $this->resolveGuestInteractionMessageHtml(),
             'actionUrl' => UrlHelper::actionUrl('engagement/favorites/toggle-favorite'),
             'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
         ]);
@@ -410,6 +420,47 @@ class TwigService extends Component
         }
 
         return $this->normalizeUrl($registerUrl);
+    }
+
+    private function resolveGuestInteractionMode(): string
+    {
+        $mode = trim($this->settings()->guestInteractionMode);
+
+        if (in_array($mode, [
+            Settings::GUEST_INTERACTION_MODE_MESSAGE,
+            Settings::GUEST_INTERACTION_MODE_REDIRECT,
+        ], true)) {
+            return $mode;
+        }
+
+        return Settings::GUEST_INTERACTION_MODE_MESSAGE;
+    }
+
+    private function resolveGuestInteractionMessage(): string
+    {
+        $message = trim($this->settings()->guestInteractionMessage);
+
+        return $message !== ''
+            ? $message
+            : Craft::t('engagement', 'Please log in or register to interact.');
+    }
+
+    private function resolveGuestInteractionMessageHtml(): string
+    {
+        $message = $this->resolveGuestInteractionMessage();
+        $sanitized = HtmlPurifier::process($message, [
+            'HTML.Allowed' => 'a[href|title|target|rel],br,strong,em,b,i,u,span',
+            'Attr.AllowedFrameTargets' => '_blank,_self,_parent,_top',
+            'URI.AllowedSchemes' => [
+                'http' => true,
+                'https' => true,
+                'mailto' => true,
+                'tel' => true,
+            ],
+            'AutoFormat.RemoveEmpty' => true,
+        ]);
+
+        return nl2br(trim($sanitized), false);
     }
 
     private function normalizeUrl(string $value): string

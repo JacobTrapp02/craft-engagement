@@ -5,6 +5,7 @@
   - widgetPreviewMode
   - widgetElementId, widgetFieldId, widgetSiteId
   - widgetActionUrl, widgetLoginUrl, widgetRegisterUrl
+  - widgetGuestInteractionMode, widgetGuestInteractionMessageHtml
   - widgetIsLoggedIn, widgetGuestAllowed
   - widgetScale, widgetUserRating
   - widgetIcon, widgetEmojiIcon, widgetCustomSvg
@@ -21,6 +22,7 @@
   data-action-url="{{ widgetActionUrl|e('html_attr') }}"
   data-login-url="{{ widgetLoginUrl|e('html_attr') }}"
   data-register-url="{{ widgetRegisterUrl ? widgetRegisterUrl|e('html_attr') : '' }}"
+  data-guest-interaction-mode="{{ widgetGuestInteractionMode|e('html_attr') }}"
   data-is-logged-in="{{ widgetIsLoggedIn ? '1' : '0' }}"
   data-guest-allowed="{{ widgetGuestAllowed ? '1' : '0' }}"
   data-scale="{{ widgetScale|e('html_attr') }}"
@@ -31,51 +33,84 @@
     </div>
   {% endif %}
 
+  {% set iconCellSize = 22 %}
+  {% set iconGap = 6 %}
+  {% set thumbOutlineSvg %}
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;">
+      <path d="M9 10V6a2.5 2.5 0 1 1 5 0v3h4a2 2 0 0 1 1.92 2.56l-1.5 5A2.5 2.5 0 0 1 16 18.5H9a2 2 0 0 1-2-2V10h2z"/>
+      <path d="M4 10h3v8H4z"/>
+    </svg>
+  {% endset %}
+  {% set thumbFilledSvg %}
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="display:block; width:100%; height:100%; fill:currentColor;">
+      <path d="M9 10V6a2.5 2.5 0 1 1 5 0v3h4a2 2 0 0 1 1.92 2.56l-1.5 5A2.5 2.5 0 0 1 16 18.5H9a2 2 0 0 1-2-2V10h2z"/>
+      <path d="M4 10h3v8H4z"/>
+    </svg>
+  {% endset %}
+
   <div data-overall-wrap>
-    <div style="display:inline-block; position:relative; font-size:24px; line-height:1; letter-spacing:1px; margin-bottom:8px;">
+    <div style="display:inline-block; position:relative; font-size:24px; line-height:1; margin-bottom:8px; --rating-cell-size:{{ iconCellSize }}px; --rating-cell-gap:{{ iconGap }}px;">
       {% if widgetIcon == 'customSvg' and widgetCustomSvg %}
-        <span style="display:inline-flex; gap:6px; color:#cbd5e1;">
+        <span style="display:inline-flex; gap:var(--rating-cell-gap); color:#cbd5e1;">
           {% for _ in 1..widgetScale %}
-            <span style="display:inline-flex; width:22px; height:22px; opacity:0.35;">{{ widgetCustomSvg|raw }}</span>
+            <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); opacity:0.35;">{{ widgetCustomSvg|raw }}</span>
           {% endfor %}
         </span>
         <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; color:#f59e0b; width:{{ fillPercent }}%;">
-          <span style="display:inline-flex; gap:6px;">
+          <span style="display:inline-flex; gap:var(--rating-cell-gap);">
             {% for _ in 1..widgetScale %}
-              <span style="display:inline-flex; width:22px; height:22px;">{{ widgetCustomSvg|raw }}</span>
+              <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size);">{{ widgetCustomSvg|raw }}</span>
             {% endfor %}
           </span>
         </span>
       {% elseif widgetIcon == 'emoji' and widgetEmojiIcon %}
-        <span style="display:inline-flex; gap:6px;">
+        <span style="display:inline-flex; gap:var(--rating-cell-gap);">
           {% for _ in 1..widgetScale %}
-            <span style="display:inline-flex; width:22px; height:22px; align-items:center; justify-content:center; opacity:0.3; filter:grayscale(1) saturate(0.2) brightness(0.85);">{{ widgetEmojiIcon }}</span>
+            <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center; opacity:0.3; filter:grayscale(1) saturate(0.2) brightness(0.85);">{{ widgetEmojiIcon }}</span>
           {% endfor %}
         </span>
         <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; width:{{ fillPercent }}%;">
-          <span style="display:inline-flex; gap:6px;">
+          <span style="display:inline-flex; gap:var(--rating-cell-gap);">
             {% for _ in 1..widgetScale %}
-              <span style="display:inline-flex; width:22px; height:22px; align-items:center; justify-content:center;">{{ widgetEmojiIcon }}</span>
+              <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center;">{{ widgetEmojiIcon }}</span>
+            {% endfor %}
+          </span>
+        </span>
+      {% elseif widgetIcon == 'thumbs' %}
+        <span style="display:inline-flex; gap:var(--rating-cell-gap); color:#94a3b8;">
+          {% for _ in 1..widgetScale %}
+            <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center;">{{ thumbOutlineSvg|raw }}</span>
+          {% endfor %}
+        </span>
+        <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; width:{{ fillPercent }}%;">
+          <span style="display:inline-flex; gap:var(--rating-cell-gap); color:#111827;">
+            {% for _ in 1..widgetScale %}
+              <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center;">{{ thumbFilledSvg|raw }}</span>
             {% endfor %}
           </span>
         </span>
       {% else %}
-        <span style="color:#cbd5e1;">
-          {% for _ in 1..widgetScale %}{{ emptyGlyph }}{% endfor %}
+        <span style="display:inline-flex; gap:var(--rating-cell-gap); color:#cbd5e1;">
+          {% for _ in 1..widgetScale %}
+            <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center;">{{ emptyGlyph }}</span>
+          {% endfor %}
         </span>
         <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; color:#f59e0b; width:{{ fillPercent }}%;">
-          {% for _ in 1..widgetScale %}{{ filledGlyph }}{% endfor %}
+          <span style="display:inline-flex; gap:var(--rating-cell-gap);">
+            {% for _ in 1..widgetScale %}
+              <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center;">{{ filledGlyph }}</span>
+            {% endfor %}
+          </span>
         </span>
       {% endif %}
-      <div data-rating-stars style="position:absolute; inset:0; display:flex; justify-content:center; gap:6px; align-items:center;">
+      <div data-rating-stars style="position:absolute; left:0; top:0; display:inline-flex; gap:var(--rating-cell-gap); align-items:center;">
         {% for value in 1..widgetScale %}
           <button
             type="button"
             data-rating-value="{{ value }}"
             aria-label="{{ 'Rate {value}'|t('engagement', { value: value }) }}"
-            style="border:none; background:transparent; padding:0; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }} line-height:1; font-size:28px; opacity:0;"
+            style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center; border:none; background:transparent; margin:0; padding:0; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }} line-height:1; font-size:0; opacity:0;"
           >
-            ★
           </button>
         {% endfor %}
       </div>

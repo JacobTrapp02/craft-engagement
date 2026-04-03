@@ -10,6 +10,7 @@ use jtdev\craftengagement\models\LikesVote;
 use jtdev\craftengagement\Plugin;
 use jtdev\craftengagement\records\LikesAggregateRecord;
 use Throwable;
+use yii\db\IntegrityException;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -74,13 +75,17 @@ class LikesController extends Controller
 
         $aggregate = $aggregateService->getByElementFieldSite($elementId, $fieldId, $siteId);
         if ($aggregate === null) {
-            $aggregate = $aggregateService->add(new LikesAggregate([
-                'elementId' => $elementId,
-                'fieldId' => $fieldId,
-                'siteId' => $siteId,
-                'likeCount' => 0,
-                'dislikeCount' => 0,
-            ]));
+            try {
+                $aggregate = $aggregateService->add(new LikesAggregate([
+                    'elementId' => $elementId,
+                    'fieldId' => $fieldId,
+                    'siteId' => $siteId,
+                    'likeCount' => 0,
+                    'dislikeCount' => 0,
+                ]));
+            } catch (IntegrityException) {
+                $aggregate = null;
+            }
 
             if ($aggregate === null) {
                 $aggregate = $aggregateService->getByElementFieldSite($elementId, $fieldId, $siteId);
@@ -141,20 +146,51 @@ class LikesController extends Controller
                     $dislikeCountDelta = -1;
                 }
             } else {
-                $savedVote = $voteService->add(new LikesVote([
-                    'aggregateId' => $aggregate->id,
-                    'userId' => $currentUser !== null ? (int)$currentUser->id : null,
-                    'sessionId' => $currentUser === null ? (string)$sessionId : null,
-                    'value' => $value,
-                ]));
-                if ($savedVote === null) {
-                    throw new BadRequestHttpException('Could not save like/dislike vote.');
-                }
-                $userVote = $savedVote?->value;
-                if ($value === 1) {
-                    $likeCountDelta = 1;
-                } else {
-                    $dislikeCountDelta = 1;
+                try {
+                    $savedVote = $voteService->add(new LikesVote([
+                        'aggregateId' => $aggregate->id,
+                        'userId' => $currentUser !== null ? (int)$currentUser->id : null,
+                        'sessionId' => $currentUser === null ? (string)$sessionId : null,
+                        'value' => $value,
+                    ]));
+                    if ($savedVote === null) {
+                        throw new BadRequestHttpException('Could not save like/dislike vote.');
+                    }
+                    $userVote = $savedVote?->value;
+                    if ($value === 1) {
+                        $likeCountDelta = 1;
+                    } else {
+                        $dislikeCountDelta = 1;
+                    }
+                } catch (IntegrityException) {
+                    $concurrentVote = $currentUser !== null
+                        ? $voteService->getByAggregateAndUserId($aggregate->id, (int)$currentUser->id)
+                        : $voteService->getByAggregateAndSessionId($aggregate->id, (string)$sessionId);
+
+                    if ($concurrentVote === null) {
+                        throw new BadRequestHttpException('Could not save like/dislike vote.');
+                    }
+
+                    if (!$normalized->allowVoteChange) {
+                        $savedVote = $concurrentVote;
+                        $userVote = $savedVote->value;
+                    } elseif ((int)$concurrentVote->value !== $value) {
+                        $savedVote = $voteService->update($concurrentVote->id, ['value' => $value]);
+                        if ($savedVote === null) {
+                            throw new BadRequestHttpException('Could not save like/dislike vote.');
+                        }
+                        $userVote = $savedVote->value;
+                        if ((int)$concurrentVote->value === 1) {
+                            $likeCountDelta = -1;
+                            $dislikeCountDelta = 1;
+                        } else {
+                            $likeCountDelta = 1;
+                            $dislikeCountDelta = -1;
+                        }
+                    } else {
+                        $savedVote = $concurrentVote;
+                        $userVote = $savedVote->value;
+                    }
                 }
             }
 

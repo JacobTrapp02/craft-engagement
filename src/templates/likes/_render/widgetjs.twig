@@ -6,6 +6,7 @@
   - widgetPreviewMode
   - widgetElementId, widgetFieldId, widgetSiteId
   - widgetActionUrl, widgetLoginUrl, widgetRegisterUrl
+  - widgetGuestInteractionMode, widgetGuestInteractionMessage
   - widgetIsLoggedIn, widgetGuestAllowed
   - widgetUserVote, widgetLikeCount, widgetDislikeCount
   - widgetHeadingText, widgetLikeText, widgetDislikeText
@@ -27,6 +28,7 @@
   const dislikeLabelEl = root.querySelector('[data-dislike-label]');
   const likeIconEl = root.querySelector('[data-like-icon]');
   const dislikeIconEl = root.querySelector('[data-dislike-icon]');
+  const iconMode = root.getAttribute('data-icon-mode') || 'thumbs';
 
   let userVote = Number({{ widgetUserVote is not null ? widgetUserVote : 0 }});
   let likeCount = Number({{ widgetLikeCount }});
@@ -41,7 +43,8 @@
   const fieldName = {{ (label ?? '')|json_encode|raw }};
   const actionUrl = root.getAttribute('data-action-url');
   const loginUrl = root.getAttribute('data-login-url') || '/login';
-  const registerUrl = root.getAttribute('data-register-url') || '';
+  const guestInteractionMode = root.getAttribute('data-guest-interaction-mode') || 'message';
+  const guestInteractionMessageHtml = {{ (widgetGuestInteractionMessageHtml ?? '')|json_encode|raw }};
   const isLoggedIn = root.getAttribute('data-is-logged-in') === '1';
   const guestAllowed = root.getAttribute('data-guest-allowed') === '1';
   const elementId = Number(root.getAttribute('data-element-id'));
@@ -124,23 +127,66 @@
       dislikeBtn.style.color = contrastTextColor(dislikeBg);
     }
     if (likeIconEl instanceof HTMLElement) {
-      likeIconEl.style.color = (userVote === 1 ? afterLikeColor : beforeLikeColor) || contrastTextColor(likeBg) || '#111827';
+      if (iconMode === 'thumbs') {
+        likeIconEl.setAttribute('data-thumb-active', userVote === 1 ? '1' : '0');
+        const outline = likeIconEl.querySelector('[data-thumb-outline]');
+        const fill = likeIconEl.querySelector('[data-thumb-fill]');
+        if (outline instanceof HTMLElement) {
+          outline.style.opacity = userVote === 1 ? '0' : '1';
+        }
+        if (fill instanceof HTMLElement) {
+          fill.style.opacity = userVote === 1 ? '1' : '0';
+        }
+      } else {
+        likeIconEl.style.color = (userVote === 1 ? afterLikeColor : beforeLikeColor) || contrastTextColor(likeBg) || '#111827';
+      }
     }
     if (dislikeIconEl instanceof HTMLElement) {
-      dislikeIconEl.style.color = (userVote === -1 ? afterDislikeColor : beforeDislikeColor) || contrastTextColor(dislikeBg) || '#111827';
+      if (iconMode === 'thumbs') {
+        dislikeIconEl.setAttribute('data-thumb-active', userVote === -1 ? '1' : '0');
+        const outline = dislikeIconEl.querySelector('[data-thumb-outline]');
+        const fill = dislikeIconEl.querySelector('[data-thumb-fill]');
+        if (outline instanceof HTMLElement) {
+          outline.style.opacity = userVote === -1 ? '0' : '1';
+        }
+        if (fill instanceof HTMLElement) {
+          fill.style.opacity = userVote === -1 ? '1' : '0';
+        }
+      } else {
+        dislikeIconEl.style.color = (userVote === -1 ? afterDislikeColor : beforeDislikeColor) || contrastTextColor(dislikeBg) || '#111827';
+      }
     }
   };
 
-  const submitVote = async (value) => {
-    if (!isLoggedIn && !guestAllowed) {
-      const goLogin = window.confirm(registerUrl
-        ? {{ 'Please log in to interact. Click OK to log in or Cancel to register.'|t('engagement')|json_encode|raw }}
-        : {{ 'Please log in to interact.'|t('engagement')|json_encode|raw }});
-      if (goLogin) {
-        window.location.href = loginUrl;
-      } else if (registerUrl) {
-        window.location.href = registerUrl;
+  const handleBlockedGuestInteraction = () => {
+    if (isLoggedIn || guestAllowed) {
+      return false;
+    }
+
+    if (guestInteractionMode === 'redirect') {
+      window.location.href = loginUrl;
+      return true;
+    }
+
+    if (!root.querySelector('[data-guest-inline-message]')) {
+      const messageEl = document.createElement('div');
+      messageEl.setAttribute('data-guest-inline-message', '1');
+      messageEl.className = 'engagement-guest-message';
+      messageEl.innerHTML = guestInteractionMessageHtml || {{ 'Please log in or register to interact.'|t('engagement')|json_encode|raw }};
+
+      const controls = root.querySelector('.engagement-likes-control');
+      if (controls) {
+        controls.replaceWith(messageEl);
+      } else {
+        root.appendChild(messageEl);
       }
+    }
+
+    return true;
+  };
+
+  const submitVote = async (value) => {
+    if (handleBlockedGuestInteraction()) {
       return;
     }
 

@@ -26,7 +26,7 @@
     <div class="heading"><label>{{ 'Text Overrides'|t('engagement') }}</label></div>
     <div class="instructions"><p>{{ 'These control the three optional text messages around the widget.'|t('engagement') }}</p></div>
     {{ forms.lightswitchField({ label: 'Text Above Widget'|t('engagement'), id: 'allowOverrideHeadingTextToggle', name: 'allowOverrideHeadingText', on: field.allowOverrideHeadingText, errors: field.getErrors('allowOverrideHeadingText') }) }}
-    {{ forms.lightswitchField({ label: 'Text Below Widget (After Rating)'|t('engagement'), id: 'allowOverrideClickToRateTextToggle', name: 'allowOverrideClickToRateText', on: field.allowOverrideClickToRateText, errors: field.getErrors('allowOverrideClickToRateText') }) }}
-    {{ forms.lightswitchField({ label: 'Text After Rating'|t('engagement'), id: 'allowOverrideYourRatingTextToggle', name: 'allowOverrideYourRatingText', on: field.allowOverrideYourRatingText, errors: field.getErrors('allowOverrideYourRatingText') }) }}
+    {{ forms.lightswitchField({ label: 'Text Below Widget (Before Rating)'|t('engagement'), id: 'allowOverrideClickToRateTextToggle', name: 'allowOverrideClickToRateText', on: field.allowOverrideClickToRateText, errors: field.getErrors('allowOverrideClickToRateText') }) }}
+    {{ forms.lightswitchField({ label: 'Text Below Widget (After Rating)'|t('engagement'), id: 'allowOverrideYourRatingTextToggle', name: 'allowOverrideYourRatingText', on: field.allowOverrideYourRatingText, errors: field.getErrors('allowOverrideYourRatingText') }) }}
   </div>
 </details>

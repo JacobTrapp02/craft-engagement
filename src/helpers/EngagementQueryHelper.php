@@ -106,7 +106,7 @@ class EngagementQueryHelper
             'likes' => "COALESCE((SELECT lAgg.likeCount $base LIMIT 1), 0)",
             'dislikes' => "COALESCE((SELECT lAgg.dislikeCount $base LIMIT 1), 0)",
             'totalVotes' => "COALESCE((SELECT (lAgg.likeCount + lAgg.dislikeCount) $base LIMIT 1), 0)",
-            'score' => "COALESCE((SELECT (CAST(lAgg.likeCount AS SIGNED) - CAST(lAgg.dislikeCount AS SIGNED)) $base LIMIT 1), 0)",
+            'score' => "COALESCE((SELECT (CAST(lAgg.likeCount AS DECIMAL(20,0)) - CAST(lAgg.dislikeCount AS DECIMAL(20,0))) $base LIMIT 1), 0)",
             default => '0',
         };
     }

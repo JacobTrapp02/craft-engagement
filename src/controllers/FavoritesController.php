@@ -10,6 +10,7 @@ use jtdev\craftengagement\models\FavoritesEntry;
 use jtdev\craftengagement\Plugin;
 use jtdev\craftengagement\records\FavoritesAggregateRecord;
 use Throwable;
+use yii\db\IntegrityException;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -61,12 +62,16 @@ class FavoritesController extends Controller
 
         $aggregate = $aggregateService->getByElementFieldSite($elementId, $fieldId, $siteId);
         if ($aggregate === null) {
-            $aggregate = $aggregateService->add(new FavoritesAggregate([
-                'elementId' => $elementId,
-                'fieldId' => $fieldId,
-                'siteId' => $siteId,
-                'favoriteCount' => 0,
-            ]));
+            try {
+                $aggregate = $aggregateService->add(new FavoritesAggregate([
+                    'elementId' => $elementId,
+                    'fieldId' => $fieldId,
+                    'siteId' => $siteId,
+                    'favoriteCount' => 0,
+                ]));
+            } catch (IntegrityException) {
+                $aggregate = null;
+            }
 
             if ($aggregate === null) {
                 $aggregate = $aggregateService->getByElementFieldSite($elementId, $fieldId, $siteId);
@@ -106,16 +111,28 @@ class FavoritesController extends Controller
                 $isFavorited = false;
                 $favoriteCountDelta = -1;
             } else {
-                $savedEntry = $entryService->add(new FavoritesEntry([
-                    'aggregateId' => $aggregate->id,
-                    'userId' => $currentUser !== null ? (int)$currentUser->id : null,
-                    'sessionId' => $currentUser === null ? (string)$sessionId : null,
-                ]));
-                if ($savedEntry === null) {
-                    throw new BadRequestHttpException('Could not save favorite entry.');
+                try {
+                    $savedEntry = $entryService->add(new FavoritesEntry([
+                        'aggregateId' => $aggregate->id,
+                        'userId' => $currentUser !== null ? (int)$currentUser->id : null,
+                        'sessionId' => $currentUser === null ? (string)$sessionId : null,
+                    ]));
+                    if ($savedEntry === null) {
+                        throw new BadRequestHttpException('Could not save favorite entry.');
+                    }
+                    $isFavorited = true;
+                    $favoriteCountDelta = 1;
+                } catch (IntegrityException) {
+                    $savedEntry = $currentUser !== null
+                        ? $entryService->getByAggregateAndUserId($aggregate->id, (int)$currentUser->id)
+                        : $entryService->getByAggregateAndSessionId($aggregate->id, (string)$sessionId);
+
+                    if ($savedEntry === null) {
+                        throw new BadRequestHttpException('Could not save favorite entry.');
+                    }
+                    $isFavorited = true;
+                    $favoriteCountDelta = 0;
                 }
-                $isFavorited = $savedEntry !== null;
-                $favoriteCountDelta = $isFavorited ? 1 : 0;
             }
 
             FavoritesAggregateRecord::updateAllCounters([

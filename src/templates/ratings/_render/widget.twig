@@ -3,6 +3,7 @@
   Available Twig variables (inputs and overrides):
   - previewMode, elementId, fieldId, siteId
   - actionUrl, loginUrl, registerUrl
+  - guestInteractionMode, guestInteractionMessage, guestInteractionMessageHtml
   - isLoggedIn, guestAllowed
   - scale, average, roundedAverage, voteCount, userRating
   - icon, emojiIcon, customSvg
@@ -27,6 +28,9 @@
 {% set widgetUserRating = userRating ?? null %}
 {% set widgetLoginUrl = loginUrl ?? url('login') %}
 {% set widgetRegisterUrl = registerUrl ?? null %}
+{% set widgetGuestInteractionMode = guestInteractionMode ?? 'message' %}
+{% set widgetGuestInteractionMessage = guestInteractionMessage ?? 'Please log in or register to interact.'|t('engagement') %}
+{% set widgetGuestInteractionMessageHtml = guestInteractionMessageHtml ?? widgetGuestInteractionMessage %}
 {% set widgetHeadingText = headingText ?? null %}
 {% set widgetClickToRateText = clickToRateText ?? 'Click to rate'|t('engagement') %}
 {% set widgetYourRatingText = yourRatingText ?? 'Your rating: {userRating} / {scale}'|t('engagement') %}

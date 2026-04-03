@@ -373,10 +373,10 @@ class ModerationController extends Controller
     {
         switch ($sort) {
             case 'scoreAsc':
-                $query->orderBy(new Expression('(CAST([[lagg.likeCount]] AS SIGNED) - CAST([[lagg.dislikeCount]] AS SIGNED)) ASC, [[lagg.id]] DESC'));
+                $query->orderBy(new Expression('(CAST([[lagg.likeCount]] AS DECIMAL(20,0)) - CAST([[lagg.dislikeCount]] AS DECIMAL(20,0))) ASC, [[lagg.id]] DESC'));
                 return;
             case 'scoreDesc':
-                $query->orderBy(new Expression('(CAST([[lagg.likeCount]] AS SIGNED) - CAST([[lagg.dislikeCount]] AS SIGNED)) DESC, [[lagg.id]] DESC'));
+                $query->orderBy(new Expression('(CAST([[lagg.likeCount]] AS DECIMAL(20,0)) - CAST([[lagg.dislikeCount]] AS DECIMAL(20,0))) DESC, [[lagg.id]] DESC'));
                 return;
             case 'totalAsc':
                 $query->orderBy(new Expression('([[lagg.likeCount]] + [[lagg.dislikeCount]]) ASC, [[lagg.id]] DESC'));

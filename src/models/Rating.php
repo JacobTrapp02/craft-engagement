@@ -39,6 +39,7 @@ class Rating extends Model
                 Settings::ICON_HEART,
                 Settings::ICON_THUMBS,
                 Settings::ICON_CUSTOM_SVG,
+                'emoji',
             ]],
             [['emojiIcon', 'customSvg', 'headingText', 'clickToRateText', 'yourRatingText'], 'string'],
         ];

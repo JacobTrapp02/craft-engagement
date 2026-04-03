@@ -6,6 +6,7 @@
   - widgetPreviewMode
   - widgetElementId, widgetFieldId, widgetSiteId
   - widgetActionUrl, widgetLoginUrl, widgetRegisterUrl
+  - widgetGuestInteractionMode, widgetGuestInteractionMessage
   - widgetIsLoggedIn, widgetGuestAllowed
   - widgetScale, widgetUserRating
   - widgetAverage, widgetDisplayAverage, voteCount
@@ -23,11 +24,13 @@
   const headingEl = root.querySelector('[data-rating-heading]');
   const userEl = root.querySelector('[data-rating-user]');
   const overallFillEl = root.querySelector('[data-overall-fill]');
+  const overallWrapEl = root.querySelector('[data-overall-wrap]');
 
   const scale = Number(root.getAttribute('data-scale') || 5);
   const actionUrl = root.getAttribute('data-action-url');
   const loginUrl = root.getAttribute('data-login-url') || '/login';
-  const registerUrl = root.getAttribute('data-register-url') || '';
+  const guestInteractionMode = root.getAttribute('data-guest-interaction-mode') || 'message';
+  const guestInteractionMessageHtml = {{ (widgetGuestInteractionMessageHtml ?? '')|json_encode|raw }};
   const isLoggedIn = root.getAttribute('data-is-logged-in') === '1';
   const guestAllowed = root.getAttribute('data-guest-allowed') === '1';
   const elementId = Number(root.getAttribute('data-element-id'));
@@ -80,6 +83,34 @@
     headingEl.style.display = text ? '' : 'none';
   };
 
+  const handleBlockedGuestInteraction = () => {
+    if (isLoggedIn || guestAllowed) {
+      return false;
+    }
+
+    if (guestInteractionMode === 'redirect') {
+      window.location.href = loginUrl;
+      return true;
+    }
+
+    if (!root.querySelector('[data-guest-inline-message]')) {
+      const messageEl = document.createElement('div');
+      messageEl.setAttribute('data-guest-inline-message', '1');
+      messageEl.className = 'engagement-guest-message';
+      messageEl.innerHTML = guestInteractionMessageHtml || {{ 'Please log in or register to interact.'|t('engagement')|json_encode|raw }};
+
+      if (overallWrapEl) {
+        overallWrapEl.replaceWith(messageEl);
+      } else if (userEl) {
+        userEl.replaceWith(messageEl);
+      } else {
+        root.appendChild(messageEl);
+      }
+    }
+
+    return true;
+  };
+
   if (selected > 0) {
     setUserText(formatText(yourTemplate, { userRating: selected, scale }));
   } else {
@@ -95,15 +126,7 @@
 
   buttons.forEach((btn) => {
     btn.addEventListener('click', async () => {
-      if (!isLoggedIn && !guestAllowed) {
-        const goLogin = window.confirm(registerUrl
-          ? {{ 'Please log in to rate this. Click OK to log in or Cancel to register.'|t('engagement')|json_encode|raw }}
-          : {{ 'Please log in to rate this.'|t('engagement')|json_encode|raw }});
-        if (goLogin) {
-          window.location.href = loginUrl;
-        } else if (registerUrl) {
-          window.location.href = registerUrl;
-        }
+      if (handleBlockedGuestInteraction()) {
         return;
       }
 
