@@ -1,6 +1,14 @@
 {% import '_includes/forms.twig' as forms %}
 
-<details class="eng-disclosure">
+{% set hasIconAppearanceErrors =
+  field.getErrors('icon')|length
+  or field.getErrors('emojiIcon')|length
+  or field.getErrors('customSvg')|length
+  or field.getErrors('beforeFavoriteColor')|length
+  or field.getErrors('afterFavoriteColor')|length
+%}
+
+<details class="eng-disclosure" {% if hasIconAppearanceErrors %}open{% endif %}>
   <summary>{{ 'Icon Appearance'|t('engagement') }}</summary>
   <div class="field eng-group-card">
     <div class="instructions"><p>{{ 'Set icon colors before and after favoriting.'|t('engagement') }}</p></div>

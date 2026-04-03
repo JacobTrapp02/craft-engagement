@@ -1,6 +1,12 @@
 {% import '_includes/forms.twig' as forms %}
 
-<details class="eng-disclosure">
+{% set hasIconAppearanceErrors =
+  field.getErrors('icon')|length
+  or field.getErrors('emojiIcon')|length
+  or field.getErrors('customSvg')|length
+%}
+
+<details class="eng-disclosure" {% if hasIconAppearanceErrors %}open{% endif %}>
   <summary>{{ 'Icon Appearance'|t('engagement') }}</summary>
   <div class="field eng-group-card">
     <div class="instructions"><p>{{ 'Choose how rating icons are displayed. Pick an icon mode, then configure the matching input below.'|t('engagement') }}</p></div>

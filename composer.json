@@ -1,6 +1,6 @@
 {
   "name": "jt-dev/craft-engagement",
-  "description": "User engagment -- customizable ratings, likes, and favorites",
+  "description": "User engagement -- customizable ratings, likes, and favorites",
   "type": "craft-plugin",
   "license": "proprietary",
   "support": {

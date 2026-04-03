@@ -4,7 +4,7 @@
   - widgetUid
   - widgetPreviewMode
   - widgetElementId, widgetFieldId, widgetSiteId
-  - widgetActionUrl, widgetLoginUrl, widgetRegisterUrl
+  - widgetActionUrl, widgetLoginUrl
   - widgetGuestInteractionMode, widgetGuestInteractionMessageHtml
   - widgetIsLoggedIn, widgetGuestAllowed
   - widgetScale, widgetUserRating
@@ -21,7 +21,6 @@
   data-site-id="{{ widgetSiteId|e('html_attr') }}"
   data-action-url="{{ widgetActionUrl|e('html_attr') }}"
   data-login-url="{{ widgetLoginUrl|e('html_attr') }}"
-  data-register-url="{{ widgetRegisterUrl ? widgetRegisterUrl|e('html_attr') : '' }}"
   data-guest-interaction-mode="{{ widgetGuestInteractionMode|e('html_attr') }}"
   data-is-logged-in="{{ widgetIsLoggedIn ? '1' : '0' }}"
   data-guest-allowed="{{ widgetGuestAllowed ? '1' : '0' }}"

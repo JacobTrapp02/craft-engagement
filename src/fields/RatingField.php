@@ -32,8 +32,8 @@ class RatingField extends Field
      */
     public ?bool $allowEntryTextOverrides = null;
 
-    public bool $defaultEnabled = true;
-    public bool $allowEditorOverrides = true;
+    public bool $defaultEnabled = false;
+    public bool $allowEditorOverrides = false;
     public bool $allowOverrideScale = true;
     public bool $allowOverrideIconAppearance = true;
     public bool $allowOverrideWidgetEnabled = true;
@@ -125,6 +125,9 @@ class RatingField extends Field
         ], 'boolean'];
         $rules[] = [['allowGuestRatings', 'allowUserRatingChange'], 'boolean'];
         $rules[] = [['emojiIcon', 'customSvg', 'headingText', 'clickToRateText', 'yourRatingText'], 'string'];
+        $rules[] = [['emojiIcon'], 'required', 'when' => function(): bool {
+            return $this->icon === self::ICON_EMOJI;
+        }];
         $rules[] = [['customSvg'], 'required', 'when' => function(): bool {
             return $this->icon === Settings::ICON_CUSTOM_SVG;
         }];
@@ -138,6 +141,13 @@ class RatingField extends Field
         $maxScale = $this->maxScale();
         if ($this->scale > $maxScale) {
             $this->scale = $maxScale;
+        }
+
+        if ($this->icon === self::ICON_EMOJI) {
+            $this->emojiIcon = trim($this->emojiIcon);
+            if ($this->emojiIcon === '') {
+                $this->emojiIcon = '⭐';
+            }
         }
 
         return parent::beforeSave($isNew);

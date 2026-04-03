@@ -22,15 +22,6 @@
     errors: settings.getErrors('loginRedirectParam'),
 }) }}
 
-{{ forms.textField({
-    label: 'Register URL (Optional)'|t('engagement'),
-    instructions: 'If set, widgets can offer registration when guests try to interact.'|t('engagement'),
-    id: 'registerUrl',
-    name: 'registerUrl',
-    value: settings.registerUrl,
-    errors: settings.getErrors('registerUrl'),
-}) }}
-
 {{ forms.selectField({
     label: 'Guest Interaction Behavior'|t('engagement'),
     instructions: 'When guests click ratings, likes, or favorites that require login, choose whether to show a message or immediately redirect to login.'|t('engagement'),

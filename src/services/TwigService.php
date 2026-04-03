@@ -96,7 +96,6 @@ class TwigService extends Component
             'guestAllowed' => (bool)($data['allowGuestRatings'] ?? false),
             'userRating' => $userRating,
             'loginUrl' => $this->resolveLoginUrl(),
-            'registerUrl' => $this->resolveRegisterUrl(),
             'guestInteractionMode' => $this->resolveGuestInteractionMode(),
             'guestInteractionMessage' => $this->resolveGuestInteractionMessage(),
             'guestInteractionMessageHtml' => $this->resolveGuestInteractionMessageHtml(),
@@ -154,7 +153,6 @@ class TwigService extends Component
             'guestAllowed' => (bool)($data['allowGuestInteractions'] ?? false),
             'userVote' => $userVote,
             'loginUrl' => $this->resolveLoginUrl(),
-            'registerUrl' => $this->resolveRegisterUrl(),
             'guestInteractionMode' => $this->resolveGuestInteractionMode(),
             'guestInteractionMessage' => $this->resolveGuestInteractionMessage(),
             'guestInteractionMessageHtml' => $this->resolveGuestInteractionMessageHtml(),
@@ -212,7 +210,6 @@ class TwigService extends Component
             'guestAllowed' => (bool)($data['allowGuestInteractions'] ?? false),
             'isFavorited' => $isFavorited,
             'loginUrl' => $this->resolveLoginUrl(),
-            'registerUrl' => $this->resolveRegisterUrl(),
             'guestInteractionMode' => $this->resolveGuestInteractionMode(),
             'guestInteractionMessage' => $this->resolveGuestInteractionMessage(),
             'guestInteractionMessageHtml' => $this->resolveGuestInteractionMessageHtml(),
@@ -408,18 +405,6 @@ class TwigService extends Component
         }
 
         return $url;
-    }
-
-    private function resolveRegisterUrl(): ?string
-    {
-        $settings = $this->settings();
-        $registerUrl = $settings->registerUrl;
-
-        if (!is_string($registerUrl) || trim($registerUrl) === '') {
-            return null;
-        }
-
-        return $this->normalizeUrl($registerUrl);
     }
 
     private function resolveGuestInteractionMode(): string

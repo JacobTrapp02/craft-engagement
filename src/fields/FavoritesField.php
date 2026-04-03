@@ -41,8 +41,8 @@ class FavoritesField extends Field
      */
     public ?string $displayMode = null;
 
-    public bool $defaultEnabled = true;
-    public bool $allowEditorOverrides = true;
+    public bool $defaultEnabled = false;
+    public bool $allowEditorOverrides = false;
     public bool $allowOverrideIconAppearance = true;
     public bool $allowOverrideIconColors = true;
     public bool $allowOverrideWidgetEnabled = true;

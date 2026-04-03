@@ -1,6 +1,17 @@
 {% import '_includes/forms.twig' as forms %}
 
-<details class="eng-disclosure">
+{% set hasIconAppearanceErrors =
+  field.getErrors('icon')|length
+  or field.getErrors('likeEmojiIcon')|length
+  or field.getErrors('dislikeEmojiIcon')|length
+  or field.getErrors('customSvg')|length
+  or field.getErrors('beforeLikeColor')|length
+  or field.getErrors('afterLikeColor')|length
+  or field.getErrors('beforeDislikeColor')|length
+  or field.getErrors('afterDislikeColor')|length
+%}
+
+<details class="eng-disclosure" {% if hasIconAppearanceErrors %}open{% endif %}>
   <summary>{{ 'Icon Appearance'|t('engagement') }}</summary>
   <div class="field eng-group-card">
     <div class="instructions"><p>{{ 'Set icon colors before and after a vote. These apply to icon mode states (like/dislike and favorited/unfavorited).'|t('engagement') }}</p></div>
