@@ -1,17 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Engagement plugin icon">
   <defs>
-    <linearGradient id="eng-bg" x1="12" y1="12" x2="116" y2="116" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#22C55E"/>
-      <stop offset="1" stop-color="#16A34A"/>
+    <linearGradient id="eng-bg" x1="16" y1="12" x2="112" y2="118" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3DDC7A"/>
+      <stop offset="0.58" stop-color="#22C55E"/>
+      <stop offset="1" stop-color="#159447"/>
+    </linearGradient>
+    <radialGradient id="eng-bg-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+      gradientTransform="translate(64 28) rotate(90) scale(82 102)">
+      <stop offset="0" stop-color="#B8F5CE" stop-opacity="0.45"/>
+      <stop offset="0.4" stop-color="#8AE8AF" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#8AE8AF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="eng-star" x1="64" y1="18" x2="64" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E8F0EB"/>
+    </linearGradient>
+    <linearGradient id="eng-thumb" x1="45" y1="47" x2="77" y2="84" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2FD36A"/>
+      <stop offset="1" stop-color="#159447"/>
     </linearGradient>
   </defs>
 
   <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#eng-bg)"/>
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#eng-bg-glow)"/>
+  <rect x="9.5" y="9.5" width="109" height="109" rx="26.5" fill="none" stroke="#C8F8D8" stroke-opacity="0.28" stroke-width="1.4"/>
+  <path d="M12 94c9 10 23 16 38 16h28c15 0 29-6 38-16v-6H12v6z" fill="#0E8A42" fill-opacity="0.18"/>
 
-  <path fill="#FFFFFF" d="M64 18 77.4 45.1 107 49.4 85.5 70.3 90.6 99.8 64 85.8 37.4 99.8 42.5 70.3 21 49.4 50.6 45.1 64 18Z"/>
+  <path fill="url(#eng-star)" d="M64 18 77.4 45.1 107 49.4 85.5 70.3 90.6 99.8 64 85.8 37.4 99.8 42.5 70.3 21 49.4 50.6 45.1 64 18Z"/>
+  <path fill="none" stroke="#D9E8DF" stroke-opacity="0.68" stroke-width="0.9" d="M64 19.4 76.6 44.8 104.4 48.9 84.2 68.6 89 96.4 64 83.2 39 96.4 43.8 68.6 23.6 48.9 51.4 44.8 64 19.4Z"/>
 
   <g transform="translate(45.1 46.7) scale(1.575)">
-    <path fill="#16A34A" d="M9 10V6a2.5 2.5 0 1 1 5 0v3h4a2 2 0 0 1 1.92 2.56l-1.5 5A2.5 2.5 0 0 1 16 18.5H9a2 2 0 0 1-2-2V10h2z"/>
-    <path fill="#16A34A" d="M4 10h3v8H4z"/>
+    <path fill="url(#eng-thumb)" d="M9 10V6a2.5 2.5 0 1 1 5 0v3h4a2 2 0 0 1 1.92 2.56l-1.5 5A2.5 2.5 0 0 1 16 18.5H9a2 2 0 0 1-2-2V10h2z"/>
+    <path fill="url(#eng-thumb)" d="M4 10h3v8H4z"/>
+    <path fill="none" stroke="#83F0AD" stroke-opacity="0.45" stroke-width="0.7" d="M9.4 10.4V6.4A2.1 2.1 0 0 1 13 4.9c.36.35.56.83.56 1.34v3.16h4.24a1.57 1.57 0 0 1 1.2.57c.3.36.4.84.26 1.29l-1.5 5a2.07 2.07 0 0 1-1.98 1.7H9a1.57 1.57 0 0 1-1.56-1.56v-6.1M4.4 10.4h2.2v7.2h-2.2z"/>
   </g>
 </svg>

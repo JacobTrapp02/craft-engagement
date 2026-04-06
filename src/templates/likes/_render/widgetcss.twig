@@ -15,6 +15,7 @@
 #}
 [data-engagement-likes] {
   text-align: center;
+  font-family: inherit;
 }
 
 [data-engagement-likes] [data-likes-heading] {
@@ -39,8 +40,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 5px;
   line-height: 1;
+  font: inherit;
+  font-size: 13px;
+  color: #334155;
+}
+
+[data-engagement-likes] [data-like-label],
+[data-engagement-likes] [data-dislike-label] {
+  font-size: 13px;
 }
 
 [data-engagement-likes] [data-like-label]:empty,

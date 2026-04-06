@@ -60,7 +60,7 @@
   >
     {% if widgetIcon != 'none' %}
       {% if widgetIcon == 'emoji' and favoriteEmojiLooksThumb %}
-      <span data-favorite-icon data-thumb-active="{{ widgetIsFavorited ? '1' : '0' }}" style="position:relative; display:inline-flex; width:18px; height:18px; color:#111827;">
+      <span data-favorite-icon data-thumb-active="{{ widgetIsFavorited ? '1' : '0' }}" style="position:relative; display:inline-flex; width:16px; height:16px; color:#111827;">
         <span data-thumb-outline style="position:absolute; inset:0; color:#94a3b8; opacity:{{ widgetIsFavorited ? '0' : '1' }};">{{ favoriteEmojiIsThumbDown ? thumbOutlineDownSvg|raw : thumbOutlineUpSvg|raw }}</span>
         <span data-thumb-fill style="position:absolute; inset:0; color:#111827; opacity:{{ widgetIsFavorited ? '1' : '0' }};">{{ favoriteEmojiIsThumbDown ? thumbFilledDownSvg|raw : thumbFilledUpSvg|raw }}</span>
       </span>
