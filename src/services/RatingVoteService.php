@@ -75,7 +75,7 @@ class RatingVoteService extends Component
         array $criteria = [],
         ?array $orderBy = ['id' => SORT_DESC],
         ?int $limit = null,
-        ?int $offset = null
+        ?int $offset = null,
     ): array {
         $query = RatingVoteRecord::find()->where($criteria);
 

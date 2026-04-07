@@ -8,8 +8,8 @@ use craft\elements\User;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use jtdev\craftengagement\Plugin;
-use jtdev\craftengagement\records\FavoritesEntryRecord;
 use jtdev\craftengagement\records\FavoritesAggregateRecord;
+use jtdev\craftengagement\records\FavoritesEntryRecord;
 use jtdev\craftengagement\records\LikesAggregateRecord;
 use jtdev\craftengagement\records\LikesVoteRecord;
 use jtdev\craftengagement\records\RatingAggregateRecord;
@@ -142,6 +142,7 @@ class ModerationController extends Controller
                 'pageSize' => $perPage,
                 'pageParam' => 'p',
             ]);
+            /** @var RatingVoteRecord[] $votes */
             $votes = $votesQuery->offset($pagination->offset)->limit($pagination->limit)->all();
 
             $users = $this->usersById(array_map(static fn($vote): ?int => $vote->userId !== null ? (int)$vote->userId : null, $votes));
@@ -171,6 +172,7 @@ class ModerationController extends Controller
                 'pageSize' => $perPage,
                 'pageParam' => 'p',
             ]);
+            /** @var LikesVoteRecord[] $votes */
             $votes = $votesQuery->offset($pagination->offset)->limit($pagination->limit)->all();
 
             $users = $this->usersById(array_map(static fn($vote): ?int => $vote->userId !== null ? (int)$vote->userId : null, $votes));
@@ -199,6 +201,7 @@ class ModerationController extends Controller
             'pageSize' => $perPage,
             'pageParam' => 'p',
         ]);
+        /** @var FavoritesEntryRecord[] $rows */
         $rows = $entriesQuery->offset($pagination->offset)->limit($pagination->limit)->all();
 
         $users = $this->usersById(array_map(static fn($row): ?int => $row->userId !== null ? (int)$row->userId : null, $rows));

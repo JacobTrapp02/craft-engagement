@@ -203,7 +203,6 @@ class Install extends Migration
                 'SET NULL',
                 'CASCADE'
             );
-
         }
 
         if (!$this->db->tableExists('{{%engagement_favorites_aggregate}}')) {
@@ -298,7 +297,6 @@ class Install extends Migration
                 'SET NULL',
                 'CASCADE'
             );
-
         }
 
         return true;

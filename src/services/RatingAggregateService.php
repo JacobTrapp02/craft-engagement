@@ -3,8 +3,8 @@
 namespace jtdev\craftengagement\services;
 
 use craft\base\Component;
-use jtdev\craftengagement\Plugin;
 use jtdev\craftengagement\models\RatingAggregate;
+use jtdev\craftengagement\Plugin;
 use jtdev\craftengagement\records\RatingAggregateRecord;
 
 /**
@@ -84,7 +84,7 @@ class RatingAggregateService extends Component
         array $criteria = [],
         ?array $orderBy = ['id' => SORT_DESC],
         ?int $limit = null,
-        ?int $offset = null
+        ?int $offset = null,
     ): array {
         $query = RatingAggregateRecord::find()->where($criteria);
 

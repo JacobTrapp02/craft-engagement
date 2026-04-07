@@ -7,6 +7,10 @@ use DateTime;
 
 /**
  * Ratings aggregate model.
+ *
+ * @property-read float $average
+ * @property-read float $percentage
+ * @property-read float $roundedAverage
  */
 class RatingAggregate extends Model
 {

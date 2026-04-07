@@ -75,7 +75,7 @@ class FavoritesEntryService extends Component
         array $criteria = [],
         ?array $orderBy = ['id' => SORT_DESC],
         ?int $limit = null,
-        ?int $offset = null
+        ?int $offset = null,
     ): array {
         $query = FavoritesEntryRecord::find()->where($criteria);
 

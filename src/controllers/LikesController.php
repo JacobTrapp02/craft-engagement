@@ -137,7 +137,7 @@ class LikesController extends Controller
                 if ($savedVote === null) {
                     throw new BadRequestHttpException('Could not save like/dislike vote.');
                 }
-                $userVote = $savedVote?->value;
+                $userVote = $savedVote->value;
                 if ((int)$existingVote->value === 1) {
                     $likeCountDelta = -1;
                     $dislikeCountDelta = 1;
@@ -156,7 +156,7 @@ class LikesController extends Controller
                     if ($savedVote === null) {
                         throw new BadRequestHttpException('Could not save like/dislike vote.');
                     }
-                    $userVote = $savedVote?->value;
+                    $userVote = $savedVote->value;
                     if ($value === 1) {
                         $likeCountDelta = 1;
                     } else {

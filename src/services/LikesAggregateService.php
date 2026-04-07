@@ -84,7 +84,7 @@ class LikesAggregateService extends Component
         array $criteria = [],
         ?array $orderBy = ['id' => SORT_DESC],
         ?int $limit = null,
-        ?int $offset = null
+        ?int $offset = null,
     ): array {
         $query = LikesAggregateRecord::find()->where($criteria);
 

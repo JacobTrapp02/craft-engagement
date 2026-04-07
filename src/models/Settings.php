@@ -22,7 +22,7 @@ class Settings extends Model
     public string $guestInteractionMessage = 'Please log in or register to interact.';
 
     /**
-     * @return array<string, mixed>
+     * @return array<int, array<int|string, mixed>>
      */
     public function rules(): array
     {

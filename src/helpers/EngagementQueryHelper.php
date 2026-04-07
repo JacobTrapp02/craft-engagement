@@ -127,6 +127,7 @@ class EngagementQueryHelper
 
     public static function rewriteOrderBy(ElementQuery $query): void
     {
+        /** @var mixed $orderBy */
         $orderBy = $query->orderBy;
         if ($orderBy === null || $orderBy === [] || $orderBy === '') {
             return;

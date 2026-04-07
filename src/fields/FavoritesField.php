@@ -274,7 +274,7 @@ class FavoritesField extends Field
         if (array_key_exists('enabled', $value)) {
             $enabled = EngagementQueryHelper::toBool($value['enabled']);
             if ($enabled !== null) {
-                $enabledCondition = self::enabledQueryCondition($instances, $params, $enabled);
+                $enabledCondition = self::enabledQueryCondition($instances, $enabled);
                 if ($enabledCondition === false) {
                     return false;
                 }
@@ -429,11 +429,11 @@ class FavoritesField extends Field
         return $stored;
     }
 
-    private static function enabledQueryCondition(array $instances, array &$params, bool $enabled): array|string|false|null
+    private static function enabledQueryCondition(array $instances, bool $enabled): string|false|null
     {
-        /** @var self $field */
+        /** @var self|null $field */
         $field = $instances[0] ?? null;
-        if ($field === null) {
+        if (!$field instanceof self) {
             return null;
         }
 
@@ -444,7 +444,10 @@ class FavoritesField extends Field
             return $defaultEnabled === $enabled ? null : false;
         }
 
-        $valueSql = self::valueSql($instances, null, $params);
+        $valueSql = self::valueSql($instances);
+        if ($valueSql === null) {
+            return null;
+        }
         $needle = $enabled ? '"enabled":true' : '"enabled":false';
         $condition = "(($valueSql) LIKE '%$needle%')";
 

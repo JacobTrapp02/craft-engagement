@@ -6,6 +6,9 @@ use craft\base\Model;
 
 /**
  * Read model exposed by the rating field in Twig.
+ *
+ * @property-read float $percentage
+ * @property-read float $roundedAverage
  */
 class Rating extends Model
 {
