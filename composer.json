@@ -7,7 +7,7 @@
     "email": "jake.trapp02@gmail.com",
     "issues": "https://github.com/jacobtrapp02/craft-engagement/issues?state=open",
     "source": "https://github.com/jacobtrapp02/craft-engagement",
-    "docs": "https://github.com/jacobtrapp02/craft-engagement",
+    "docs": "https://www.jtdevelop.com/development/plugins/engagement",
     "rss": "https://github.com/jacobtrapp02/craft-engagement/releases.atom"
   },
   "require": {
@@ -27,7 +27,7 @@
     "handle": "engagement",
     "name": "Engagement",
     "developer": "JTDev",
-    "documentationUrl": "https://github.com/jacobtrapp02/craft-engagement"
+    "documentationUrl": "https://www.jtdevelop.com/development/plugins/engagement"
   },
   "scripts": {
     "check-cs": "ecs check --ansi",
