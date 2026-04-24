@@ -19,13 +19,6 @@ If you want higher dwell time, clearer audience signals, and easy social proof w
 - Craft CMS 5+
 - PHP 8.2+
 
-## Installation
-
-```bash
-composer require jt-dev/craft-engagement
-./craft plugin/install engagement
-```
-
 ## Documentation
 
-Full technical documentation is available in `documentation.txt` in this repository.
+Full technical documentation is available at https://www.jtdevelop.com/development/plugins/engagement
