@@ -1,9 +1,7 @@
 {% js %}
 (() => {
-  if (window.__engagementSharedFieldAssetsBound) {
-    return;
-  }
-  window.__engagementSharedFieldAssetsBound = true;
+  window.__engagementSharedFieldAssets = window.__engagementSharedFieldAssets || {};
+  const sharedState = window.__engagementSharedFieldAssets;
 
   const toSixDigitHex = (value) => {
     if (typeof value !== 'string') {
@@ -68,56 +66,92 @@
     });
   };
 
-  const bindEntryRoots = () => {
-    const roots = document.querySelectorAll('[data-rating-entry-settings], [data-like-entry-settings], [data-favorite-entry-settings]');
+  const syncEntryPanels = (root) => {
+    if (!(root instanceof HTMLElement)) {
+      return;
+    }
+    const select = root.querySelector('[data-entry-icon-mode-source="1"]');
+    if (!(select instanceof HTMLSelectElement)) {
+      return;
+    }
+    const mode = select.value;
+    const panels = root.querySelectorAll('[data-entry-icon-mode-panel]');
+    panels.forEach((panel) => {
+      if (panel instanceof HTMLElement) {
+        panel.style.display = panel.dataset.entryIconModePanel === mode ? '' : 'none';
+      }
+    });
+  };
+
+  const initEntryRoots = (scope = document) => {
+    const roots = scope.querySelectorAll('[data-rating-entry-settings], [data-like-entry-settings], [data-favorite-entry-settings]');
     roots.forEach((root) => {
       if (!(root instanceof HTMLElement)) {
         return;
       }
-
-      const select = root.querySelector('[data-entry-icon-mode-source="1"]');
-      const syncPanels = () => {
-        if (!(select instanceof HTMLSelectElement)) {
-          return;
-        }
-        const mode = select.value;
-        const panels = root.querySelectorAll('[data-entry-icon-mode-panel]');
-        panels.forEach((panel) => {
-          if (panel instanceof HTMLElement) {
-            panel.style.display = panel.dataset.entryIconModePanel === mode ? '' : 'none';
-          }
-        });
-      };
-
-      if (select instanceof HTMLSelectElement && select.dataset.engPanelsBound !== '1') {
-        select.dataset.engPanelsBound = '1';
-        select.addEventListener('change', syncPanels);
-      }
-
       bindColorPairs(root);
-      syncPanels();
-      requestAnimationFrame(syncPanels);
+      syncEntryPanels(root);
+      requestAnimationFrame(() => syncEntryPanels(root));
     });
   };
 
-  document.addEventListener('change', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-    if (target.matches('[data-icon-mode-source="1"]')) {
-      syncSettingsIconPanels();
-    }
-  });
-
-  bindColorPairs(document);
-  bindEntryRoots();
-  syncSettingsIconPanels();
-  requestAnimationFrame(() => {
+  const initAll = () => {
     bindColorPairs(document);
-    bindEntryRoots();
+    initEntryRoots(document);
     syncSettingsIconPanels();
-  });
+    requestAnimationFrame(() => {
+      bindColorPairs(document);
+      initEntryRoots(document);
+      syncSettingsIconPanels();
+    });
+  };
+
+  if (!sharedState.listenersBound) {
+    sharedState.listenersBound = true;
+
+    document.addEventListener('change', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+
+      if (target.matches('[data-icon-mode-source="1"]')) {
+        syncSettingsIconPanels();
+      }
+
+      if (target.matches('[data-entry-icon-mode-source="1"]')) {
+        const root = target.closest('[data-rating-entry-settings], [data-like-entry-settings], [data-favorite-entry-settings]');
+        if (root instanceof HTMLElement) {
+          syncEntryPanels(root);
+        }
+      }
+    });
+
+    sharedState.observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (!(node instanceof HTMLElement)) {
+            return;
+          }
+
+          if (node.matches('[data-rating-entry-settings], [data-like-entry-settings], [data-favorite-entry-settings]')) {
+            bindColorPairs(node);
+            syncEntryPanels(node);
+            requestAnimationFrame(() => syncEntryPanels(node));
+          } else {
+            bindColorPairs(node);
+            initEntryRoots(node);
+          }
+        });
+      });
+    });
+
+    if (document.body) {
+      sharedState.observer.observe(document.body, { childList: true, subtree: true });
+    }
+  }
+
+  initAll();
 })();
 {% endjs %}
 
