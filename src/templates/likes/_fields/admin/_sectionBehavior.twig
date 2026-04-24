@@ -1,9 +1,23 @@
 {% import '_includes/forms.twig' as forms %}
+{% import 'engagement/_partials/helpTooltip.twig' as help %}
+
+{% set guestInteractionDocsUrl = 'https://www.jtdevelop.com/development/plugins/engagement/guest-and-user-interaction' %}
+{% set pluginSettingsUrl = '/admin/settings/plugins/engagement' %}
+{% set helpSource = {
+    sourceUrl: guestInteractionDocsUrl,
+    sourceLabel: 'Guest & User Interaction docs'|t('engagement'),
+} %}
+{% set behaviorHelp = {
+    allowGuestInteractions: 'Allows logged-out visitors to like or dislike content for this field. When this is off, guests follow the global Guest Interaction Behavior from the [Engagement plugin settings]({url}), where you can choose whether blocked guests see a message or get redirected to login.'|t('engagement', {
+        url: pluginSettingsUrl,
+    }),
+} %}
 
 <details class="eng-disclosure">
   <summary>{{ 'Like/Dislike Behavior'|t('engagement') }}</summary>
   {{ forms.lightswitchField({
       label: 'Default Enabled State'|t('engagement'),
+      instructions: 'Whether the like/dislike widget is shown by default on new entries.'|t('engagement'),
       id: 'defaultEnabled',
       name: 'defaultEnabled',
       on: field.defaultEnabled,
@@ -11,7 +25,7 @@
   }) }}
 
   {{ forms.lightswitchField({
-      label: 'Allow Guest Interactions'|t('engagement'),
+      label: 'Allow Guest Interactions'|t('engagement') ~ help.tooltip(behaviorHelp.allowGuestInteractions, helpSource),
       id: 'allowGuestInteractions',
       name: 'allowGuestInteractions',
       on: field.allowGuestInteractions,
@@ -20,6 +34,7 @@
 
   {{ forms.lightswitchField({
       label: 'Allow Users to Change Their Vote'|t('engagement'),
+      instructions: 'Whether visitors can update their vote after submitting one.'|t('engagement'),
       id: 'allowUserVoteChange',
       name: 'allowUserVoteChange',
       on: field.allowUserVoteChange,

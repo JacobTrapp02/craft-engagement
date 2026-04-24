@@ -1,4 +1,14 @@
 {% import '_includes/forms.twig' as forms %}
+{% import 'engagement/_partials/helpTooltip.twig' as help %}
+
+{% set favoritesDocsUrl = 'https://www.jtdevelop.com/development/plugins/engagement/favorites#favorites-field-settings' %}
+{% set helpSource = {
+    sourceUrl: favoritesDocsUrl,
+    sourceLabel: 'Favorites field settings docs'|t('engagement'),
+} %}
+{% set iconHelp = {
+    iconMode: 'Chooses the visual style used for the favorite button. Native icons use the built-in heart or star options. Emoji uses the selected emoji. Custom SVG uses your SVG markup. The color fields below control the button state before and after an item is favorited.'|t('engagement'),
+} %}
 
 {% set hasIconAppearanceErrors =
   field.getErrors('icon')|length
@@ -13,7 +23,7 @@
   <div class="field eng-group-card">
     <div class="instructions"><p>{{ 'Set icon colors before and after favoriting.'|t('engagement') }}</p></div>
     {{ forms.selectField({
-        label: 'Icon Mode'|t('engagement'),
+        label: 'Icon Mode'|t('engagement') ~ help.tooltip(iconHelp.iconMode, helpSource),
         id: 'icon',
         name: 'icon',
         options: iconOptions,

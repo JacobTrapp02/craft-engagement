@@ -2,9 +2,31 @@
 {# @var settings \jtdev\craftengagement\models\Settings #}
 
 {% import '_includes/forms.twig' as forms %}
+{% import 'engagement/_partials/helpTooltip.twig' as help %}
+
+{% set docsUrl = 'https://www.jtdevelop.com/development/plugins/engagement' %}
+{% set guestInteractionDocsUrl = docsUrl ~ '/guest-and-user-interaction' %}
+{% set helpSource = {
+    sourceUrl: guestInteractionDocsUrl,
+    sourceLabel: 'Guest & User Interaction docs'|t('engagement'),
+} %}
+{% set settingHelp = {
+    loginUrl: 'The front-end URL guests are sent to when an interaction requires an account and the plugin is configured to redirect blocked guests. This can be a site path such as `login` or an absolute URL. When the redirect parameter below is enabled, the current page URL is appended to this login URL.'|t('engagement'),
+    loginRedirectParam: 'The optional query-string key used to send users back to the page they were viewing after login. For example, `redirect` produces a login URL like `login?redirect={currentUrl}`. Leave this blank when your login flow does not support return URLs or when you want guests to land on the plain login page.'|t('engagement'),
+    guestInteractionMode: 'Controls what happens when a guest clicks a Ratings, Likes/Dislikes, or Favorites widget that does not allow guest interaction. **Show Message on Click** replaces the widget action with the guest message. **Auto-Redirect to Login** sends the guest to the login URL immediately.'|t('engagement'),
+    guestInteractionMessage: 'The inline message shown when guest interactions are blocked and Guest Interaction Behavior is set to **Show Message on Click**. Basic HTML links are allowed, so you can send users to login, registration, or account-help pages, for example `<a href="/login">Log in</a>`.'|t('engagement'),
+} %}
+
+{{ help.styles() }}
+
+<p>
+    {{ 'Need help understanding things or getting started? Visit the [Engagement documentation]({url}).'|t('engagement', {
+        url: guestInteractionDocsUrl,
+    })|cpmd }}
+</p>
 
 {{ forms.textField({
-    label: 'Login URL'|t('engagement'),
+    label: 'Login URL'|t('engagement') ~ help.tooltip(settingHelp.loginUrl, helpSource),
     instructions: 'Where users should be sent when they need to log in. Can be a path (for example, login) or full URL.'|t('engagement'),
     id: 'loginUrl',
     name: 'loginUrl',
@@ -14,7 +36,7 @@
 }) }}
 
 {{ forms.textField({
-    label: 'Login Redirect Param'|t('engagement'),
+    label: 'Login Redirect Param'|t('engagement') ~ help.tooltip(settingHelp.loginRedirectParam, helpSource),
     instructions: 'Optional query parameter used to return users after login (for example, redirect). Leave blank to disable.'|t('engagement'),
     id: 'loginRedirectParam',
     name: 'loginRedirectParam',
@@ -23,7 +45,7 @@
 }) }}
 
 {{ forms.selectField({
-    label: 'Guest Interaction Behavior'|t('engagement'),
+    label: 'Guest Interaction Behavior'|t('engagement') ~ help.tooltip(settingHelp.guestInteractionMode, helpSource),
     instructions: 'When guests click ratings, likes, or favorites that require login, choose whether to show a message or immediately redirect to login.'|t('engagement'),
     id: 'guestInteractionMode',
     name: 'guestInteractionMode',
@@ -36,7 +58,7 @@
 }) }}
 
 {{ forms.textareaField({
-    label: 'Guest Interaction Message'|t('engagement'),
+    label: 'Guest Interaction Message'|t('engagement') ~ help.tooltip(settingHelp.guestInteractionMessage, helpSource),
     instructions: 'Message shown inline when Guest Interaction Behavior is set to Show Message on Click. Supports basic HTML links (for example, <a href="/login">Log in</a>).'|t('engagement'),
     id: 'guestInteractionMessage',
     name: 'guestInteractionMessage',

@@ -1,8 +1,20 @@
 {# @var field \jtdev\craftengagement\fields\FavoritesField #}
 
+{% import 'engagement/_partials/helpTooltip.twig' as help %}
+
+{% set favoritesDocsUrl = 'https://www.jtdevelop.com/development/plugins/engagement/favorites' %}
+
+{{ help.styles() }}
+
+<p>
+    {{ 'Need help setting up favorites? Visit the [Favorites documentation]({url}).'|t('engagement', {
+        url: favoritesDocsUrl,
+    })|cpmd }}
+</p>
+
 {% include 'engagement/favorites/_fields/_widgetPreview.twig' with {
     title: 'Widget Preview'|t('engagement'),
-    instructions: 'Live preview of the favorites widget before and after interaction.'|t('engagement'),
+    instructions: 'Live preview of the favorites widget before and after interaction. Preview uses sample favorite data.'|t('engagement'),
     elementId: 1,
     fieldId: 1,
     siteId: 1,

@@ -1,8 +1,21 @@
 {% import '_includes/forms.twig' as forms %}
+{% import 'engagement/_partials/helpTooltip.twig' as help %}
+
+{% set guestInteractionDocsUrl = 'https://www.jtdevelop.com/development/plugins/engagement/guest-and-user-interaction' %}
+{% set pluginSettingsUrl = '/admin/settings/plugins/engagement' %}
+{% set helpSource = {
+    sourceUrl: guestInteractionDocsUrl,
+    sourceLabel: 'Guest & User Interaction docs'|t('engagement'),
+} %}
+{% set behaviorHelp = {
+    allowGuestInteractions: 'Allows logged-out visitors to favorite or unfavorite content for this field. When this is off, guests follow the global Guest Interaction Behavior from the [Engagement plugin settings]({url}), where you can choose whether blocked guests see a message or get redirected to login.'|t('engagement', {
+        url: pluginSettingsUrl,
+    }),
+} %}
 
 <details class="eng-disclosure">
   <summary>{{ 'Favorite Behavior'|t('engagement') }}</summary>
-  {{ forms.lightswitchField({ label: 'Default Enabled State'|t('engagement'), id: 'defaultEnabled', name: 'defaultEnabled', on: field.defaultEnabled, errors: field.getErrors('defaultEnabled') }) }}
+  {{ forms.lightswitchField({ label: 'Default Enabled State'|t('engagement'), instructions: 'Whether the favorite widget is shown by default on new entries.'|t('engagement'), id: 'defaultEnabled', name: 'defaultEnabled', on: field.defaultEnabled, errors: field.getErrors('defaultEnabled') }) }}
 
-  {{ forms.lightswitchField({ label: 'Allow Guest Interactions'|t('engagement'), id: 'allowGuestInteractions', name: 'allowGuestInteractions', on: field.allowGuestInteractions, errors: field.getErrors('allowGuestInteractions') }) }}
+  {{ forms.lightswitchField({ label: 'Allow Guest Interactions'|t('engagement') ~ help.tooltip(behaviorHelp.allowGuestInteractions, helpSource), id: 'allowGuestInteractions', name: 'allowGuestInteractions', on: field.allowGuestInteractions, errors: field.getErrors('allowGuestInteractions') }) }}
 </details>

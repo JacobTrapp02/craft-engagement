@@ -1,9 +1,21 @@
 {# @var field \jtdev\craftengagement\fields\RatingField #}
 {# @var maxScale int #}
 
+{% import 'engagement/_partials/helpTooltip.twig' as help %}
+
+{% set ratingDocsUrl = 'https://www.jtdevelop.com/development/plugins/engagement/ratings#field-settings' %}
+
+{{ help.styles() }}
+
+<p>
+    {{ 'Need help setting up ratings? Visit the [Ratings documentation]({url}).'|t('engagement', {
+        url: ratingDocsUrl,
+    })|cpmd }}
+</p>
+
 {% include 'engagement/ratings/_fields/_widgetPreview.twig' with {
     title: 'Widget Preview'|t('engagement'),
-    instructions: 'Live preview of how the widget will look before and after rating.'|t('engagement'),
+    instructions: 'Live preview of how the widget will look before and after rating. Preview uses sample rating data.'|t('engagement'),
     elementId: 1,
     fieldId: 1,
     siteId: 1,

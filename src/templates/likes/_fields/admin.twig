@@ -1,8 +1,20 @@
 {# @var field \jtdev\craftengagement\fields\LikesField #}
 
+{% import 'engagement/_partials/helpTooltip.twig' as help %}
+
+{% set likesDocsUrl = 'https://www.jtdevelop.com/development/plugins/engagement/likes-and-dislikes#likes-field-settings' %}
+
+{{ help.styles() }}
+
+<p>
+    {{ 'Need help setting up likes and dislikes? Visit the [Likes/Dislikes documentation]({url}).'|t('engagement', {
+        url: likesDocsUrl,
+    })|cpmd }}
+</p>
+
 {% include 'engagement/likes/_fields/_widgetPreview.twig' with {
     title: 'Widget Preview'|t('engagement'),
-    instructions: 'Live preview of the like/dislike widget before and after interaction.'|t('engagement'),
+    instructions: 'Live preview of the like/dislike widget before and after interaction. Preview uses sample vote data.'|t('engagement'),
     elementId: 1,
     fieldId: 1,
     siteId: 1,

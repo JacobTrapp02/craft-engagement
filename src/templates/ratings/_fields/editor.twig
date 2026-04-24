@@ -41,7 +41,7 @@
   {% if canShowWidgetPreview %}
     {% include 'engagement/ratings/_fields/_widgetPreview.twig' with {
         title: 'Widget Preview'|t('engagement'),
-        instructions: null,
+        instructions: 'Live preview of how the widget will look before and after rating. Preview uses sample rating data.'|t('engagement'),
         elementId: 1,
         fieldId: field.id ?? 1,
         siteId: craft.app.sites.currentSite.id,

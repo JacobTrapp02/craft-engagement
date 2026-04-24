@@ -36,7 +36,7 @@
   {% if canShowWidgetPreview %}
     {% include 'engagement/likes/_fields/_widgetPreview.twig' with {
         title: 'Widget Preview'|t('engagement'),
-        instructions: null,
+        instructions: 'Live preview of the like/dislike widget before and after interaction. Preview uses sample vote data.'|t('engagement'),
         elementId: 1,
         fieldId: field.id ?? 1,
         siteId: craft.app.sites.currentSite.id,

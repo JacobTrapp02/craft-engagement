@@ -1,0 +1,123 @@
+{% macro styles() %}
+  <style>
+    .eng-help-tooltip {
+      display: inline-flex;
+      position: relative;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .eng-help-tooltip__trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      border: 1px solid #cdd8e4;
+      border-radius: 50%;
+      background: #f3f7fc;
+      color: #4b5c6b;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: help;
+    }
+
+    .eng-help-tooltip__trigger:hover,
+    .eng-help-tooltip__trigger:focus {
+      border-color: #8fa6bd;
+      background: #e9f1f9;
+      color: #1f2d3d;
+      outline: none;
+    }
+
+    .eng-help-tooltip__content {
+      display: none;
+      position: absolute;
+      z-index: 100;
+      top: calc(100% + 8px);
+      left: 50%;
+      width: min(360px, calc(100vw - 48px));
+      padding: 12px 14px;
+      border: 1px solid #cdd8e4;
+      border-radius: 6px;
+      background: #fff;
+      box-shadow: 0 12px 28px rgb(31 45 61 / 16%);
+      color: #1f2d3d;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.45;
+      text-align: left;
+      transform: translateX(-50%);
+      white-space: normal;
+    }
+
+    .eng-help-tooltip__content::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      border-top: 1px solid #cdd8e4;
+      border-left: 1px solid #cdd8e4;
+      background: #fff;
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    .eng-help-tooltip:hover .eng-help-tooltip__content,
+    .eng-help-tooltip:focus-within .eng-help-tooltip__content {
+      display: block;
+    }
+
+    .eng-help-tooltip__content p {
+      margin: 0 0 8px;
+    }
+
+    .eng-help-tooltip__content p:last-child,
+    .eng-help-tooltip__content pre:last-child {
+      margin-bottom: 0;
+    }
+
+    .eng-help-tooltip__content code {
+      white-space: normal;
+    }
+
+    .eng-help-tooltip__source {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid #e3e9ef;
+      color: #5f6c76;
+      font-size: 12px;
+    }
+  </style>
+{% endmacro %}
+
+{% macro tooltip(content, options) %}
+  {% set options = options ?? {} %}
+  {% set id = options.id ?? "eng-help-tooltip-#{random()}" %}
+  {% set label = options.label ?? 'More information'|t('engagement') %}
+  {% set sourceUrl = options.sourceUrl ?? null %}
+  {% set sourceLabel = options.sourceLabel ?? 'Documentation'|t('engagement') %}
+
+  <div class="eng-help-tooltip">
+    <button
+      type="button"
+      class="eng-help-tooltip__trigger"
+      aria-label="{{ label }}"
+      aria-describedby="{{ id }}"
+    >?</button>
+    <div id="{{ id }}" class="eng-help-tooltip__content" role="tooltip">
+      {{ content|cpmd }}
+      {% if sourceUrl %}
+        <div class="eng-help-tooltip__source">
+          {{ 'Source: [{label}]({url})'|t('engagement', {
+            label: sourceLabel,
+            url: sourceUrl,
+          })|cpmd }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endmacro %}

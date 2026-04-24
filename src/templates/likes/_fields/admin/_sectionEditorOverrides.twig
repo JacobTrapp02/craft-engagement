@@ -1,12 +1,24 @@
 {% import '_includes/forms.twig' as forms %}
+{% import 'engagement/_partials/helpTooltip.twig' as help %}
+
+{% set likesDocsUrl = 'https://www.jtdevelop.com/development/plugins/engagement/likes-and-dislikes#likes-field-settings' %}
+{% set helpSource = {
+    sourceUrl: likesDocsUrl,
+    sourceLabel: 'Likes/Dislikes field settings docs'|t('engagement'),
+} %}
+{% set overrideHelp = {
+    allowEditorOverrides: 'Master switch for per-entry like/dislike controls. When this is off, entries use the field defaults exactly as configured here.'|t('engagement'),
+} %}
 
 <details class="eng-disclosure">
   <summary>{{ 'Editor Overrides'|t('engagement') }}</summary>
   <div class="eng-editor-master">
-    {{ forms.lightswitchField({ label: 'Allow Editor Overrides'|t('engagement'), id: 'allowEditorOverridesToggle', name: 'allowEditorOverrides', on: field.allowEditorOverrides, errors: field.getErrors('allowEditorOverrides') }) }}
+    {{ forms.lightswitchField({ label: 'Allow Editor Overrides'|t('engagement') ~ help.tooltip(overrideHelp.allowEditorOverrides, helpSource), instructions: 'Master switch. Turn this on to allow any per-entry overrides.'|t('engagement'), id: 'allowEditorOverridesToggle', name: 'allowEditorOverrides', on: field.allowEditorOverrides, errors: field.getErrors('allowEditorOverrides') }) }}
   </div>
 
   <div class="eng-group-card eng-subgroup-card">
+    <div class="heading"><label>{{ 'Editor Override Permissions'|t('engagement') }}</label></div>
+    <div class="instructions"><p>{{ 'Choose which settings editors can change on individual entries.'|t('engagement') }}</p></div>
     {{ forms.lightswitchField({ label: 'Enable/Disable Widget Per Entry'|t('engagement'), id: 'allowOverrideWidgetEnabledToggle', name: 'allowOverrideWidgetEnabled', on: field.allowOverrideWidgetEnabled, errors: field.getErrors('allowOverrideWidgetEnabled') }) }}
     {{ forms.lightswitchField({ label: 'Show Widget Preview to Editors'|t('engagement'), id: 'allowOverrideWidgetPreviewToggle', name: 'allowOverrideWidgetPreview', on: field.allowOverrideWidgetPreview, errors: field.getErrors('allowOverrideWidgetPreview') }) }}
     {{ forms.lightswitchField({ label: 'Icon Appearance'|t('engagement'), id: 'allowOverrideIconAppearanceToggle', name: 'allowOverrideIconAppearance', on: field.allowOverrideIconAppearance, errors: field.getErrors('allowOverrideIconAppearance') }) }}

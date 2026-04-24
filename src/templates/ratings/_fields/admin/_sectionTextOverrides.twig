@@ -3,7 +3,10 @@
 <details class="eng-disclosure">
   <summary>{{ 'Text Overrides'|t('engagement') }}</summary>
   <div class="field eng-group-card">
-    <div class="instructions"><p>{{ 'Optional. Supports tokens: {userRating}, {votes}, {average}, {roundedAverage}, {scale}, {fieldName}.'|t('engagement') }}</p></div>
+    <div class="instructions">
+      <p>{{ 'Optional. Supports tokens: {userRating}, {votes}, {average}, {roundedAverage}, {scale}, {fieldName}.'|t('engagement') }}</p>
+      <p>{{ 'Example: Your rating: {userRating} / {scale}'|t('engagement') }}</p>
+    </div>
 
     {{ forms.textField({
         label: 'Text Above Widget'|t('engagement'),

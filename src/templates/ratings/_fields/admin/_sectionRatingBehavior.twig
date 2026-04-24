@@ -1,4 +1,17 @@
 {% import '_includes/forms.twig' as forms %}
+{% import 'engagement/_partials/helpTooltip.twig' as help %}
+
+{% set ratingDocsUrl = 'https://www.jtdevelop.com/development/plugins/engagement/guest-and-user-interaction' %}
+{% set guestInteractionDocsUrl = '/admin/settings/plugins/engagement' %}
+{% set helpSource = {
+    sourceUrl: ratingDocsUrl,
+    sourceLabel: 'Ratings field settings docs'|t('engagement'),
+} %}
+{% set ratingHelp = {
+    allowGuestRatings: 'Allows logged-out visitors to submit ratings for this field. When this is off, guests follow the global Guest Interaction Behavior from the [Engagement plugin settings]({url}), where you can choose whether blocked guests see a message or get redirected to login.'|t('engagement', {
+        url: guestInteractionDocsUrl,
+    }),
+} %}
 
 <details class="eng-disclosure">
   <summary>{{ 'Rating Behavior'|t('engagement') }}</summary>
@@ -17,7 +30,7 @@
 
   {{ forms.lightswitchField({
       label: 'Default Enabled State'|t('engagement'),
-      instructions: 'Whether ratings are enabled by default on newly-created elements.'|t('engagement'),
+      instructions: 'Whether the rating widget is shown by default on new entries.'|t('engagement'),
       id: 'defaultEnabled',
       name: 'defaultEnabled',
       on: field.defaultEnabled,
@@ -25,7 +38,7 @@
   }) }}
 
   {{ forms.lightswitchField({
-      label: 'Allow Guest Ratings'|t('engagement'),
+      label: 'Allow Guest Ratings'|t('engagement') ~ help.tooltip(ratingHelp.allowGuestRatings, helpSource),
       id: 'allowGuestRatings',
       name: 'allowGuestRatings',
       on: field.allowGuestRatings,
@@ -34,6 +47,7 @@
 
   {{ forms.lightswitchField({
       label: 'Allow Users to Change Their Rating'|t('engagement'),
+      instructions: 'Whether visitors can update their rating after submitting one.'|t('engagement'),
       id: 'allowUserRatingChange',
       name: 'allowUserRatingChange',
       on: field.allowUserRatingChange,

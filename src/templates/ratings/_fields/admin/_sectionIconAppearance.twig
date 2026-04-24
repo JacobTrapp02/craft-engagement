@@ -1,4 +1,14 @@
 {% import '_includes/forms.twig' as forms %}
+{% import 'engagement/_partials/helpTooltip.twig' as help %}
+
+{% set ratingDocsUrl = 'https://www.jtdevelop.com/development/plugins/engagement/ratings#field-settings' %}
+{% set helpSource = {
+    sourceUrl: ratingDocsUrl,
+    sourceLabel: 'Ratings field settings docs'|t('engagement'),
+} %}
+{% set iconHelp = {
+    iconMode: 'Chooses the visual style used for each rating step. Native icons use the built-in star, heart, or thumbs options. Emoji uses the selected emoji. Custom SVG repeats your SVG across the full rating scale.'|t('engagement'),
+} %}
 
 {% set hasIconAppearanceErrors =
   field.getErrors('icon')|length
@@ -12,7 +22,7 @@
     <div class="instructions"><p>{{ 'Choose how rating icons are displayed. Pick an icon mode, then configure the matching input below.'|t('engagement') }}</p></div>
 
     {{ forms.selectField({
-        label: 'Icon Mode'|t('engagement'),
+        label: 'Icon Mode'|t('engagement') ~ help.tooltip(iconHelp.iconMode, helpSource),
         id: 'icon',
         name: 'icon',
         options: iconOptions,

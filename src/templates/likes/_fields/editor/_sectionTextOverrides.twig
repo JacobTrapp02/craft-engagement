@@ -3,7 +3,10 @@
 <details class="eng-disclosure">
   <summary>{{ 'Text Overrides'|t('engagement') }}</summary>
   <div class="field eng-group-card">
-    <div class="instructions"><p>{{ 'Optional. Supports tokens: {likes}, {dislikes}, {fieldName}, {elementId}, {userVote}.'|t('engagement') }}</p></div>
+    <div class="instructions">
+      <p>{{ 'Optional. Supports tokens: {likes}, {dislikes}, {fieldName}, {elementId}, {userVote}.'|t('engagement') }}</p>
+      <p>{{ 'Example: {likes} likes / {dislikes} dislikes'|t('engagement') }}</p>
+    </div>
     {% if field.allowOverrideHeadingText %}
       {{ forms.textField({ label: 'Text Above Widget'|t('engagement'), id: prefix ~ '-heading-text', name: prefix ~ '[headingText]', value: like.headingText }) }}
     {% endif %}

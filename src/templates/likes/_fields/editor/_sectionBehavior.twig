@@ -3,10 +3,10 @@
 <details class="eng-disclosure">
   <summary>{{ 'Like/Dislike Behavior'|t('engagement') }}</summary>
   {% if canOverrideGuests %}
-    {{ forms.lightswitchField({ label: 'Allow Guest Interactions'|t('engagement'), id: prefix ~ '-allow-guest', name: prefix ~ '[allowGuestInteractions]', on: like.allowGuestInteractions }) }}
+    {{ forms.lightswitchField({ label: 'Allow Guest Interactions'|t('engagement'), instructions: 'Whether logged-out visitors can like or dislike this entry.'|t('engagement'), id: prefix ~ '-allow-guest', name: prefix ~ '[allowGuestInteractions]', on: like.allowGuestInteractions }) }}
   {% endif %}
 
   {% if canOverrideVoteChange %}
-    {{ forms.lightswitchField({ label: 'Allow Users To Change Vote'|t('engagement'), id: prefix ~ '-allow-vote-change', name: prefix ~ '[allowUserVoteChange]', on: like.allowVoteChange }) }}
+    {{ forms.lightswitchField({ label: 'Allow Users To Change Vote'|t('engagement'), instructions: 'Whether visitors can update their vote after submitting one.'|t('engagement'), id: prefix ~ '-allow-vote-change', name: prefix ~ '[allowUserVoteChange]', on: like.allowVoteChange }) }}
   {% endif %}
 </details>

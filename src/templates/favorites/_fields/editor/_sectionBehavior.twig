@@ -3,6 +3,6 @@
 <details class="eng-disclosure">
   <summary>{{ 'Favorite Behavior'|t('engagement') }}</summary>
   {% if canOverrideGuests %}
-    {{ forms.lightswitchField({ label: 'Allow Guest Interactions'|t('engagement'), id: prefix ~ '-allow-guest', name: prefix ~ '[allowGuestInteractions]', on: favorite.allowGuestInteractions }) }}
+    {{ forms.lightswitchField({ label: 'Allow Guest Interactions'|t('engagement'), instructions: 'Whether logged-out visitors can favorite or unfavorite this entry.'|t('engagement'), id: prefix ~ '-allow-guest', name: prefix ~ '[allowGuestInteractions]', on: favorite.allowGuestInteractions }) }}
   {% endif %}
 </details>

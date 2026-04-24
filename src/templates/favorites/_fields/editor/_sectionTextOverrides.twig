@@ -3,7 +3,10 @@
 <details class="eng-disclosure">
   <summary>{{ 'Text Overrides'|t('engagement') }}</summary>
   <div class="field eng-group-card">
-    <div class="instructions"><p>{{ 'Optional. Supports tokens: {favorites}, {favoriteCount}, {fieldName}, {elementId}, {isFavorited}.'|t('engagement') }}</p></div>
+    <div class="instructions">
+      <p>{{ 'Optional. Supports tokens: {favorites}, {favoriteCount}, {fieldName}, {elementId}, {isFavorited}.'|t('engagement') }}</p>
+      <p>{{ 'Example: {favoriteCount} favorites'|t('engagement') }}</p>
+    </div>
     {% if field.allowOverrideHeadingText %}
       {{ forms.textField({ label: 'Text Above Widget'|t('engagement'), id: prefix ~ '-heading-text', name: prefix ~ '[headingText]', value: favorite.headingText }) }}
     {% endif %}

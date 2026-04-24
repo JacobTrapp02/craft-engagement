@@ -1,4 +1,14 @@
 {% import '_includes/forms.twig' as forms %}
+{% import 'engagement/_partials/helpTooltip.twig' as help %}
+
+{% set likesDocsUrl = 'https://www.jtdevelop.com/development/plugins/engagement/likes-and-dislikes#likes-field-settings' %}
+{% set helpSource = {
+    sourceUrl: likesDocsUrl,
+    sourceLabel: 'Likes/Dislikes field settings docs'|t('engagement'),
+} %}
+{% set iconHelp = {
+    iconMode: 'Chooses the visual style used for the like and dislike buttons. Native icons use the built-in thumbs option. Emoji uses the selected like and dislike emoji. Custom SVG uses separate SVG markup for each button. The color fields below control each button state: before like, after like, before dislike, and after dislike.'|t('engagement'),
+} %}
 
 {% set hasIconAppearanceErrors =
   field.getErrors('icon')|length
@@ -17,7 +27,7 @@
   <div class="field eng-group-card">
     <div class="instructions"><p>{{ 'Set icon colors before and after a vote. These apply to icon mode states (like/dislike and favorited/unfavorited).'|t('engagement') }}</p></div>
     {{ forms.selectField({
-        label: 'Icon Mode'|t('engagement'),
+        label: 'Icon Mode'|t('engagement') ~ help.tooltip(iconHelp.iconMode, helpSource),
         id: 'icon',
         name: 'icon',
         options: iconOptions,
