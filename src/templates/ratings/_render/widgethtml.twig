@@ -50,12 +50,12 @@
   <div data-overall-wrap>
     <div style="display:inline-block; position:relative; font-size:24px; line-height:1; margin-bottom:8px; --rating-cell-size:{{ iconCellSize }}px; --rating-cell-gap:{{ iconGap }}px;">
       {% if widgetIcon == 'customSvg' and widgetCustomSvg %}
-        <span style="display:inline-flex; gap:var(--rating-cell-gap); color:#cbd5e1;">
+        <span aria-hidden="true" style="display:inline-flex; gap:var(--rating-cell-gap); color:#cbd5e1;">
           {% for _ in 1..widgetScale %}
             <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); opacity:0.35;">{{ widgetCustomSvg|raw }}</span>
           {% endfor %}
         </span>
-        <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; color:#f59e0b; width:{{ fillPercent }}%;">
+        <span aria-hidden="true" data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; color:#f59e0b; width:{{ fillPercent }}%;">
           <span style="display:inline-flex; gap:var(--rating-cell-gap);">
             {% for _ in 1..widgetScale %}
               <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size);">{{ widgetCustomSvg|raw }}</span>
@@ -63,12 +63,12 @@
           </span>
         </span>
       {% elseif widgetIcon == 'emoji' and widgetEmojiIcon %}
-        <span style="display:inline-flex; gap:var(--rating-cell-gap);">
+        <span aria-hidden="true" style="display:inline-flex; gap:var(--rating-cell-gap);">
           {% for _ in 1..widgetScale %}
             <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center; opacity:0.3; filter:grayscale(1) saturate(0.2) brightness(0.85);">{{ widgetEmojiIcon }}</span>
           {% endfor %}
         </span>
-        <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; width:{{ fillPercent }}%;">
+        <span aria-hidden="true" data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; width:{{ fillPercent }}%;">
           <span style="display:inline-flex; gap:var(--rating-cell-gap);">
             {% for _ in 1..widgetScale %}
               <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center;">{{ widgetEmojiIcon }}</span>
@@ -76,12 +76,12 @@
           </span>
         </span>
       {% elseif widgetIcon == 'thumbs' %}
-        <span style="display:inline-flex; gap:var(--rating-cell-gap); color:#94a3b8;">
+        <span aria-hidden="true" style="display:inline-flex; gap:var(--rating-cell-gap); color:#94a3b8;">
           {% for _ in 1..widgetScale %}
             <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center;">{{ thumbOutlineSvg|raw }}</span>
           {% endfor %}
         </span>
-        <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; width:{{ fillPercent }}%;">
+        <span aria-hidden="true" data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; width:{{ fillPercent }}%;">
           <span style="display:inline-flex; gap:var(--rating-cell-gap); color:#111827;">
             {% for _ in 1..widgetScale %}
               <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center;">{{ thumbFilledSvg|raw }}</span>
@@ -89,12 +89,12 @@
           </span>
         </span>
       {% else %}
-        <span style="display:inline-flex; gap:var(--rating-cell-gap); color:#cbd5e1;">
+        <span aria-hidden="true" style="display:inline-flex; gap:var(--rating-cell-gap); color:#cbd5e1;">
           {% for _ in 1..widgetScale %}
             <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center;">{{ emptyGlyph }}</span>
           {% endfor %}
         </span>
-        <span data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; color:#f59e0b; width:{{ fillPercent }}%;">
+        <span aria-hidden="true" data-overall-fill style="position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; color:#f59e0b; width:{{ fillPercent }}%;">
           <span style="display:inline-flex; gap:var(--rating-cell-gap);">
             {% for _ in 1..widgetScale %}
               <span style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center;">{{ filledGlyph }}</span>
@@ -102,12 +102,15 @@
           </span>
         </span>
       {% endif %}
-      <div data-rating-stars style="position:absolute; left:0; top:0; display:inline-flex; gap:var(--rating-cell-gap); align-items:center;">
+      <div data-rating-stars role="radiogroup" aria-label="{{ (widgetHeadingTextRendered ?: (label ?? 'Rating'|t('engagement')))|striptags|e('html_attr') }}" style="position:absolute; left:0; top:0; display:inline-flex; gap:var(--rating-cell-gap); align-items:center;">
         {% for value in 1..widgetScale %}
           <button
             type="button"
             data-rating-value="{{ value }}"
-            aria-label="{{ 'Rate {value}'|t('engagement', { value: value }) }}"
+            role="radio"
+            aria-checked="{{ widgetUserRating == value ? 'true' : 'false' }}"
+            tabindex="{{ widgetUserRating is not null ? (widgetUserRating == value ? '0' : '-1') : (value == 1 ? '0' : '-1') }}"
+            aria-label="{{ 'Rate {value} of {scale}'|t('engagement', { value: value, scale: widgetScale }) }}"
             style="display:inline-flex; width:var(--rating-cell-size); height:var(--rating-cell-size); align-items:center; justify-content:center; border:none; background:transparent; margin:0; padding:0; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }} line-height:1; font-size:0; opacity:0;"
           >
           </button>
@@ -123,4 +126,5 @@
       {{ widgetClickToRateTextRendered }}
     {% endif %}
   </div>
+  <p class="engagement-sr-only" data-rating-status aria-live="polite" aria-atomic="true"></p>
 </div>

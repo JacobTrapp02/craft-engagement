@@ -52,20 +52,26 @@
     </div>
   {% endif %}
 
-  <div class="engagement-likes-control">
+  <div
+    class="engagement-likes-control"
+    role="group"
+    aria-label="{{ (widgetHeadingTextRendered ?: (label ?? 'Feedback'|t('engagement')))|striptags|e('html_attr') }}"
+  >
     <button
       type="button"
       data-like-btn="1"
+      aria-pressed="{{ widgetUserVote == 1 ? 'true' : 'false' }}"
+      aria-label="{{ (widgetLikeTextRendered ?: 'Like'|t('engagement'))|striptags|e('html_attr') }}"
       style="border:none; padding:6px 12px; background:{{ widgetUserVote == 1 ? widgetLikeAfterBg : widgetLikeBeforeBg }}; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }}"
     >
       {% if widgetIcon != 'none' %}
         {% set likeIconColor = widgetUserVote == 1 ? (widgetAfterLikeColor ?: '#111827') : (widgetBeforeLikeColor ?: '#64748b') %}
         {% if widgetIcon == 'thumbs' %}
-        <span data-like-icon data-thumb-active="{{ widgetUserVote == 1 ? '1' : '0' }}" style="position:relative; display:inline-flex; width:18px; height:18px;">
+        <span aria-hidden="true" data-like-icon data-thumb-active="{{ widgetUserVote == 1 ? '1' : '0' }}" style="position:relative; display:inline-flex; width:18px; height:18px;">
           <span data-thumb-outline style="position:absolute; inset:0; color:#94a3b8; opacity:{{ widgetUserVote == 1 ? '0' : '1' }};">{{ thumbOutlineUpSvg|raw }}</span>
           <span data-thumb-fill style="position:absolute; inset:0; color:currentColor; opacity:{{ widgetUserVote == 1 ? '1' : '0' }};">{{ thumbFilledUpSvg|raw }}</span>
         {% else %}
-        <span data-like-icon style="color:{{ likeIconColor }};">
+        <span aria-hidden="true" data-like-icon style="color:{{ likeIconColor }};">
         {% endif %}
         {% if widgetIcon == 'emoji' %}
           {{ widgetLikeEmojiIcon }}
@@ -84,16 +90,18 @@
     <button
       type="button"
       data-like-btn="-1"
+      aria-pressed="{{ widgetUserVote == -1 ? 'true' : 'false' }}"
+      aria-label="{{ (widgetDislikeTextRendered ?: 'Dislike'|t('engagement'))|striptags|e('html_attr') }}"
       style="border:none; padding:6px 12px; background:{{ widgetUserVote == -1 ? widgetDislikeAfterBg : widgetDislikeBeforeBg }}; {{ widgetPreviewMode ? 'cursor:default;' : 'cursor:pointer;' }}"
     >
       {% if widgetIcon != 'none' %}
         {% set dislikeIconColor = widgetUserVote == -1 ? (widgetAfterDislikeColor ?: '#111827') : (widgetBeforeDislikeColor ?: '#64748b') %}
         {% if widgetIcon == 'thumbs' %}
-        <span data-dislike-icon data-thumb-active="{{ widgetUserVote == -1 ? '1' : '0' }}" style="position:relative; display:inline-flex; width:18px; height:18px;">
+        <span aria-hidden="true" data-dislike-icon data-thumb-active="{{ widgetUserVote == -1 ? '1' : '0' }}" style="position:relative; display:inline-flex; width:18px; height:18px;">
           <span data-thumb-outline style="position:absolute; inset:0; color:#94a3b8; opacity:{{ widgetUserVote == -1 ? '0' : '1' }};">{{ thumbOutlineDownSvg|raw }}</span>
           <span data-thumb-fill style="position:absolute; inset:0; color:currentColor; opacity:{{ widgetUserVote == -1 ? '1' : '0' }};">{{ thumbFilledDownSvg|raw }}</span>
         {% else %}
-        <span data-dislike-icon style="color:{{ dislikeIconColor }};">
+        <span aria-hidden="true" data-dislike-icon style="color:{{ dislikeIconColor }};">
         {% endif %}
         {% if widgetIcon == 'emoji' %}
           {{ widgetDislikeEmojiIcon }}
@@ -107,4 +115,5 @@
       <span data-dislike-label>{{ widgetDislikeTextRendered }}</span>
     </button>
   </div>
+  <p class="engagement-sr-only" data-likes-status aria-live="polite" aria-atomic="true"></p>
 </div>

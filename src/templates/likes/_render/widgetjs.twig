@@ -26,6 +26,7 @@
   const headingEl = root.querySelector('[data-likes-heading]');
   const likeLabelEl = root.querySelector('[data-like-label]');
   const dislikeLabelEl = root.querySelector('[data-dislike-label]');
+  const statusEl = root.querySelector('[data-likes-status]');
   const likeIconEl = root.querySelector('[data-like-icon]');
   const dislikeIconEl = root.querySelector('[data-dislike-icon]');
   const iconMode = root.getAttribute('data-icon-mode') || 'thumbs';
@@ -41,6 +42,10 @@
   const beforeDislikeColor = {{ widgetBeforeDislikeColor|json_encode|raw }};
   const afterDislikeColor = {{ widgetAfterDislikeColor|json_encode|raw }};
   const fieldName = {{ (label ?? '')|json_encode|raw }};
+  const likeFallbackLabel = {{ 'Like'|t('engagement')|json_encode|raw }};
+  const dislikeFallbackLabel = {{ 'Dislike'|t('engagement')|json_encode|raw }};
+  const voteUpdatedText = {{ 'Vote updated.'|t('engagement')|json_encode|raw }};
+  const voteErrorText = {{ 'Could not update vote right now.'|t('engagement')|json_encode|raw }};
   const actionUrl = root.getAttribute('data-action-url');
   const loginUrl = root.getAttribute('data-login-url') || '/login';
   const guestInteractionMode = root.getAttribute('data-guest-interaction-mode') || 'message';
@@ -120,11 +125,17 @@
       likeBg = userVote === 1 ? (afterLikeColor || '#fff') : (beforeLikeColor || '#fff');
       likeBtn.style.background = likeBg;
       likeBtn.style.color = contrastTextColor(likeBg);
+      likeBtn.setAttribute('aria-pressed', userVote === 1 ? 'true' : 'false');
+      const likeText = likeLabelEl?.textContent?.trim() || likeFallbackLabel;
+      likeBtn.setAttribute('aria-label', likeText);
     }
     if (dislikeBtn instanceof HTMLElement) {
       dislikeBg = userVote === -1 ? (afterDislikeColor || '#fff') : (beforeDislikeColor || '#fff');
       dislikeBtn.style.background = dislikeBg;
       dislikeBtn.style.color = contrastTextColor(dislikeBg);
+      dislikeBtn.setAttribute('aria-pressed', userVote === -1 ? 'true' : 'false');
+      const dislikeText = dislikeLabelEl?.textContent?.trim() || dislikeFallbackLabel;
+      dislikeBtn.setAttribute('aria-label', dislikeText);
     }
     if (likeIconEl instanceof HTMLElement) {
       if (iconMode === 'thumbs') {
@@ -164,6 +175,17 @@
     }
   };
 
+  const announce = (message) => {
+    if (!(statusEl instanceof HTMLElement)) {
+      return;
+    }
+
+    statusEl.textContent = '';
+    window.requestAnimationFrame(() => {
+      statusEl.textContent = message;
+    });
+  };
+
   const handleBlockedGuestInteraction = () => {
     if (isLoggedIn || guestAllowed) {
       return false;
@@ -177,6 +199,7 @@
     if (!root.querySelector('[data-guest-inline-message]')) {
       const messageEl = document.createElement('div');
       messageEl.setAttribute('data-guest-inline-message', '1');
+      messageEl.setAttribute('role', 'alert');
       messageEl.className = 'engagement-guest-message';
       messageEl.innerHTML = guestInteractionMessageHtml || {{ 'Please log in or register to interact.'|t('engagement')|json_encode|raw }};
 
@@ -213,6 +236,7 @@
       });
 
       if (!response.ok) {
+        announce(voteErrorText);
         return;
       }
 
@@ -221,7 +245,9 @@
       likeCount = Number(data?.aggregate?.likeCount ?? 0);
       dislikeCount = Number(data?.aggregate?.dislikeCount ?? 0);
       refreshState();
+      announce(voteUpdatedText);
     } catch (e) {
+      announce(voteErrorText);
     }
   };
 

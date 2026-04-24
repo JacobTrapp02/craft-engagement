@@ -25,6 +25,7 @@
   const userEl = root.querySelector('[data-rating-user]');
   const overallFillEl = root.querySelector('[data-overall-fill]');
   const overallWrapEl = root.querySelector('[data-overall-wrap]');
+  const statusEl = root.querySelector('[data-rating-status]');
 
   const scale = Number(root.getAttribute('data-scale') || 5);
   const actionUrl = root.getAttribute('data-action-url');
@@ -37,6 +38,8 @@
   const fieldId = Number(root.getAttribute('data-field-id'));
   const siteId = Number(root.getAttribute('data-site-id'));
   const fieldName = {{ (label ?? '')|json_encode|raw }};
+  const ratingUpdatedText = {{ 'Rating updated.'|t('engagement')|json_encode|raw }};
+  const ratingErrorText = {{ 'Could not submit rating right now.'|t('engagement')|json_encode|raw }};
 
   let selected = Number({{ widgetUserRating is not null ? widgetUserRating : 0 }});
   const headingTemplate = {{ (widgetHeadingText ?? '')|json_encode|raw }};
@@ -83,6 +86,26 @@
     headingEl.style.display = text ? '' : 'none';
   };
 
+  const announce = (message) => {
+    if (!(statusEl instanceof HTMLElement)) {
+      return;
+    }
+
+    statusEl.textContent = '';
+    window.requestAnimationFrame(() => {
+      statusEl.textContent = message;
+    });
+  };
+
+  const updateRatingA11yState = (activeValue) => {
+    buttons.forEach((btn) => {
+      const value = Number(btn.getAttribute('data-rating-value') || 0);
+      const isActive = activeValue > 0 ? value === activeValue : value === 1;
+      btn.setAttribute('aria-checked', activeValue > 0 && value === activeValue ? 'true' : 'false');
+      btn.setAttribute('tabindex', isActive ? '0' : '-1');
+    });
+  };
+
   const handleBlockedGuestInteraction = () => {
     if (isLoggedIn || guestAllowed) {
       return false;
@@ -96,6 +119,7 @@
     if (!root.querySelector('[data-guest-inline-message]')) {
       const messageEl = document.createElement('div');
       messageEl.setAttribute('data-guest-inline-message', '1');
+      messageEl.setAttribute('role', 'alert');
       messageEl.className = 'engagement-guest-message';
       messageEl.innerHTML = guestInteractionMessageHtml || {{ 'Please log in or register to interact.'|t('engagement')|json_encode|raw }};
 
@@ -116,6 +140,7 @@
   } else {
     setUserText(formatText(clickTemplate, { scale }));
   }
+  updateRatingA11yState(selected);
   setHeadingText(formatText(headingTemplate, {
     userRating: selected,
     votes: initialVotes,
@@ -124,8 +149,7 @@
     scale,
   }));
 
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', async () => {
+  const submitRating = async (value) => {
       if (handleBlockedGuestInteraction()) {
         return;
       }
@@ -134,7 +158,6 @@
         return;
       }
 
-      const value = Number(btn.getAttribute('data-rating-value'));
       if (!value || value < 1 || value > scale) {
         return;
       }
@@ -153,13 +176,15 @@
 
         if (!response.ok) {
           if (userEl) {
-            userEl.textContent = {{ 'Could not submit rating right now.'|t('engagement')|json_encode|raw }};
+            userEl.textContent = ratingErrorText;
           }
+          announce(ratingErrorText);
           return;
         }
 
         const data = await response.json();
         selected = Number(data?.vote?.rating || value);
+        updateRatingA11yState(selected);
 
         if (data?.aggregate && overallFillEl) {
           const avgRaw = Number(data.aggregate.average ?? data.aggregate.roundedAverage ?? 0);
@@ -183,13 +208,49 @@
             roundedAverage: avgQuarter,
             scale,
           }));
+          announce(ratingUpdatedText);
         } else {
           setUserText(formatText(yourTemplate, { userRating: selected, scale }));
+          announce(ratingUpdatedText);
         }
       } catch (e) {
         if (userEl) {
-          userEl.textContent = {{ 'Could not submit rating right now.'|t('engagement')|json_encode|raw }};
+          userEl.textContent = ratingErrorText;
         }
+        announce(ratingErrorText);
+      }
+  };
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const value = Number(btn.getAttribute('data-rating-value'));
+      submitRating(value);
+    });
+
+    btn.addEventListener('keydown', (event) => {
+      const currentValue = Number(btn.getAttribute('data-rating-value') || 0);
+      let nextValue = currentValue;
+
+      if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+        nextValue = currentValue >= scale ? 1 : currentValue + 1;
+      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+        nextValue = currentValue <= 1 ? scale : currentValue - 1;
+      } else if (event.key === 'Home') {
+        nextValue = 1;
+      } else if (event.key === 'End') {
+        nextValue = scale;
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        submitRating(currentValue);
+        return;
+      } else {
+        return;
+      }
+
+      event.preventDefault();
+      const nextButton = root.querySelector(`[data-rating-value="${nextValue}"]`);
+      if (nextButton instanceof HTMLElement) {
+        nextButton.focus();
       }
     });
   });

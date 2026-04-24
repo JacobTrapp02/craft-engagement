@@ -24,6 +24,7 @@
   const headingEl = root.querySelector('[data-favorite-heading]');
   const labelEl = root.querySelector('[data-favorite-label]');
   const iconEl = root.querySelector('[data-favorite-icon]');
+  const statusEl = root.querySelector('[data-favorite-status]');
   const iconMode = root.getAttribute('data-icon-mode') || 'heart';
   const emojiIsThumb = root.getAttribute('data-emoji-is-thumb') === '1';
 
@@ -35,6 +36,9 @@
   const beforeFavoriteColor = {{ widgetBeforeFavoriteColor|json_encode|raw }};
   const afterFavoriteColor = {{ widgetAfterFavoriteColor|json_encode|raw }};
   const fieldName = {{ (label ?? '')|json_encode|raw }};
+  const fallbackFavoriteLabel = {{ 'Toggle favorite'|t('engagement')|json_encode|raw }};
+  const favoriteUpdatedText = {{ 'Favorite updated.'|t('engagement')|json_encode|raw }};
+  const favoriteErrorText = {{ 'Could not update favorite right now.'|t('engagement')|json_encode|raw }};
 
   const actionUrl = root.getAttribute('data-action-url');
   const loginUrl = root.getAttribute('data-login-url') || '/login';
@@ -109,6 +113,9 @@
       const favoriteBg = isFavorited ? (afterFavoriteColor || '#fff') : (beforeFavoriteColor || '#fff');
       button.style.background = favoriteBg;
       button.style.color = contrastTextColor(favoriteBg);
+      button.setAttribute('aria-pressed', isFavorited ? 'true' : 'false');
+      const labelText = labelEl?.textContent?.trim() || fallbackFavoriteLabel;
+      button.setAttribute('aria-label', labelText);
     }
     if (iconEl instanceof HTMLElement) {
       if (iconMode === 'emoji' && emojiIsThumb) {
@@ -129,6 +136,17 @@
     }
   };
 
+  const announce = (message) => {
+    if (!(statusEl instanceof HTMLElement)) {
+      return;
+    }
+
+    statusEl.textContent = '';
+    window.requestAnimationFrame(() => {
+      statusEl.textContent = message;
+    });
+  };
+
   const handleBlockedGuestInteraction = () => {
     if (isLoggedIn || guestAllowed) {
       return false;
@@ -142,6 +160,7 @@
     if (!root.querySelector('[data-guest-inline-message]')) {
       const messageEl = document.createElement('div');
       messageEl.setAttribute('data-guest-inline-message', '1');
+      messageEl.setAttribute('role', 'alert');
       messageEl.className = 'engagement-guest-message';
       messageEl.innerHTML = guestInteractionMessageHtml || {{ 'Please log in or register to interact.'|t('engagement')|json_encode|raw }};
 
@@ -177,6 +196,7 @@
       });
 
       if (!response.ok) {
+        announce(favoriteErrorText);
         return;
       }
 
@@ -184,7 +204,9 @@
       isFavorited = Boolean(data?.entry?.isFavorited ?? false);
       favoriteCount = Number(data?.aggregate?.favoriteCount ?? favoriteCount);
       refreshState();
+      announce(favoriteUpdatedText);
     } catch (e) {
+      announce(favoriteErrorText);
     }
   });
 

@@ -30,6 +30,14 @@
   min-height: 18px;
 }
 
+[data-engagement-rating] [data-rating-value]:focus-visible {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 2px;
+  border-radius: 4px;
+  opacity: 1 !important;
+  background: rgba(29, 78, 216, 0.14) !important;
+}
+
 [data-engagement-rating] .engagement-guest-message {
   display: inline-block;
   font-size: 13px;
@@ -44,4 +52,16 @@
 [data-engagement-rating] .engagement-guest-message a {
   color: #1d4ed8;
   text-decoration: underline;
+}
+
+[data-engagement-rating] .engagement-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
