@@ -32,7 +32,7 @@ class RatingField extends Field
      */
     public ?bool $allowEntryTextOverrides = null;
 
-    public bool $defaultEnabled = false;
+    public bool $defaultEnabled = true;
     public bool $allowEditorOverrides = false;
     public bool $allowOverrideScale = true;
     public bool $allowOverrideIconAppearance = true;
