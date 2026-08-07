@@ -1,3 +1,11 @@
+# Release Notes for Engagement
+## 1.0.2 - 2026-08-07
+- Added opt-in `mode: 'deferred'` rendering for Blitz-safe Ratings, Likes, and Favorites widgets.
+- Added the external `Engagement.init(root)` initializer and the bubbling `engagement:ready` browser event.
+- Added `craft.engagement.registerDeferredAssets()` for loading the initializer from a cached outer template.
+- Deferred widgets now carry token-free client configuration and fetch a fresh session CSRF token only when an allowed interaction is submitted.
+- HTML and CSS template overrides run in normal and deferred modes; JS overrides remain unchanged in normal mode and are intentionally omitted in deferred mode.
+
 ## 1.0.1 - 2026-04-24
 
 ### Fixed

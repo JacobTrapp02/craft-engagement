@@ -12,8 +12,11 @@
   - headingText, likeText, dislikeText
   - label
   - widgetTemplates (optional per-call overrides: html/css/js)
+  - widgetMode (`normal` or `deferred`), widgetConfig (CSRF-token-free client config)
 #}
-{% set widgetUid = random() %}
+{% set widgetMode = widgetMode ?? 'normal' %}
+{% set widgetConfig = widgetConfig ?? {} %}
+{% set widgetUid = widgetUid ?? random() %}
 {% set widgetPreviewMode = previewMode ?? false %}
 {% set widgetElementId = elementId ?? null %}
 {% set widgetFieldId = fieldId ?? null %}
@@ -99,9 +102,18 @@
 
 {% if widgetElementId and widgetFieldId %}
   <style>{{ craft.app.view.renderTemplate(widgetCssTemplate, _context, widgetCssTemplateMode)|raw }}</style>
-  {{ craft.app.view.renderTemplate(widgetHtmlTemplate, _context, widgetHtmlTemplateMode)|raw }}
+  {% if widgetMode == 'deferred' %}
+    <div
+      id="{{ widgetUid|e('html_attr') }}"
+      data-engagement-deferred
+      data-engagement-type="likes"
+      data-engagement-config="{{ widgetConfig|json_encode|e('html_attr') }}"
+    >{{ craft.app.view.renderTemplate(widgetHtmlTemplate, _context, widgetHtmlTemplateMode)|raw }}</div>
+  {% else %}
+    {{ craft.app.view.renderTemplate(widgetHtmlTemplate, _context, widgetHtmlTemplateMode)|raw }}
+  {% endif %}
 
-  {% if not widgetPreviewMode %}
+  {% if not widgetPreviewMode and widgetMode != 'deferred' %}
   <script>{{ craft.app.view.renderTemplate(widgetJsTemplate, _context, widgetJsTemplateMode)|raw }}</script>
   {% endif %}
 {% endif %}

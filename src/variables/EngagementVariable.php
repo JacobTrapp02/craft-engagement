@@ -10,6 +10,12 @@ use Twig\Markup;
  */
 class EngagementVariable
 {
+    /** Register the external deferred-widget initializer for this response. */
+    public function registerDeferredAssets(): void
+    {
+        Plugin::getInstance()->twig->registerDeferredAssets();
+    }
+
     /**
      * Render UI by inferring the field value type automatically.
      */

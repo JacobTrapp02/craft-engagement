@@ -11,6 +11,7 @@ use jtdev\craftengagement\models\Like;
 use jtdev\craftengagement\models\Rating;
 use jtdev\craftengagement\models\Settings;
 use jtdev\craftengagement\Plugin;
+use jtdev\craftengagement\web\assets\DeferredWidgetAsset;
 use Twig\Markup;
 use yii\helpers\HtmlPurifier;
 
@@ -61,11 +62,13 @@ class TwigService extends Component
         }
 
         $fieldName = $this->resolveFieldName($data['fieldId'] ?? null);
-        $currentUser = Craft::$app->getUser()->getIdentity();
-        $isLoggedIn = $currentUser !== null;
+        $widgetMode = $this->resolveWidgetMode($options);
+        $isShell = $widgetMode === 'shell';
+        $currentUser = $isShell ? null : Craft::$app->getUser()->getIdentity();
+        $isLoggedIn = !$isShell && $currentUser !== null;
         $userRating = null;
 
-        if (!empty($data['id'])) {
+        if (!$isShell && !empty($data['id'])) {
             if ($isLoggedIn) {
                 $vote = Plugin::getInstance()->ratingVotes->getByAggregateAndUserId((int)$data['id'], (int)$currentUser->id);
                 $userRating = $vote?->rating;
@@ -77,10 +80,30 @@ class TwigService extends Component
             }
         }
 
-        $html = $this->renderPluginTemplate('engagement/ratings/_render/widget.twig', [
-            'elementId' => $data['elementId'] ?? null,
-            'fieldId' => $data['fieldId'] ?? null,
-            'siteId' => $data['siteId'] ?? Craft::$app->getSites()->getCurrentSite()->id,
+        $context = $this->baseWidgetContext(
+            $data,
+            'rating',
+            'engagement/ratings/cast-rating',
+            $isLoggedIn,
+            (bool)($data['allowGuestRatings'] ?? false),
+        );
+        $context['widgetConfig'] = array_merge($context['widgetConfig'], [
+            'scale' => $data['scale'] ?? 5,
+            'userRating' => $userRating,
+            'average' => $data['average'] ?? 0,
+            'voteCount' => $data['voteCount'] ?? 0,
+            'headingText' => $data['headingText'] ?? '',
+            'clickToRateText' => $data['clickToRateText'] ?? '',
+            'yourRatingText' => $data['yourRatingText'] ?? '',
+            'fieldName' => $fieldName ?? Craft::t('engagement', 'Rating'),
+            'updatedText' => Craft::t('engagement', 'Rating updated.'),
+            'errorText' => Craft::t('engagement', 'Could not submit rating right now.'),
+        ]);
+
+        $html = $this->renderPluginTemplate('engagement/ratings/_render/widget.twig', array_merge($context, [
+            'widgetMode' => $widgetMode,
+            'widgetUid' => $widgetMode === 'deferred' ? $this->widgetUid('rating', $data) : null,
+            'previewMode' => $isShell,
             'label' => $fieldName ?? Craft::t('engagement', 'Rating'),
             'icon' => $data['icon'] ?? 'star',
             'emojiIcon' => $data['emojiIcon'] ?? '⭐',
@@ -92,16 +115,9 @@ class TwigService extends Component
             'headingText' => $data['headingText'] ?? null,
             'clickToRateText' => $data['clickToRateText'] ?? null,
             'yourRatingText' => $data['yourRatingText'] ?? null,
-            'isLoggedIn' => $isLoggedIn,
-            'guestAllowed' => (bool)($data['allowGuestRatings'] ?? false),
             'userRating' => $userRating,
-            'loginUrl' => $this->resolveLoginUrl(),
-            'guestInteractionMode' => $this->resolveGuestInteractionMode(),
-            'guestInteractionMessage' => $this->resolveGuestInteractionMessage(),
-            'guestInteractionMessageHtml' => $this->resolveGuestInteractionMessageHtml(),
-            'actionUrl' => UrlHelper::actionUrl('engagement/ratings/cast-rating'),
             'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
-        ]);
+        ]));
 
         return new Markup($html, Craft::$app->charset ?: 'UTF-8');
     }
@@ -130,10 +146,33 @@ class TwigService extends Component
             }
         }
 
-        $html = $this->renderPluginTemplate('engagement/likes/_render/widget.twig', [
-            'elementId' => $data['elementId'] ?? null,
-            'fieldId' => $data['fieldId'] ?? null,
-            'siteId' => $data['siteId'] ?? Craft::$app->getSites()->getCurrentSite()->id,
+        $widgetMode = $this->resolveWidgetMode($options);
+        $context = $this->baseWidgetContext(
+            $data,
+            'likes',
+            'engagement/likes/cast-like',
+            $isLoggedIn,
+            (bool)($data['allowGuestInteractions'] ?? false),
+        );
+        $context['widgetConfig'] = array_merge($context['widgetConfig'], [
+            'userVote' => $userVote,
+            'likeCount' => $data['likeCount'] ?? 0,
+            'dislikeCount' => $data['dislikeCount'] ?? 0,
+            'headingText' => $data['headingText'] ?? '',
+            'likeText' => $data['likeText'] ?? '',
+            'dislikeText' => $data['dislikeText'] ?? '',
+            'beforeLikeColor' => $data['beforeLikeColor'] ?? '',
+            'afterLikeColor' => $data['afterLikeColor'] ?? '',
+            'beforeDislikeColor' => $data['beforeDislikeColor'] ?? '',
+            'afterDislikeColor' => $data['afterDislikeColor'] ?? '',
+            'fieldName' => $fieldName ?? Craft::t('engagement', 'Likes'),
+            'updatedText' => Craft::t('engagement', 'Vote updated.'),
+            'errorText' => Craft::t('engagement', 'Could not update vote right now.'),
+        ]);
+
+        $html = $this->renderPluginTemplate('engagement/likes/_render/widget.twig', array_merge($context, [
+            'widgetMode' => $widgetMode,
+            'widgetUid' => $widgetMode === 'deferred' ? $this->widgetUid('likes', $data) : null,
             'label' => $fieldName ?? Craft::t('engagement', 'Likes'),
             'icon' => $data['icon'] ?? 'thumbs',
             'emojiIcon' => $data['emojiIcon'] ?? $data['likeEmojiIcon'] ?? '👍',
@@ -150,16 +189,9 @@ class TwigService extends Component
             'headingText' => $data['headingText'] ?? null,
             'likeText' => $data['likeText'] ?? null,
             'dislikeText' => $data['dislikeText'] ?? null,
-            'isLoggedIn' => $isLoggedIn,
-            'guestAllowed' => (bool)($data['allowGuestInteractions'] ?? false),
             'userVote' => $userVote,
-            'loginUrl' => $this->resolveLoginUrl(),
-            'guestInteractionMode' => $this->resolveGuestInteractionMode(),
-            'guestInteractionMessage' => $this->resolveGuestInteractionMessage(),
-            'guestInteractionMessageHtml' => $this->resolveGuestInteractionMessageHtml(),
-            'actionUrl' => UrlHelper::actionUrl('engagement/likes/cast-like'),
             'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
-        ]);
+        ]));
 
         return new Markup($html, Craft::$app->charset ?: 'UTF-8');
     }
@@ -193,10 +225,30 @@ class TwigService extends Component
             }
         }
 
-        $html = $this->renderPluginTemplate('engagement/favorites/_render/widget.twig', [
-            'elementId' => $data['elementId'] ?? null,
-            'fieldId' => $data['fieldId'] ?? null,
-            'siteId' => $data['siteId'] ?? Craft::$app->getSites()->getCurrentSite()->id,
+        $widgetMode = $this->resolveWidgetMode($options);
+        $context = $this->baseWidgetContext(
+            $data,
+            'favorite',
+            'engagement/favorites/toggle-favorite',
+            $isLoggedIn,
+            (bool)($data['allowGuestInteractions'] ?? false),
+        );
+        $context['widgetConfig'] = array_merge($context['widgetConfig'], [
+            'isFavorited' => $isFavorited,
+            'favoriteCount' => $data['favoriteCount'] ?? 0,
+            'headingText' => $data['headingText'] ?? '',
+            'favoriteText' => $data['favoriteText'] ?? '',
+            'unfavoriteText' => $data['unfavoriteText'] ?? '',
+            'beforeFavoriteColor' => $data['beforeFavoriteColor'] ?? '',
+            'afterFavoriteColor' => $data['afterFavoriteColor'] ?? '',
+            'fieldName' => $fieldName ?? Craft::t('engagement', 'Favorite'),
+            'updatedText' => Craft::t('engagement', 'Favorite updated.'),
+            'errorText' => Craft::t('engagement', 'Could not update favorite right now.'),
+        ]);
+
+        $html = $this->renderPluginTemplate('engagement/favorites/_render/widget.twig', array_merge($context, [
+            'widgetMode' => $widgetMode,
+            'widgetUid' => $widgetMode === 'deferred' ? $this->widgetUid('favorite', $data) : null,
             'label' => $fieldName ?? Craft::t('engagement', 'Favorite'),
             'icon' => $data['icon'] ?? 'heart',
             'emojiIcon' => $data['emojiIcon'] ?? '⭐',
@@ -207,16 +259,9 @@ class TwigService extends Component
             'headingText' => $data['headingText'] ?? null,
             'favoriteText' => $data['favoriteText'] ?? null,
             'unfavoriteText' => $data['unfavoriteText'] ?? null,
-            'isLoggedIn' => $isLoggedIn,
-            'guestAllowed' => (bool)($data['allowGuestInteractions'] ?? false),
             'isFavorited' => $isFavorited,
-            'loginUrl' => $this->resolveLoginUrl(),
-            'guestInteractionMode' => $this->resolveGuestInteractionMode(),
-            'guestInteractionMessage' => $this->resolveGuestInteractionMessage(),
-            'guestInteractionMessageHtml' => $this->resolveGuestInteractionMessageHtml(),
-            'actionUrl' => UrlHelper::actionUrl('engagement/favorites/toggle-favorite'),
             'widgetTemplates' => $this->resolveWidgetTemplateOverrides($options),
-        ]);
+        ]));
 
         return new Markup($html, Craft::$app->charset ?: 'UTF-8');
     }
@@ -471,6 +516,79 @@ class TwigService extends Component
         $settings = Plugin::getInstance()->getSettings();
 
         return $settings;
+    }
+
+    /** Register the external initializer in the current page response. */
+    public function registerDeferredAssets(): void
+    {
+        Craft::$app->getView()->registerAssetBundle(DeferredWidgetAsset::class);
+    }
+
+    /** @param array<string, mixed>|null $options */
+    private function resolveWidgetMode(?array $options): string
+    {
+        $mode = $options['mode'] ?? 'normal';
+
+        return in_array($mode, ['normal', 'deferred', 'shell'], true) ? $mode : 'normal';
+    }
+
+    /**
+     * Build the shared Twig variables and token-free client configuration.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function baseWidgetContext(
+        array $data,
+        string $type,
+        string $actionRoute,
+        bool $isLoggedIn,
+        bool $guestAllowed,
+    ): array {
+        $siteId = $data['siteId'] ?? Craft::$app->getSites()->getCurrentSite()->id;
+        $actionUrl = UrlHelper::actionUrl($actionRoute);
+        $loginUrl = $this->resolveLoginUrl();
+        $guestInteractionMode = $this->resolveGuestInteractionMode();
+        $guestInteractionMessage = $this->resolveGuestInteractionMessage();
+        $guestInteractionMessageHtml = $this->resolveGuestInteractionMessageHtml();
+
+        return [
+            'elementId' => $data['elementId'] ?? null,
+            'fieldId' => $data['fieldId'] ?? null,
+            'siteId' => $siteId,
+            'actionUrl' => $actionUrl,
+            'loginUrl' => $loginUrl,
+            'guestInteractionMode' => $guestInteractionMode,
+            'guestInteractionMessage' => $guestInteractionMessage,
+            'guestInteractionMessageHtml' => $guestInteractionMessageHtml,
+            'isLoggedIn' => $isLoggedIn,
+            'guestAllowed' => $guestAllowed,
+            'widgetConfig' => [
+                'type' => $type,
+                'elementId' => $data['elementId'] ?? null,
+                'fieldId' => $data['fieldId'] ?? null,
+                'siteId' => $siteId,
+                'actionUrl' => $actionUrl,
+                'csrfUrl' => UrlHelper::actionUrl('users/session-info'),
+                'isLoggedIn' => $isLoggedIn,
+                'guestAllowed' => $guestAllowed,
+                'loginUrl' => $loginUrl,
+                'guestInteractionMode' => $guestInteractionMode,
+                'guestInteractionMessageHtml' => $guestInteractionMessageHtml,
+            ],
+        ];
+    }
+
+    /** @param array<string, mixed> $data */
+    private function widgetUid(string $type, array $data): string
+    {
+        return sprintf(
+            'engagement-%s-%s-%s-%s',
+            $type,
+            $data['elementId'] ?? '0',
+            $data['fieldId'] ?? '0',
+            $data['siteId'] ?? Craft::$app->getSites()->getCurrentSite()->id,
+        );
     }
 
     /**
