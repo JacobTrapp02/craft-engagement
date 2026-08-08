@@ -5,10 +5,10 @@
   "license": "proprietary",
   "support": {
     "email": "jake.trapp02@gmail.com",
-    "issues": "https://github.com/jacobtrapp02/craft-engagement/issues?state=open",
-    "source": "https://github.com/jacobtrapp02/craft-engagement",
+    "issues": "https://github.com/JakeTrapp/craft-engagement/issues?state=open",
+    "source": "https://github.com/JakeTrapp/craft-engagement",
     "docs": "https://www.jtdevelop.com/development/plugins/engagement",
-    "rss": "https://github.com/jacobtrapp02/craft-engagement/releases.atom"
+    "rss": "https://github.com/JakeTrapp/craft-engagement/releases.atom"
   },
   "require": {
     "php": ">=8.2",
